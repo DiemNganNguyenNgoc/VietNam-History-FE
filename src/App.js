@@ -12,7 +12,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
         <Routes>
           {routes.map((route)=> {
             const Page=route.page
-            const Layout = route.isShowHeader ? DefaultComponent : Fragment
+            const Layout = route.isShowHeader  ? DefaultComponent : Fragment
             return (
               <Route path={route.path} element={
                 <Layout>

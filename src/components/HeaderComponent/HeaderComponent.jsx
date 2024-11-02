@@ -3,13 +3,13 @@ import Styles from '../../style';
 
 const HeaderComponent = () => {
   return (
-    <nav className="navbar" style={{ backgroundColor: '#023E73' }}>
+    <><nav className="navbar" style={{ backgroundColor: '#023E73' }} >
       <div class="container">
         <a className="navbar-brand" href="#">
           SHARING-CODE
         </a>
 
-        <input class="form-control" type="text" placeholder="Search question" style={{ width: '400px', height: '35px' }}></input>
+        <input class="form-control" type="text" placeholder="Search question" style={{ width: '500px', height: '35px' }}></input>
 
         <div>
           <div className="btn">
@@ -27,6 +27,42 @@ const HeaderComponent = () => {
         </div>
       </div>
     </nav>
+
+    {/* <hr style={{ background: 'black', height: '2px', border: 'none' }} /> */}
+
+      {/* Tại chưa dẫn link nên nó cảnh báo thôi, kh sao đâu nha */}
+      <nav className="navbar" style={{ backgroundColor: '#023E73', height: '50px' }}>
+        <div class="container">
+          <ul class="nav nav-underline">
+            <li class="nav-item">
+              <a class="nav-link" href="#" style={Styles.textHeader}>
+                Home
+              </a>
+            </li>
+          </ul>
+          <ul class="nav nav-underline">
+            <li class="nav-item">
+              <a class="nav-link" href="#" style={Styles.textHeader}>
+                Questions
+              </a>
+            </li>
+          </ul>
+          <ul class="nav nav-underline">
+            <li class="nav-item">
+              <a class="nav-link" href="#" style={Styles.textHeader}>
+                Tags
+              </a>
+            </li>
+          </ul>
+          <ul class="nav nav-underline">
+            <li class="nav-item">
+              <a class="nav-link" href="#" style={Styles.textHeader}>
+                Users
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav></>
   );
 }
 
