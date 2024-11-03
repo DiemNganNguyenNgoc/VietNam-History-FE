@@ -14,11 +14,13 @@ export const routes = [
   {
     path: "/signup",
     page: SignUpPage,
+    isShowHeader: true
   },
 
   {
     path: "/login",
     page: LogInPage,
+    isShowHeader: true
   },
   {
     path: '/question',

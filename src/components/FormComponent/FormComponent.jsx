@@ -1,8 +1,14 @@
 import React from "react";
+import "./FormComponent";
 
-const TextBoxComponent = (props) => {
+const FormComponent = (props) => {
   return (
-    <div className="mb-3">
+    <div className="mb-3" style={{
+      display: 'flex',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      width: '421px'
+    }}>
       <label htmlFor="exampleFormControlInput1" className="form-label">
         {props.label}
       </label>
@@ -16,4 +22,4 @@ const TextBoxComponent = (props) => {
   );
 };
 
-export default TextBoxComponent;
+export default FormComponent;

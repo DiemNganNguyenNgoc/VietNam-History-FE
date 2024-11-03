@@ -13,7 +13,14 @@ const Styles = {
         color: '#FFFFFF', 
         fontSize: '16px',
     },
+
+    title: {
+      fontSize: '50px',
+      color: '#023E73',
+      
+    }
 };
+
 
   export default Styles;
   
