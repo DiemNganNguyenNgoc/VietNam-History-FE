@@ -1,4 +1,5 @@
 import HomePage from "../pages/HomePage/HomePage";
+import QuestionPage from "../pages/QuestionPage/QuestionPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import LogInPage from "../pages/LogInPage/LogInPage";
@@ -27,6 +28,11 @@ export const routes = [
     isShowHeader: true,
   },
 
+  {
+    path: '/question',
+    page: QuestionPage,
+    isShowHeader: true
+},
   {
     path: "*",
     page: NotFoundPage,
