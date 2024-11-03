@@ -31,11 +31,12 @@ const HeaderComponent = () => {
     {/* <hr style={{ background: 'black', height: '2px', border: 'none' }} /> */}
 
       {/* Tại chưa dẫn link nên nó cảnh báo thôi, kh sao đâu nha */}
-      <nav className="navbar" style={{ backgroundColor: '#023E73', height: '50px' }}>
+      <nav className="navbar" style={{ backgroundColor: '#023E73', height: '65px' }}>
         <div class="container">
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
+                <i class="bi bi-house-door-fill" style={Styles.iconStyles}></i>
                 Home
               </a>
             </li>
@@ -43,6 +44,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
+                <i class="bi bi-chat-left-fill" style={Styles.iconStyles}></i>
                 Questions
               </a>
             </li>
@@ -50,6 +52,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
+                <i class="bi bi-tags-fill" style={Styles.iconStyles}></i>
                 Tags
               </a>
             </li>
@@ -57,6 +60,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
+                <i class="bi bi-people-fill" style={Styles.iconStyles}></i>
                 Users
               </a>
             </li>

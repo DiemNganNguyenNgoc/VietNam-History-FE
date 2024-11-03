@@ -2,14 +2,15 @@ import HomePage from "../pages/HomePage/HomePage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import LogInPage from "../pages/LogInPage/LogInPage";
+import ProfilePage from "../pages/ProfilePage/ProfilePage";
 
 export const routes = [
   {
-    path: "/",
+    path: "/homepage",
     page: HomePage,
     isShowHeader: true,
-    isShowMenu: true,
   },
+
   {
     path: "/signup",
     page: SignUpPage,
@@ -19,6 +20,13 @@ export const routes = [
     path: "/login",
     page: LogInPage,
   },
+
+  {
+    path: "/profilepage",
+    page: ProfilePage,
+    isShowHeader: true,
+  },
+
   {
     path: "*",
     page: NotFoundPage,
