@@ -13,16 +13,16 @@ const HeaderComponent = () => {
 
         <div>
           <div className="btn">
-            <i class="bi bi-person-circle" style={Styles.iconStyles}></i>
+            <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
           </div>
           <div className="btn">
-            <i class="bi bi-bell-fill" style={Styles.iconStyles}></i>
+            <i class="bi bi-bell-fill" style={Styles.iconHeader}></i>
           </div>
           <div className="btn">
-            <i class="bi bi-trophy-fill" style={Styles.iconStyles}></i>
+            <i class="bi bi-trophy-fill" style={Styles.iconHeader}></i>
           </div>
           <div className="btn">
-            <i class="bi bi-question-circle-fill" style={Styles.iconStyles}></i>
+            <i class="bi bi-question-circle-fill" style={Styles.iconHeader}></i>
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
-                <i class="bi bi-house-door-fill" style={Styles.iconStyles}></i>
+                <i class="bi bi-house-door-fill" style={Styles.iconHeader}></i>
                 Home
               </a>
             </li>
@@ -44,7 +44,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
-                <i class="bi bi-chat-left-fill" style={Styles.iconStyles}></i>
+                <i class="bi bi-chat-left-fill" style={Styles.iconHeader}></i>
                 Questions
               </a>
             </li>
@@ -52,7 +52,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
-                <i class="bi bi-tags-fill" style={Styles.iconStyles}></i>
+                <i class="bi bi-tags-fill" style={Styles.iconHeader}></i>
                 Tags
               </a>
             </li>
@@ -60,7 +60,7 @@ const HeaderComponent = () => {
           <ul class="nav nav-underline">
             <li class="nav-item">
               <a class="nav-link" href="#" style={Styles.textHeader}>
-                <i class="bi bi-people-fill" style={Styles.iconStyles}></i>
+                <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
               </a>
             </li>

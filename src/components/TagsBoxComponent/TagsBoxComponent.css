@@ -1,0 +1,32 @@
+.tagsname{
+    width: fit-content;
+    background-color: #C5E3FC;
+    border-radius: 10px;
+    padding: 5px 10px ;
+    /* margin-right: 5px;
+    margin-left: 10px; */
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
+.description{
+    font-size: 14px;
+    color: #033F74;
+}
+
+.quantity{
+    font-size: 14px;
+    color: #666666
+}
+
+.tags-box{
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #F2F5FF;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: #666666;
+    width: fit-content;
+}
