@@ -1,7 +1,7 @@
 import React from "react";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import FormComponent from "../../components/FormComponent/FormComponent";
-import Styles from "../../style";
+import { Styles } from "../../style";
 
 const LogInPage = () => {
   return (

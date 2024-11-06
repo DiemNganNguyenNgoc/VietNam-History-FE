@@ -1,28 +1,4 @@
-const Styles = {
-  iconHeader: {
-    color: '#FFFFFF',
-    fontSize: '24px',
-    marginRight: '8px',
-    marginLeft: '8px',
-  },
-
-<<<<<<< Updated upstream
-    textHeader:{
-        color: '#FFFFFF', 
-        fontSize: '20px',
-    },
-
-    title: {
-      fontSize: '50px',
-      color: '#023E73',
-      
-    }
-};
-
-
-  export default Styles;
-  
-=======
+ export const Styles={
   textHeader: {
     color: '#FFFFFF',
     fontSize: '20px',
@@ -44,7 +20,11 @@ const Styles = {
     marginRight: '8px',
     marginLeft: '8px',
   },
-};
 
-export default Styles;
->>>>>>> Stashed changes
+  iconHeader: {
+    color: '#FFFFFF',
+    fontSize: '24px',
+    marginRight: '8px',
+    marginLeft: '8px',
+  },
+};
