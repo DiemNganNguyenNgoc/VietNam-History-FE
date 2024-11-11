@@ -21,22 +21,36 @@ const tags = [
     description: "dafafa",
     quantity: 1314,
   },
+  {
+    id: 4,
+    tagsname: "Python",
+    description: "dafafa",
+    quantity: 1314,
+  },
+  {
+    id: 5,
+    tagsname: "Java",
+    description: "dafafa",
+    quantity: 1314,
+  },
 ];
 
 const TagsHolder = () => {
   return (
-    <div style={{ padding: '20px' }}>
-      {tags.map((tags) => (
-        <TagsBoxComponent
-          key={tags.id}
-          tagsname={tags.tagsname}
-          description={tags.description}
-          quantity={tags.quantity}
-        />
-      ))}
+    <div className="container" style={{ padding: '20px' }}>
+      <div className="row">
+        {tags.map((tag) => (
+          <div className="col-md-3 mb-4" key={tag.id}>
+            <TagsBoxComponent
+              tagsname={tag.tagsname}
+              description={tag.description}
+              quantity={tag.quantity}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default TagsHolder;
-

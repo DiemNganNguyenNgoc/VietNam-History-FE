@@ -4,7 +4,6 @@ import { routes } from './routes'
 import DefaultComponent from './components/DefaultComponent/DefaultComponent'
 import "./../node_modules/bootstrap/dist/css/bootstrap.min.css"
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
  function App() {
   return (
     <div>
@@ -12,7 +11,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
         <Routes>
           {routes.map((route)=> {
             const Page=route.page
-            const Layout = route.isShowHeader  ? DefaultComponent : Fragment
+            const Layout = route.isShowHeader ? DefaultComponent : Fragment
             return (
               <Route path={route.path} element={
                 <Layout>

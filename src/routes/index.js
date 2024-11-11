@@ -5,10 +5,11 @@ import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import LogInPage from "../pages/LogInPage/LogInPage";
 // import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import TagsPage from "../pages/TagsPage/TagsPage";
+import TagsDetailPage from "../pages/TagsDetailPage/TagsDetailPage";
 
 export const routes = [
   {
-    path: "/homepage",
+    path: "/home",
     page: HomePage,
     isShowHeader: true,
   },
@@ -38,7 +39,7 @@ export const routes = [
   },
 
   {
-    path: '/tagspage',
+    path: '/tags',
     page: TagsPage,
     isShowHeader: true
   },
@@ -46,5 +47,11 @@ export const routes = [
   {
     path: "*",
     page: NotFoundPage,
+  },
+
+  {
+    path: '/tagsdetail',
+    page: TagsDetailPage,
+    isShowHeader: true
   },
 ];

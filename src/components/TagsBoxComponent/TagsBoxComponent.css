@@ -20,13 +20,12 @@
     color: #666666
 }
 
-.tags-box{
-    display: flex;
-    border: 1px solid #ccc;
+.tags-box {
+    width: 250px;
+    height: 250px; /* Đặt chiều dài cố định */
+    padding: 20px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    background-color: #F2F5FF;
-    padding: 10px;
-    margin-bottom: 10px;
-    color: #666666;
-    width: fit-content;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
 }
