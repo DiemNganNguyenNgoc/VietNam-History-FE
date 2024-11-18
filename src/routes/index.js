@@ -3,13 +3,13 @@ import QuestionPage from "../pages/QuestionPage/QuestionPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import LogInPage from "../pages/LogInPage/LogInPage";
-// import ProfilePage from "../pages/ProfilePage/ProfilePage";
+import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import TagsPage from "../pages/TagsPage/TagsPage";
 import TagsDetailPage from "../pages/TagsDetailPage/TagsDetailPage";
 
 export const routes = [
   {
-    path: "/home",
+    path: "/",
     page: HomePage,
     isShowHeader: true,
   },
@@ -26,11 +26,11 @@ export const routes = [
     isShowHeader: true
   },
 
-  // {
-  //   path: "/profilepage",
-  //   page: ProfilePage,
-  //   isShowHeader: true,
-  // },
+  {
+    path: "/profile",
+    page: ProfilePage,
+    isShowHeader: true,
+  },
 
   {
     path: '/question',

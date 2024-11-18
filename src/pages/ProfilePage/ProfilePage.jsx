@@ -1,67 +1,74 @@
-// import React from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import ActivityTab from "./ActivityTab";
+import ProfileTab from "./ProfileTab";
 
-// const UserProfile = () => {
-//   return (
-//     <div className="container text-center">
-//       <div class="row" style={{ height: '100px' }}>
 
-//         <div class="col">
-//           <img src="..." class="img-thumbnail" alt="..." style={{ width: '100px', height: '100px' }} />
-//         </div>
 
-//         <div class="col">
-//           <div class="row">
-//             Username
-//           </div>
-//           <div class="col">
-//             <i class="bi bi-calendar"></i>
-//             Member for 10 days
-//           </div>
-//           <div className="col" >
-//             <i class="bi bi-clock" ></i>
-//             Recent access history: 01/01/2024
-//           </div>
-//         </div>
-//       </div>
+function ProfilePage() {
+  const [activeTab, setActiveTab] = useState("profile");
 
-//       <div>
-//         <div className="col">
-//           <nav class="nav nav-tabs nav-stacked">
-//             <a class="nav-link active" href="#profile">Profile</a>
-//             <a class="nav-link active" href="#activity">Activity</a>
-//           </nav>
+  return (
+    <div className="container mt-4">
+      {/* Avatar và Tên */}
+      <div className="row ">
+        <div className="col-3">
+          <img
+            src="https://via.placeholder.com/150"
+            alt="Avatar"
+            className="rounded-circle"
+          />
+          </div>
+          <div className="col-9">
+            <div className="row">
+          <h2 className="mt-3">Nguyễn Văn A</h2>
+          </div>
+          <div className="row">
+            <div className="col">
+          <i class="bi bi-calendar"></i>
+          <p>Member for 10 days</p>
+          </div>
+          <div className="col">
+          <i class="bi bi-clock-history"></i>
+          <p>Recent access history: 01/01/2024</p>
+          </div>
+          </div>
+          </div>
+      </div>
 
-//           <div class="tab-content">
-//             <div role="tabpanel" class="nav-link active" id="profile">
-//               <div className="col">
-//                 <div class="row">
-//                   <text style={{ fontSize: '20px' }}>Sumary</text>
-//                   <div class="card">
-//                     <div class="card-body">
-//                       <div class="container text-center">
-//                         <div class="row row-cols-2">
-//                           <div class="col">Column</div>
-//                           <div class="col">Column</div>
-//                           <div class="col">Column</div>
-//                           <div class="col">Column</div>
-//                         </div>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
+      {/* Tabs */}
+      <div className="row mt-4">
+        <div className="col-12">
+          <ul className="nav nav-tabs">
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "profile" ? "active" : ""}`}
+                onClick={() => setActiveTab("profile")}
+              >
+                Profile
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "activity" ? "active" : ""}`}
+                onClick={() => setActiveTab("activity")}
+              >
+                Activity
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-//             <div role="tabpanel" class="nav-link" id="list">
+      {/* Nội dung Tab */}
+      <div className="row mt-4">
+        <div className="col-12">
+          {activeTab === "profile" && <ProfileTab />}
+          {activeTab === "activity" && <ActivityTab />}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-//             </div>
-//           </div>
-
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default UserProfile;
+export default ProfilePage;

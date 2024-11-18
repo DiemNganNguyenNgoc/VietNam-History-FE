@@ -30,6 +30,7 @@ const QuestionPage = () => {
   };
 
   return (
+    <div className="container">
     <div
       style={{
         color: '#023E73',
@@ -73,6 +74,7 @@ const QuestionPage = () => {
         <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
       </div>
       <QuestionHolder />
+    </div>
     </div>
   );
 };

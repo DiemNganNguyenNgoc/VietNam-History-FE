@@ -26,6 +26,8 @@ const SignUpPage = () => {
         <h1
           className="title title_signup"
           style={{
+            fontSize:'25px',
+            fontWeight:'bold',
             marginBottom: "20px",
             textAlign: "center",
             color: "#003366",
@@ -83,21 +85,11 @@ const SignUpPage = () => {
             placeholder="Enter your address"
           ></FormComponent>
 
-          <ButtonComponent
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#5C9EAD",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              marginTop: "10px",
-            }}
-          >
-            Sign Up
-          </ButtonComponent>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <ButtonComponent
+              textButton="Sign Up"
+            />
+          </div>
         </form>
         <div
           style={{
@@ -108,7 +100,7 @@ const SignUpPage = () => {
           }}
         >
           You already have an account?{" "}
-          <a
+          <a className="text-decoration-underline"
             href="./login"
             style={{
               color: "#003366",
