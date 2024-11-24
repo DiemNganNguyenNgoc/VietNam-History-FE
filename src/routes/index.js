@@ -6,6 +6,7 @@ import LogInPage from "../pages/LogInPage/LogInPage";
 import ProfilePage from "../pages/ProfilePage/ProfilePage";
 import TagsPage from "../pages/TagsPage/TagsPage";
 import TagsDetailPage from "../pages/TagsDetailPage/TagsDetailPage";
+import OtherUserProfilePage from "../pages/OtherUserProfilePage/OtherUserProfilePage";
 
 export const routes = [
   {
@@ -52,6 +53,12 @@ export const routes = [
   {
     path: '/tagsdetail',
     page: TagsDetailPage,
+    isShowHeader: true
+  },
+
+  {
+    path: '/otheruserprofile',
+    page: OtherUserProfilePage,
     isShowHeader: true
   },
 ];

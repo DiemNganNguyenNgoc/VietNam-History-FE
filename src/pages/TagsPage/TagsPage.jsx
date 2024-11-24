@@ -15,13 +15,15 @@ const TagsPage = () => {
                         <input className="form-control" type="text" placeholder="Search tag by name" style={{ width: '300px', height: '35px' }} />
                     </div>
                     <div className="col">
-                        <SortBtn_Tags />
+                        <SortBtn_Tags/>
                     </div>
                 </div>
             </div>
 
-            <div className="container text-left">
+            <div className="container ">
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-5">
                 <TagsHolder />
+                </div>
             </div>
         </>
     );

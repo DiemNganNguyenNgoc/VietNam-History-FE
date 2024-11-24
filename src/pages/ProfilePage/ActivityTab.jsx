@@ -1,42 +1,17 @@
-import React, { useState } from 'react'
-import '../../css/ProfilePage.css'
-import ProfileReputation from '../../components/ProfileReputation/ProfileReputation';
+import React, { useState } from 'react';
+import '../../css/ProfilePage.css';
+import ReputationSubTab from './ReputationSubTab';
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
 
-  const dataReputation={
-    totalPoints: 100,
-    date: '2024-11-18',
-    details: [
-      { type: 'add', points: 20, description: 'Điểm thưởng' },
-      { type: 'subtract', points: 10, description: 'Điểm trừ vì vi phạm' },
-      { type: 'add', points: 30, description: 'Điểm thưởng do hoàn thành nhiệm vụ' },
-    ]
-  }
-
-  const reputationContent =(
-    <>
-    <h3 className="title-profile" style={{marginLeft:'12px', marginBottom:'20px'}}>Reputation 280</h3>
-    {[...Array(5)].map((_, index) => (
-                    <ProfileReputation 
-                    key={index}
-                    totalPoints={dataReputation.totalPoints}
-                    date={dataReputation.date}
-                    details={dataReputation.details}
-                  />
-                ))}
-    
-    </>
-  )
-
   return (
-    <div className="d-flex">
+    <div className="d-flex" >
       {/* Tabs dọc */}
       <div className="nav flex-column nav-pills me-3" style={{ width: '200px' }}>
         <button 
           className={`nav-link ${activeTab === "questions" ? "active" : ""}`}
-          onClick={() => setActiveTab("questions")}
+          onClick={() => setActiveTab("questions")} 
         >
           Questions
         </button>
@@ -100,7 +75,7 @@ const ActivityTab = () => {
           {activeTab === "saved" && <div>Saved Content</div>}
           {activeTab === "followers" && <div>Followers Content</div>}
           {activeTab === "following" && <div>Following Content</div>}
-          {activeTab === "reputation" && <div>{reputationContent}</div>}
+          {activeTab === "reputation" && <ReputationSubTab/>}
           {activeTab === "voted" && <div>Voted Content</div>}
         </div>
       </div>

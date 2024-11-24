@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-const ScoreStatistics = ({ totalPoints, date, details }) => {
+const ProfileReputation = ({ totalPoints, date, details }) => {
   const [collapse, setCollapse] = useState(false);
 
   const toggleCollapse = () => setCollapse(!collapse);
 
   return (
     <div className="container">
-          <div className="card">
+          <div className="card" >
             <div className="card-header">
               <h5>
                 <div className="row">
@@ -19,10 +19,10 @@ const ScoreStatistics = ({ totalPoints, date, details }) => {
                   {collapse ? <i class="bi bi-caret-up-fill"></i> : <i class="bi bi-caret-down-fill"></i>}
                 </button>
                 </div>
-                <div className="col">
+                <div className="col" >
                 Tổng điểm: {totalPoints} 
                 </div>
-                <div className="col">
+                <div className="col" >
                 Ngày: {date}
                 </div>
                 </div>
@@ -32,7 +32,7 @@ const ScoreStatistics = ({ totalPoints, date, details }) => {
               <div className="card-body">
                 <div>
                   {details.map((item, index) => (
-                    <li key={index} className={`text-${item.type === 'add' ? 'success' : 'danger'}`}>
+                    <li key={index} className={`text-${item.type === 'add' ? 'primary' : 'danger'}`}>
                       {item.type === 'add' ? '+' : '-'} {item.points} điểm: {item.description}
                     </li>
                   ))}
@@ -45,4 +45,4 @@ const ScoreStatistics = ({ totalPoints, date, details }) => {
   );
 };
 
-export default ScoreStatistics;
+export default ProfileReputation;

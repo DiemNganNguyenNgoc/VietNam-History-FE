@@ -30,9 +30,8 @@
     margin-left: 13px;
 }
 
-/* Thêm vào CSS */
 .nav-link.active {
-    background-color: #003366 !important; /* Chuyển sang màu đỏ khi active */
-    color: white !important; /* Đảm bảo chữ màu trắng */
+    background-color: #003366 !important; 
+    color: white !important; 
   }
   
