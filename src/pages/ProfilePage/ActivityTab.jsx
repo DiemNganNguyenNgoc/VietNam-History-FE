@@ -3,6 +3,9 @@ import "../../css/ProfilePage.css";
 import ReputationSubTab from "./ReputationSubTab";
 import FollowerSubTab from "./FollowerSubTab";
 import FollowingSubTab from "./FollowingSubTab";
+import QuestionSubTab from "./QuestionSubTab";
+import AnswerSubTab from "./AnswerSubTab";
+import TagSubTab from "./TagSubTab";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
@@ -33,10 +36,10 @@ const ActivityTab = () => {
           Responses
         </button>
         <button
-          className={`nav-link ${activeTab === "tabs" ? "active" : ""}`}
-          onClick={() => setActiveTab("tabs")}
+          className={`nav-link ${activeTab === "tags" ? "active" : ""}`}
+          onClick={() => setActiveTab("tags")}
         >
-          Tabs
+          Tags
         </button>
         <button
           className={`nav-link ${activeTab === "saved" ? "active" : ""}`}
@@ -73,10 +76,10 @@ const ActivityTab = () => {
       {/* Nội dung Tab */}
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
-          {activeTab === "questions" && <div>Questions Content</div>}
-          {activeTab === "answers" && <div>Answers Content</div>}
+          {activeTab === "questions" && <QuestionSubTab />}
+          {activeTab === "answers" && <AnswerSubTab />}
           {activeTab === "responses" && <div>Responses Content</div>}
-          {activeTab === "tabs" && <div>Tabs Content</div>}
+          {activeTab === "tags" && <TagSubTab />}
           {activeTab === "saved" && <div>Saved Content</div>}
           {activeTab === "followers" && <FollowerSubTab />}
           {activeTab === "following" && <FollowingSubTab />}

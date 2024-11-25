@@ -12,6 +12,7 @@ import StatisticQuestionPage from "../pages/StatisticPage/StatisticQuestionPage"
 import StatisticUserPage from "../pages/StatisticPage/StatisticUserPage";
 import StatisticTopicPage from "../pages/StatisticPage/StatisticTopicPage";
 import StatisticActivityPage from "../pages/StatisticPage/StatisticActivityPage";
+import AskQuestionPage from "../pages/AskQuestionPage/AskQuestionPage";
 
 export const routes = [
   {
@@ -95,5 +96,10 @@ export const routes = [
     path: "/otheruserprofile",
     page: OtherUserProfilePage,
     isShowHeader: true,
+  },
+  {
+    path: '/askquestion',
+    page: AskQuestionPage,
+    isShowHeader: true
   },
 ];
