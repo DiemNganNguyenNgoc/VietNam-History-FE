@@ -18,13 +18,13 @@ export const routes = [
   {
     path: "/signup",
     page: SignUpPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 
   {
     path: "/login",
     page: LogInPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 
   {
@@ -34,16 +34,17 @@ export const routes = [
   },
 
   {
-    path: '/question',
+    path: "/question",
     page: QuestionPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 
   {
-    path: '/tags',
+    path: "/tags",
     page: TagsPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
+
 
   {
     path: "*",
@@ -51,14 +52,14 @@ export const routes = [
   },
 
   {
-    path: '/tagsdetail',
+    path: "/tagsdetail",
     page: TagsDetailPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 
   {
-    path: '/otheruserprofile',
+    path: "/otheruserprofile",
     page: OtherUserProfilePage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 ];

@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
-import '../../css/ProfilePage.css';
-import ReputationSubTab from './ReputationSubTab';
+import React, { useState } from "react";
+import "../../css/ProfilePage.css";
+import ReputationSubTab from "./ReputationSubTab";
+import FollowerSubTab from "./FollowerSubTab";
+import FollowingSubTab from "./FollowingSubTab";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
 
   return (
-    <div className="d-flex" >
+    <div className="d-flex">
       {/* Tabs dọc */}
-      <div className="nav flex-column nav-pills me-3" style={{ width: '200px' }}>
-        <button 
+      <div
+        className="nav flex-column nav-pills me-3"
+        style={{ width: "200px" }}
+      >
+        <button
           className={`nav-link ${activeTab === "questions" ? "active" : ""}`}
-          onClick={() => setActiveTab("questions")} 
+          onClick={() => setActiveTab("questions")}
         >
           Questions
         </button>
@@ -73,14 +78,14 @@ const ActivityTab = () => {
           {activeTab === "responses" && <div>Responses Content</div>}
           {activeTab === "tabs" && <div>Tabs Content</div>}
           {activeTab === "saved" && <div>Saved Content</div>}
-          {activeTab === "followers" && <div>Followers Content</div>}
-          {activeTab === "following" && <div>Following Content</div>}
-          {activeTab === "reputation" && <ReputationSubTab/>}
+          {activeTab === "followers" && <FollowerSubTab />}
+          {activeTab === "following" && <FollowingSubTab />}
+          {activeTab === "reputation" && <ReputationSubTab />}
           {activeTab === "voted" && <div>Voted Content</div>}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ActivityTab;
