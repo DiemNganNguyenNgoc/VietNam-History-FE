@@ -1,25 +1,9 @@
 import React from 'react';
 import './QuestionBox.css';
-import img1 from "../../assets/image/avatar_1.jpg";
 
-const QuestionBox = ({ username, reputation, followers, title, tags, date, views, answers, likes }) => {
+const QuestionBox = ({ title, tags, date, views, answers, likes }) => {
   return (
     <div className="question-box">
-      <div className="user-info">
-        <div className="icon-container">
-          <img className="icon-styles" src={img1} alt="avatar"></img>
-        </div>
-        <span className="username">{username}</span>
-        <div className="details-container">
-          <span className="detail-item">
-            <i className="bi bi-trophy-fill trophy-icon"></i> {reputation}
-          </span>
-          <span className="detail-item">
-            <i className="bi bi-heart-fill heart-icon"></i> {followers}
-          </span>
-        </div>
-      </div>
-      <div className="divider"></div>
       <div className="question-content">
         <div className="question-details">
           <span className="detail-item">{views} views</span>
