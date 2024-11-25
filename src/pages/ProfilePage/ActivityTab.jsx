@@ -3,6 +3,7 @@ import "../../css/ProfilePage.css";
 import ReputationSubTab from "./ReputationSubTab";
 import FollowerSubTab from "./FollowerSubTab";
 import FollowingSubTab from "./FollowingSubTab";
+import ResponsesSubTab from "./ResponsesSubTab";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
@@ -75,7 +76,7 @@ const ActivityTab = () => {
         <div className="tab-pane fade show active">
           {activeTab === "questions" && <div>Questions Content</div>}
           {activeTab === "answers" && <div>Answers Content</div>}
-          {activeTab === "responses" && <div>Responses Content</div>}
+          {activeTab === "responses" && <div><ResponsesSubTab/></div>}
           {activeTab === "tabs" && <div>Tabs Content</div>}
           {activeTab === "saved" && <div>Saved Content</div>}
           {activeTab === "followers" && <FollowerSubTab />}

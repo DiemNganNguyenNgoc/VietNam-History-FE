@@ -3,7 +3,8 @@
     display: flex;                 
     justify-content: center;        
     align-items: center;            
-    height: 257px;                  
+    height: 257px;    
+    width: 100%;              
   }
   
   .slider-image {
