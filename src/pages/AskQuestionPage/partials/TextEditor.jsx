@@ -7,8 +7,11 @@ const TextEditor = ({ value, onChange, placeholder }) => {
     toolbar: [
       ['bold', 'italic', 'underline'],
       [{ 'list': 'bullet' }],
-      ['link'],
       [{ 'align': [] }],
+      ['blockquote'],
+      ['link'],
+      ['image'],
+      ['code'],
     ],
   };
 
