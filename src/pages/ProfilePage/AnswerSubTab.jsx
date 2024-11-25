@@ -7,7 +7,7 @@ const AnswerSubTab = (answerQuantity) => {
   return (
     <div>
       <div className="title">
-        <h3>Questions {answerQuantity} </h3>
+        <h3>Answers {answerQuantity} </h3>
       </div>
       <div className="answer-list">
         <QuestionHolder></QuestionHolder>
