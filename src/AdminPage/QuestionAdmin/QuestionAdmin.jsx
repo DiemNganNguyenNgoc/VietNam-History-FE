@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import AskQuestionBtn from '../../components/AskQuestionBtn/AskQuestionBtn';
-import SortBtn from '../../components/SortBtn/SortBtn';
+import SortBtnAdmin from '../../components/SortBtnAdmin/SortBtnAdmin'
 import QuestionFilter from '../../components/QuestionFilter/QuestionFilter';
-import QuestionHolder from '../../components/QuestionHolder/QuestionHolder';
+import QuestionHolderAdmin from '../../components/QuestionHolderAdmin/QuestionHolderAdmin';
 
-const QuestionPage = () => {
+const QuestionAdmin = () => {
   const [filters, setFilters] = useState({
     no_answers: false,
     no_accepted_answer: false,
@@ -69,15 +69,15 @@ const QuestionPage = () => {
         2,535,460 questions
       </p>
       <br/>
-      <SortBtn />
+      <SortBtnAdmin></SortBtnAdmin>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', width: '100%' }}>
         <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
       </div>
-      <QuestionHolder />
+      <QuestionHolderAdmin />
     </div>
     </div>
   );
 };
 
-export default QuestionPage;
+export default QuestionAdmin;

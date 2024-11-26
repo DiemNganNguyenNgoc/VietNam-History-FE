@@ -13,6 +13,8 @@ import StatisticUserPage from "../pages/StatisticPage/StatisticUserPage";
 import StatisticTopicPage from "../pages/StatisticPage/StatisticTopicPage";
 import StatisticActivityPage from "../pages/StatisticPage/StatisticActivityPage";
 import AskQuestionPage from "../pages/AskQuestionPage/AskQuestionPage";
+import ProfileAdmin from "../AdminPage/ProfileAdmin/Profile_Admin";
+import QuestionAdmin from "../AdminPage/QuestionAdmin/QuestionAdmin";
 
 export const routes = [
   {
@@ -102,4 +104,16 @@ export const routes = [
     page: AskQuestionPage,
     isShowHeader: true
   },
+
+  {
+    path: "/profile/admin",
+    page: ProfileAdmin,
+    isShowHeader: true,
+  },
+  {
+    path: "/question/admin",
+    page: QuestionAdmin,
+    isShowHeader: true,
+  },
+
 ];
