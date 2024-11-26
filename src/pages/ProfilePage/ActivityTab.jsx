@@ -7,6 +7,8 @@ import ResponsesSubTab from "./ResponsesSubTab";
 import QuestionSubTab from "./QuestionSubTab";
 import AnswerSubTab from "./AnswerSubTab";
 import TagSubTab from "./TagSubTab";
+import SaveSubTab from "./SaveSubTab";
+import VoteSubTab from "./VoteSubTab";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
@@ -86,11 +88,11 @@ const ActivityTab = () => {
           {activeTab === "answers" && <AnswerSubTab />}
           {activeTab === "responses" && <div>Responses Content</div>}
           {activeTab === "tags" && <TagSubTab />}
-          {activeTab === "saved" && <div>Saved Content</div>}
+          {activeTab === "saved" && <SaveSubTab/>}
           {activeTab === "followers" && <FollowerSubTab />}
           {activeTab === "following" && <FollowingSubTab />}
           {activeTab === "reputation" && <ReputationSubTab />}
-          {activeTab === "voted" && <div>Voted Content</div>}
+          {activeTab === "voted" && <VoteSubTab/>}
         </div>
       </div>
     </div>

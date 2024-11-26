@@ -16,6 +16,9 @@ import AskQuestionPage from "../pages/AskQuestionPage/AskQuestionPage";
 import ProfileAdmin from "../AdminPage/ProfileAdmin/Profile_Admin";
 import QuestionAdmin from "../AdminPage/QuestionAdmin/QuestionAdmin";
 import UsersAdmin from "../AdminPage/UsersAdmin/UsersAdmin"
+import QuestionDetailPage from "../pages/QuestionDetailPage/QuestionDetailPage";
+import QuestionDetailAdmin from "../AdminPage/QuestionDetailAdmin/QuestionDetailAdmin";
+import TagAdmin from "../AdminPage/TagAdmin/TagAdmin";
 export const routes = [
   {
     path: "/",
@@ -118,6 +121,21 @@ export const routes = [
   {
     path: "/user/admin",
     page: UsersAdmin,
+    isShowHeader: true,
+  },
+  {
+    path: "/questiondetail",
+    page: QuestionDetailPage,
+    isShowHeader: true,
+  },
+  {
+    path: "/questiondetail/admin",
+    page: QuestionDetailAdmin,
+    isShowHeader: true,
+  },
+  {
+    path: "/tag/admin",
+    page: TagAdmin,
     isShowHeader: true,
   },
 ];
