@@ -15,7 +15,7 @@ import StatisticActivityPage from "../pages/StatisticPage/StatisticActivityPage"
 import AskQuestionPage from "../pages/AskQuestionPage/AskQuestionPage";
 import ProfileAdmin from "../AdminPage/ProfileAdmin/Profile_Admin";
 import QuestionAdmin from "../AdminPage/QuestionAdmin/QuestionAdmin";
-
+import UsersAdmin from "../AdminPage/UsersAdmin/UsersAdmin"
 export const routes = [
   {
     path: "/",
@@ -115,5 +115,9 @@ export const routes = [
     page: QuestionAdmin,
     isShowHeader: true,
   },
-
+  {
+    path: "/user/admin",
+    page: UsersAdmin,
+    isShowHeader: true,
+  },
 ];
