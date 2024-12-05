@@ -51,7 +51,7 @@ export const routes = [
   },
 
   {
-    path: "/tags",
+    path: "/tag",
     page: TagsPage,
     isShowHeader: true,
   },

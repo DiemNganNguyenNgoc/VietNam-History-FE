@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ButtonComponent = ({ textButton, icon, ...rests }) => {
+const ButtonComponent = (props) => {
   const [hover, setHover] = useState(false);
 
   return (
@@ -14,9 +14,10 @@ const ButtonComponent = ({ textButton, icon, ...rests }) => {
       }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={props.onClick}
     >
-      <span>{textButton}</span>
-      {icon && <span style={{ fontSize: '20px', marginLeft: '8px' }}>{icon}</span>}
+      <span>{props.textButton}</span>
+      {props.icon && <span style={{ fontSize: '20px', marginLeft: '8px' }}>{props.icon}</span>}
     </button>
   );
 };

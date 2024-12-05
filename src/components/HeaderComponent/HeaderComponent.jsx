@@ -35,7 +35,7 @@ const HeaderComponent = () => {
         <div class="container">
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="#" style={Styles.textHeader}>
+              <a class="nav-link" href="/" style={Styles.textHeader}>
                 <i class="bi bi-house-door-fill" style={Styles.iconHeader}></i>
                 Home
               </a>
@@ -43,7 +43,7 @@ const HeaderComponent = () => {
           </ul>
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="#" style={Styles.textHeader}>
+              <a class="nav-link" href="/question" style={Styles.textHeader}>
                 <i class="bi bi-chat-left-fill" style={Styles.iconHeader}></i>
                 Questions
               </a>
@@ -51,7 +51,7 @@ const HeaderComponent = () => {
           </ul>
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="#" style={Styles.textHeader}>
+              <a class="nav-link" href="/tag" style={Styles.textHeader}>
                 <i class="bi bi-tags-fill" style={Styles.iconHeader}></i>
                 Tags
               </a>
@@ -59,7 +59,7 @@ const HeaderComponent = () => {
           </ul>
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="#" style={Styles.textHeader}>
+              <a class="nav-link" href="/profile" style={Styles.textHeader}>
                 <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
               </a>
