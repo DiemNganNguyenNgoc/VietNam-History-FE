@@ -1,12 +1,18 @@
 import React from "react";
 
 const FormComponent = (props) => {
-    const handleOnChangeInput=(e)=>{
-        props.onChange(e.target.value)
-    }
+    const handleOnChangeInput = (e) => {
+        props.onChange(e.target.value); // Gọi props.onChange và truyền giá trị
+    };
+
     return (
         <div style={{ marginBottom: '10px' }}>
-            <label className="form-label" style={{ display: 'block', marginBottom: '5px', fontSize: '16px' }}>{props.label}</label>
+            <label
+                className="form-label"
+                style={{ display: 'block', marginBottom: '5px', fontSize: '16px' }}
+            >
+                {props.label}
+            </label>
             <input
                 value={props.value}
                 placeholder={props.placeholder}
@@ -20,7 +26,6 @@ const FormComponent = (props) => {
                     border: 'none',
                     borderRadius: '10px',
                 }}
-
                 onChange={handleOnChangeInput}
             />
         </div>

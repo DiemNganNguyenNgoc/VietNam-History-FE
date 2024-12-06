@@ -1,112 +1,82 @@
 import React, { useEffect, useState } from 'react';
-import SortBtn_Tags from '../../components/SortBtn/SortBtn_Tags';
-import TagsBoxComponent from '../../components/TagsBoxComponent/TagsBoxComponent';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import FormComponent from '../../components/FormComponent/FormComponent';
+import * as message from "../../components/MessageComponent/MessageComponent";
 import ModalComponent from '../../components/ModalComponent/ModalComponent';
-import { useNavigate } from 'react-router-dom';
+import SortBtn_Tags from '../../components/SortBtn/SortBtn_Tags';
+import TagsBoxComponent from '../../components/TagsBoxComponent/TagsBoxComponent';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as TagService from '../../services/TagService';
-import * as message from "../../components/MessageComponent/MessageComponent"
+import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
+import { useNavigate } from 'react-router-dom';
 
 const TagsPage = () => {
+    const tag = [
+        {
+            id: 1,
+            tagsname: "javascript",
+            description: "JavaScript (a dialect of ECMAScript) is a high-level, multi-paradigm, object-oriented, prototype-based, dynamically-typed, and interpreted language traditionally used for client-side scripting in web browsers.",
+            quantity: 1314,
+        },
+        {
+            id: 2,
+            tagsname: "python",
+            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
+            quantity: 1024,
+        },
+        {
+            id: 4,
+            tagsname: "python",
+            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
+            quantity: 1024,
+        },
+        {
+            id: 5,
+            tagsname: "python",
+            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
+            quantity: 1024,
+        },
+        {
+            id: 6,
+            tagsname: "python",
+            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
+            quantity: 1024,
+        }
+    ];
+
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-
-
+    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+
     const mutation = useMutationHook(data => TagService.addTag(data));
-    const { data, isLoading, isSuccess, isError } = mutation
+    const { data, isLoading, isSuccess, isError } = mutation;
 
     useEffect(() => {
         if (isSuccess) {
-            message.success()
-        } else if (isError) {
-            message.error()
+            message.success();
         }
-    }, [isError, isSuccess, navigate])
+        if (isError) {
+            message.error();
+        }
+    }, [isSuccess, isError, navigate]);
 
     const handleOnChangeName = (value) => setName(value);
     const handleOnChangeDes = (value) => setDescription(value);
 
-    const tag = [{
-        id: 1,
-        tagsname: "javascript",
-        description: "JavaScript (a dialect of ECMAScript) is a high-level, multi-paradigm, object-oriented, prototype-based, dynamically-typed, and interpreted language traditionally used for client-side scripting in web browsers.",
-        quantity: 1314,
-    },
-    {
-        id: 2,
-        tagsname: "python",
-        description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-        quantity: 1024,
-    },
-    {
-        id: 4,
-        tagsname: "python",
-        description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-        quantity: 1024,
-    },
-    {
-        id: 5,
-        tagsname: "python",
-        description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-        quantity: 1024,
-    },
-    {
-        id: 6,
-        tagsname: "python",
-        description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-        quantity: 1024,
-    }
-    ];
-    const [showModal, setShowModal] = useState(false);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalBody, setModalBody] = useState(null);
-    const [textButton1, setTextButton1] = useState(''); // Nút Lưu/Cập nhật
-    const [onSave, setOnSave] = useState(() => () => { });
-    const [onCancel, setOnCancel] = useState(() => () => { });
-
-    // Hàm mở modal thêm danh mục
     const handleAddTag = () => {
-        setModalTitle('ADD NEW TAG');
-        setModalBody(
-            <>
-                <FormComponent
-                    id="nameTagInput"
-                    label="Name"
-                    type="text"
-                    placeholder="Enter tag's name"
-                    value={name}
-                    onChange={handleOnChangeName}
-                />
-                <FormComponent
-                    id="descTagInput"
-                    label="Description"
-                    type="text"
-                    placeholder="Enter description"
-                    value={description}
-                    onChange={handleOnChangeDes}
-                />
-                {data?.status === 'ERR' &&
-                    <span style={{ color: "red", fontSize: "16px" }}>{data?.message}</span>}
-            </>
-        );
-
-        setTextButton1('Add'); // Đặt nút là "Thêm"
-        setOnSave(() => () => {
-            mutation.mutate({ name, description })
-            console.log('info',name, description);
-            alert('A new tag has been added!');
-            setShowModal(false);
-        });
-        setOnCancel(() => () => {
-            alert('Cancel adding the tag!');
-            setShowModal(false);
-        });
-        setShowModal(true);
+        setShowModal(true); // Mở modal khi muốn thêm tag
     };
 
+    const onSave = async () => {
+            await mutation.mutateAsync({ name, description });
+
+    };
+
+    const onCancel = () => {
+        alert('Cancel adding the tag!');
+        setShowModal(false);
+    };
 
     return (
         <>
@@ -118,7 +88,7 @@ const TagsPage = () => {
                     <div className="col-6 d-flex justify-content-end" style={{ marginTop: '30px' }}>
                         <div style={{ marginLeft: 'auto' }}>
                             <ButtonComponent
-                                textButton="Thêm danh mục"
+                                textButton="Add new tag"
                                 icon={<i className="bi bi-plus-circle"></i>}
                                 onClick={handleAddTag}
                             />
@@ -132,7 +102,6 @@ const TagsPage = () => {
                     <div className="col-6">
                         <input className="form-control" type="text" placeholder="Search tag by name" style={{ width: '300px', height: '35px' }} />
                     </div>
-                    {/* Căn nút SortBtn_Tags ra lề phải màn hình */}
                     <div className="col d-flex justify-content-end" style={{ marginTop: '30px' }}>
                         <div style={{ marginLeft: 'auto' }}>
                             <SortBtn_Tags />
@@ -155,14 +124,39 @@ const TagsPage = () => {
                 </div>
             </div>
 
+            {/* Modal để thêm tag mới */}
             <ModalComponent
                 isOpen={showModal}
-                title={modalTitle}
-                body={modalBody}
-                textButton1={textButton1}
+                title="ADD NEW TAG"
+                body={
+                    <>
+                        <FormComponent
+                            id="nameTagInput"
+                            label="Name"
+                            type="text"
+                            placeholder="Enter tag's name"
+                            value={name}
+                            onChange={handleOnChangeName}
+                        />
+                        <FormComponent
+                            id="descTagInput"
+                            label="Description"
+                            type="text"
+                            placeholder="Enter description"
+                            value={description}
+                            onChange={handleOnChangeDes}
+                        />
+                        {data?.status === 'ERR' &&
+                            <span style={{ color: "red", fontSize: "16px" }}>{data?.message}</span>}
+                    </>
+                }
+                textButton1="Add"
                 onClick1={onSave}
                 onClick2={onCancel}
             />
+
+            {/* Hiển thị Loading Spinner nếu đang xử lý */}
+            {isLoading && <LoadingComponent />}
         </>
     );
 };
