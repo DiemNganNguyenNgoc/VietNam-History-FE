@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import FormComponent from '../../components/FormComponent/FormComponent';
 import * as message from "../../components/MessageComponent/MessageComponent";
@@ -7,74 +8,63 @@ import SortBtn_Tags from '../../components/SortBtn/SortBtn_Tags';
 import TagsBoxComponent from '../../components/TagsBoxComponent/TagsBoxComponent';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as TagService from '../../services/TagService';
+import { useQuery } from '@tanstack/react-query';
 import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
-import { useNavigate } from 'react-router-dom';
 
 const TagsPage = () => {
-    const tag = [
-        {
-            id: 1,
-            tagsname: "javascript",
-            description: "JavaScript (a dialect of ECMAScript) is a high-level, multi-paradigm, object-oriented, prototype-based, dynamically-typed, and interpreted language traditionally used for client-side scripting in web browsers.",
-            quantity: 1314,
-        },
-        {
-            id: 2,
-            tagsname: "python",
-            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-            quantity: 1024,
-        },
-        {
-            id: 4,
-            tagsname: "python",
-            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-            quantity: 1024,
-        },
-        {
-            id: 5,
-            tagsname: "python",
-            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-            quantity: 1024,
-        },
-        {
-            id: 6,
-            tagsname: "python",
-            description: "Python is a high-level, interpreted, general-purpose programming language. It emphasizes readability and supports multiple programming paradigms.",
-            quantity: 1024,
-        }
-    ];
-
+    //state cho form
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+    const handleOnChangeName = (value) => setName(value);
+    const handleOnChangeDes = (value) => setDescription(value);
 
+    // Hàm reset form
+    const resetForm = () => {
+        setName('');
+        setDescription('');
+    };
+
+    // Mutation để thêm tag
     const mutation = useMutationHook(data => TagService.addTag(data));
     const { data, isLoading, isSuccess, isError } = mutation;
 
+    // Lấy danh sách đơn vị từ API
+    const getAllTag = async () => {
+        const res = await TagService.getAllTag();
+        return res.data;
+    };
+
+    const { isLoading: isLoadingTag, data: tags } = useQuery({
+        queryKey: ['tags'],
+        queryFn: getAllTag,
+    });
+
     useEffect(() => {
-        if (isSuccess) {
+        if (isSuccess && data?.status !== 'ERR') {
             message.success();
+            alert('Add new tag successfully!');
+            resetForm();
+            setShowModal(false);
         }
         if (isError) {
             message.error();
         }
     }, [isSuccess, isError, navigate]);
 
-    const handleOnChangeName = (value) => setName(value);
-    const handleOnChangeDes = (value) => setDescription(value);
-
     const handleAddTag = () => {
         setShowModal(true); // Mở modal khi muốn thêm tag
     };
 
     const onSave = async () => {
-            await mutation.mutateAsync({ name, description });
+        await mutation.mutateAsync({ name, description });
 
     };
 
     const onCancel = () => {
         alert('Cancel adding the tag!');
+        resetForm();
         setShowModal(false);
     };
 
@@ -112,15 +102,38 @@ const TagsPage = () => {
 
             <div className="container">
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-5">
-                    {tag.map((tag) => (
-                        <div className="col-6 col-md-4 col-lg-2 mb-4" key={tag.id}>
+                    {isLoadingTag ? (
+                        <tr>
+                            <td colSpan="4" className="text-center">
+                                <LoadingComponent />
+                            </td>
+                        </tr>
+                    ) : tags && tags.length > 0 ? (
+                        tags.map((tag) => (
+                            <div className="col-6 col-md-4 col-lg-2 mb-4" key={tag._id}>
+                                <TagsBoxComponent
+                                    tagsname={tag.name}
+                                    description={tag.description}
+                                    // quantity={tag.quantity}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" className="text-center">
+                                Không có dữ liệu để hiển thị.
+                            </td>
+                        </tr>
+                    )}
+                    {/* {tags.map((tag) => (
+                        <div className="col-6 col-md-4 col-lg-2 mb-4" key={tag._id}>
                             <TagsBoxComponent
-                                tagsname={tag.tagsname}
+                                tagsname={tag.name}
                                 description={tag.description}
                                 quantity={tag.quantity}
                             />
                         </div>
-                    ))}
+                    ))} */}
                 </div>
             </div>
 
@@ -154,9 +167,6 @@ const TagsPage = () => {
                 onClick1={onSave}
                 onClick2={onCancel}
             />
-
-            {/* Hiển thị Loading Spinner nếu đang xử lý */}
-            {isLoading && <LoadingComponent />}
         </>
     );
 };

@@ -59,7 +59,7 @@ const HeaderComponent = () => {
           </ul>
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="/profile" style={Styles.textHeader}>
+              <a class="nav-link" href="/otheruserprofile" style={Styles.textHeader}>
                 <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
               </a>

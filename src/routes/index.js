@@ -109,17 +109,17 @@ export const routes = [
   },
 
   {
-    path: "/profile/admin",
+    path: "admin/profile",
     page: ProfileAdmin,
     isShowHeader: true,
   },
   {
-    path: "/question/admin",
+    path: "admin/question",
     page: QuestionAdmin,
     isShowHeader: true,
   },
   {
-    path: "/user/admin",
+    path: "admin/user",
     page: UsersAdmin,
     isShowHeader: true,
   },
@@ -129,12 +129,12 @@ export const routes = [
     isShowHeader: true,
   },
   {
-    path: "/questiondetail/admin",
+    path: "/admin/questiondetail",
     page: QuestionDetailAdmin,
     isShowHeader: true,
   },
   {
-    path: "/tag/admin",
+    path: "/admin/tag",
     page: TagAdmin,
     isShowHeader: true,
   },
