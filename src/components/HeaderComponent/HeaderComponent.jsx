@@ -1,7 +1,14 @@
 import React from 'react'
 import { Styles } from '../../style';
+import { useNavigate } from 'react-router-dom';
+
 
 const HeaderComponent = () => {
+
+  const navigate = useNavigate()
+  const handleNavigateLogin = () =>{
+    navigate('/login')
+  }
   return (
     <><nav className="navbar" style={{ backgroundColor: '#023E73' }} >
       <div class="container">
@@ -13,7 +20,9 @@ const HeaderComponent = () => {
 
         <div>
           <div className="btn">
+            <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
             <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
+            </div>
           </div>
           <div className="btn">
             <i class="bi bi-bell-fill" style={Styles.iconHeader}></i>

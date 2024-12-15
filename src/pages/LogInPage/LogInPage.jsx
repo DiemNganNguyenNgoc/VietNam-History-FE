@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import FormComponent from "../../components/FormComponent/FormComponent";
 import { Styles } from "../../style";
 import { useMutation } from "@tanstack/react-query";
 import * as AdminService from "../../services/AdminService";
+import * as UserService from "../../services/UserService";
+import * as message from "../../components/MessageComponent/MessageComponent";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
@@ -20,9 +22,20 @@ const LogInPage = () => {
   const handleForgotPassword = () => {
     navigate("/forgot-password");
   };
-
-  const mutation = useMutationHook((data) => AdminService.loginAdmin(data));
-  const { data } = mutation;
+  
+  const mutation = useMutationHook(
+    data => {
+      // Check if the email contains "admin"
+      if (data.email.includes("admin")) {
+        // Use AdminService for admin login
+        return AdminService.loginAdmin(data);
+      } else {
+        // Use UserService for user login
+        return UserService.loginUser(data);
+      }
+    }
+  );
+  const { data, isLoading, isSuccess } = mutation;
 
   // Check if all fields are filled to enable the button
   const isFormValid =
@@ -39,7 +52,7 @@ const LogInPage = () => {
     e.preventDefault();
     console.log("Form submitted, showing loading...");
     setShowLoading(true); // Hiện loading
-    // setErrorMessage("");
+    setErrorMessage("");
     mutation.mutate(
       {
         email: formData.email,
@@ -129,6 +142,7 @@ const LogInPage = () => {
                 value={formData.password}
                 onChange={handleChange}
               ></FormComponent>
+              {data?.status === 'ERR' && <span style={{ color: 'red'}}>{data?.message}</span>}
 
               {/* hiện thông báo lỗi */}
               {errorMessage && (
@@ -155,7 +169,6 @@ const LogInPage = () => {
               >
                 Forgot password?
               </a>
-
               <div
                 style={{
                   display: "flex",
