@@ -9,6 +9,10 @@ import * as message from "../../components/MessageComponent/MessageComponent";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux'
+import { updateUser } from "../../redux/slides/userSlide";
+
 const LogInPage = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -17,6 +21,7 @@ const LogInPage = () => {
 
   const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái riêng
   const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
   const handleForgotPassword = () => {
@@ -36,6 +41,24 @@ const LogInPage = () => {
     }
   );
   const { data, isLoading, isSuccess } = mutation;
+
+  useEffect(() => {
+    if (isSuccess) {
+      localStorage.setItem('access_token', data?.access_token)
+      if (data?.access_token) {
+        const decoded = jwtDecode(data?.access_token)
+        console.log('decode', decoded)
+        if(decoded?.id) {
+          handleGetDetailsUser(decoded?.id, data?.access_token)
+        }
+      }
+    }
+  }, [isSuccess])
+
+  const handleGetDetailsUser = async (id, token) => {
+    const res = await UserService.getDetailsUser(id, token)
+    dispatch(updateUser({ ...res?.data, access_token: token }))
+  }
 
   // Check if all fields are filled to enable the button
   const isFormValid =

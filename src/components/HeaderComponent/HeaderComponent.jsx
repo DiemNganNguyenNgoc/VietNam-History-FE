@@ -1,14 +1,16 @@
 import React from 'react'
 import { Styles } from '../../style';
 import { useNavigate } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 
 const HeaderComponent = () => {
 
   const navigate = useNavigate()
+  const user = useSelector((state) => state.user)
   const handleNavigateLogin = () =>{
     navigate('/login')
   }
+  console.log('user', user);
   return (
     <><nav className="navbar" style={{ backgroundColor: '#023E73' }} >
       <div class="container">
@@ -20,9 +22,18 @@ const HeaderComponent = () => {
 
         <div>
           <div className="btn">
-            <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
+            {user?.name ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
+                <span style={{ marginTop: '0px', fontSize: '15px', fontWeight: '500', color: '#FFFFFF' }}>
+                  {user.name}
+                </span>
+              </div>
+            ) : (
+              <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
             <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
             </div>
+            )}
           </div>
           <div className="btn">
             <i class="bi bi-bell-fill" style={Styles.iconHeader}></i>
