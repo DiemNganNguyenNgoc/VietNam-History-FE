@@ -1,16 +1,61 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Styles } from '../../style';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { Popover} from 'antd';
+import * as UserService from "../../services/UserService";
+import { resetUser } from "../../redux/slides/userSlide";
 
 const HeaderComponent = () => {
 
   const navigate = useNavigate()
   const user = useSelector((state) => state.user)
+  const dispatch = useDispatch()
   const handleNavigateLogin = () =>{
     navigate('/login')
   }
-  console.log('user', user);
+
+  const handleLogout = async () => {
+    try {
+      await UserService.logoutUser();
+      dispatch(resetUser());
+      localStorage.clear();
+      alert('Logout successful');
+    } catch (error) {
+      console.error('Logout failed', error);
+ 
+    }
+  }
+
+  const handleNavigateUserProfile = () =>{
+    navigate('/profile')
+  }
+
+  const content = (
+    <div>
+      {['Logout', 'User Profile'].map((item, index) => (
+        <p
+          key={index}
+          onClick={item === 'Logout' ? handleLogout : item === 'User Profile' ? handleNavigateUserProfile: null}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = '#C5E3FC')}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+          style={{
+            padding: '10px',
+            margin: 0,
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+          }}
+        >
+          {item}
+        </p>
+      ))}
+    </div>
+  );
+  
+  useEffect(() => {
+    console.log('User state:', user); // To debug the user state after logout
+  }, [user]);  
+
   return (
     <><nav className="navbar" style={{ backgroundColor: '#023E73' }} >
       <div class="container">
@@ -23,12 +68,16 @@ const HeaderComponent = () => {
         <div>
           <div className="btn">
             {user?.name ? (
+              <>
+              <Popover content={content} trigger="click" >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
                 <span style={{ marginTop: '0px', fontSize: '15px', fontWeight: '500', color: '#FFFFFF' }}>
                   {user.name}
                 </span>
               </div>
+              </Popover>
+              </>
             ) : (
               <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
             <i class="bi bi-person-circle" style={Styles.iconHeader}></i>

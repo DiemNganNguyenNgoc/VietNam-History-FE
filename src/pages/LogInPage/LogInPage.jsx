@@ -5,7 +5,6 @@ import { Styles } from "../../style";
 import { useMutation } from "@tanstack/react-query";
 import * as AdminService from "../../services/AdminService";
 import * as UserService from "../../services/UserService";
-import * as message from "../../components/MessageComponent/MessageComponent";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
@@ -44,10 +43,9 @@ const LogInPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      localStorage.setItem('access_token', data?.access_token)
+      localStorage.setItem('access_token', JSON.stringify(data?.access_token))
       if (data?.access_token) {
         const decoded = jwtDecode(data?.access_token)
-        console.log('decode', decoded)
         if(decoded?.id) {
           handleGetDetailsUser(decoded?.id, data?.access_token)
         }

@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const axiosJWT = axios.create()
+
 export const loginUser = async (data) => {
   try {
     const res = await axios.post(
@@ -30,7 +32,7 @@ export const loginUser = async (data) => {
 export const signupUser = async (data) => {
   try {
     const res = await axios.post(
-      `${process.env.REACT_APP_API_URL_BACKEND}/admin/sign-up`,
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/sign-up`,
       data,
       {
         headers: {
@@ -44,8 +46,8 @@ export const signupUser = async (data) => {
     if (error.response) {
       // API trả về response
       throw {
-        status: error.response.data?.status || "ERR",
-        message: error.response.data?.message || "Đã xảy ra lỗi.",
+        status: error.response.status,
+        message: error.response.data.message || "Đã xảy ra lỗi.",
       };
     } else {
       // Lỗi không có response (ví dụ lỗi mạng)
@@ -55,10 +57,22 @@ export const signupUser = async (data) => {
 };
 
 export const getDetailsUser = async (id, access_token) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`, {
+  const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`, {
     headers: {
       token: `Bearer ${access_token}`,
     }
   })
+  return res.data
+};
+
+export const refreshToken = async () => {
+  const res = await axios.post(`${process.env.REACT_APP_API_URL_BACKEND}/user/refresh-token`, {
+    withCredentials: true
+  })
+  return res.data
+};
+
+export const logoutUser = async () => {
+  const res = await axios.post(`${process.env.REACT_APP_API_URL_BACKEND}/user/log-out`)
   return res.data
 };
