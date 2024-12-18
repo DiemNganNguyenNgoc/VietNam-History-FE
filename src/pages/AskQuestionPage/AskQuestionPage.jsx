@@ -1,32 +1,166 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import '../../css/AskQuestionPage.css';
-import SubmitButton from './partials/SubmitButton';
 import TextEditor from './partials/TextEditor';
+import * as TagService from "../../services/TagService";
+import * as QuestionService from "../../services/QuestionService";
+import { useQuery } from '@tanstack/react-query';
+import FormSelectComponent from '../../components/FormSelectComponent/FormSelectComponent';
+import { useSelector } from 'react-redux';
+import { useMutationHook } from '../../hooks/useMutationHook';
+import * as message from "../../components/MessageComponent/MessageComponent";
+import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
+import Compressor from 'compressorjs';
+import { useNavigate } from 'react-router-dom';
 
 const AskQuestionPage = () => {
-  const [titleValue, setTitleValue] = useState('');
-  const [problemDetails, setProblemDetails] = useState('');
-  const [triedExpecting, setTriedExpecting] = useState('');
-  const [tags, setTags] = useState('');
+  const user = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
-  const handleAskQuestionClick = () => {
-    alert('Nút đã được nhấn');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [note, setNote] = useState('');
+  const [userQues, setIdUser] = useState('');
+  const [selectedTags, setTags] = useState([]); // Chứa các tags đã chọn
+  const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
+
+  // Lấy tất cả các tag
+  const getAllTag = async () => {
+    const res = await TagService.getAllTag();
+    return res?.data || []; // Trả về mảng rỗng nếu không có dữ liệu
   };
 
-  const handleTitleChange = (e) => {
-    setTitleValue(e.target.value);
+  const { isLoading: isTagLoading, data: tagsData } = useQuery({
+    queryKey: ["tagsData"],
+    queryFn: getAllTag,
+  });
+
+  // Chuyển đổi tags thành mảng để dùng trong dropdown
+  const allTags = Array.isArray(tagsData)
+    ? tagsData.map((tag) => ({
+      value: tag._id,
+      label: tag.name,
+    }))
+    : [];
+
+  useEffect(() => {
+    if (user?.id) {
+      setIdUser(user.id);
+    }
+  }, [user]);
+
+  const handleTitle = (value) => {
+    setTitle(value);
   };
 
-  const handleTagsChange = (e) => {
-    setTags(e.target.value);
+  const handleContent = (value) => {
+    setContent(value);
   };
+
+  const handleNote = (value) => {
+    setNote(value);
+  };
+
+  const handleTagsChange = (selectedOptions) => {
+    if (Array.isArray(selectedOptions)) {
+      // Kiểm tra nếu số lượng tag lớn hơn 5
+      if (selectedOptions.length <= 5) {
+        const selectedTagIds = selectedOptions.map(option => option.value);
+        setTags(selectedTagIds);
+      } else {
+        // Nếu chọn hơn 5 tag, không cho phép chọn thêm
+        alert("You can select up to 5 tags only.");
+      }
+    } else {
+      setTags([]);
+    }
+  };
+
+  // Xử lý khi chọn ảnh và nén ảnh
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach((file) => {
+      new Compressor(file, {
+        quality: 0.6, // Quality (60%)
+        maxWidth: 800, // Max width
+        maxHeight: 800, // Max height
+        success(result) {
+          // Tạo URL tạm cho các ảnh đã nén
+          const compressedImage = URL.createObjectURL(result);
+          setImageSrcs(prevImages => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
+        },
+        error(err) {
+          console.error(err);
+        }
+      });
+    });
+  };
+
+  // Xử lý xóa ảnh
+  const handleRemoveImage = (index) => {
+    const newImageSrcs = [...imageSrcs];
+    newImageSrcs.splice(index, 1);
+    setImageSrcs(newImageSrcs);
+  };
+
+  // Lưu câu hỏi
+  const mutation = useMutationHook(data => QuestionService.addQues(data));
+  const { data, isLoading, isSuccess, isError } = mutation;
+
+  useEffect(() => {
+    if (isSuccess && data?.status !== 'ERR') {
+      message.success();
+      alert('Question has been added successfully!');
+      navigate("/question")
+    }
+    if (isError) {
+      message.error();
+    }
+  }, [isSuccess, isError]);
+
+  const handleAskQuestionClick = async () => {
+    // Kiểm tra nếu không có tag được chọn
+    if (selectedTags.length < 1) {
+      alert("Please select at least 1 tag.");
+      return;
+    }
+
+    // Kiểm tra nếu không có ảnh được chọn
+    if (imageSrcs.length > 0) {
+      // Lưu ảnh vào câu hỏi trước khi gửi
+      const imageUrls = imageSrcs.map(src => src);  // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
+    }
+
+    if (!userQues) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+
+    const questionData = {
+      title,
+      content,
+      userQues,
+      note,
+      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+      tags: selectedTags, // Truyền mảng tag đã chọn vào câu hỏi
+    };
+
+    await mutation.mutateAsync(questionData);
+  };
+
+  const handleCancelClick = () => {
+    alert("Cancel adding the question!");
+    navigate("/question")
+  }
+
   return (
-    <div>
-      <div className="title-container">
+    <div className="container">
+      <div className="title" style={{ marginTop: '30px' }}>
         <h1 className="title">Ask a Question</h1>
       </div>
 
-      <div className="input-container">
+      <div className="input">
         <h1 className="label">
           Question title <span className="asterisk">*</span>
         </h1>
@@ -36,12 +170,55 @@ const AskQuestionPage = () => {
         <input
           type="text"
           className="input-field"
-          value={titleValue}
-          onChange={handleTitleChange}
+          value={title}
+          onChange={(e) => handleTitle(e.target.value)}
         />
       </div>
 
-      <div className="input-container">
+      {/* Upload nhiều ảnh */}
+      <div className="input" style={{ marginTop: '30px' }}>
+        <h1 className="label">Upload Images</h1>
+        <input type="file" multiple onChange={handleImageUpload} />
+        {imageSrcs.length > 0 && (
+          <div>
+            <h3>Preview Images</h3>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {imageSrcs.map((src, index) => (
+                <div key={index} style={{ position: 'relative' }}>
+                  <img
+                    src={src}
+                    alt={`Uploaded preview ${index}`}
+                    style={{
+                      width: '500px',  // Adjusted size
+                      height: 'auto',  // Keep aspect ratio
+                      margin: '10px',
+                      objectFit: 'cover', // To ensure images are properly scaled
+                    }}
+                  />
+                  <button
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      right: '0',
+                      backgroundColor: 'red',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                    }}
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="input" style={{ marginTop: '30px' }}>
         <h1 className="label">
           Problem details <span className="asterisk">*</span>
         </h1>
@@ -49,40 +226,56 @@ const AskQuestionPage = () => {
           Introduce the problem and expand on what you put in the title. Minimum 20 characters.
         </h2>
         <TextEditor
-          value={problemDetails}
-          onChange={setProblemDetails}
+          value={content}
+          onChange={handleContent}
           placeholder="Describe the problem here..."
         />
       </div>
 
-      <div className="input-container">
+      <div className="input" style={{ marginTop: '30px' }}>
         <h1 className="label">
-          What did you try and what where you expecting?
+          What did you try and what were you expecting?
         </h1>
         <h2 className="description">
           Describe what you tried, what you expected to happen, and what actually resulted. Minimum 20 characters.
         </h2>
         <TextEditor
-          value={triedExpecting}
-          onChange={setTriedExpecting}
+          value={note}
+          onChange={handleNote}
           placeholder="Describe what you tried and expected here..."
         />
       </div>
-      
-      <div className="input-container">
+
+      {/* ComboBox Tags với thẻ select */}
+      <div className="input" style={{ marginTop: '30px' }}>
         <h1 className="label">Tags</h1>
         <h2 className="description">
-        Add up to 5 tags to describe what your question is about. Start typing to see suggestions.
+          Add up to 5 tags to describe what your question is about. Start typing to see suggestions.
         </h2>
-        <input
-          type="text"
-          className="input-field"
-          value={tags}
+        <FormSelectComponent
+          placeholder={isTagLoading ? "Đang tải..." : "Chọn Tags"}
+          options={allTags}
+          selectedValue={selectedTags}
           onChange={handleTagsChange}
+          isMulti
         />
       </div>
 
-      <SubmitButton onClick={handleAskQuestionClick} />
+      {data?.status === 'ERR' &&
+        <span style={{ color: "red", fontSize: "16px" }}>{data?.message}</span>}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '30px',
+        }}
+      >
+        <ButtonComponent textButton="Cancel" onClick={handleCancelClick} />
+        <LoadingComponent isLoading={isLoading}>
+          <ButtonComponent textButton="Submit question" onClick={handleAskQuestionClick} />
+        </LoadingComponent>
+      </div>
     </div>
   );
 };

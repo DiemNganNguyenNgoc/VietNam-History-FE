@@ -10,7 +10,6 @@ const TextEditor = ({ value, onChange, placeholder }) => {
       [{ 'align': [] }],
       ['blockquote'],
       ['link'],
-      ['image'],
       ['code'],
     ],
   };

@@ -2,7 +2,7 @@ import React from "react";
 
 const FormComponent = (props) => {
   const handleOnChangeInput = (e) => {
-    props.onChange(e); // Truyền toàn bộ event thay vì chỉ value
+    props.onChange(e.target.value); // Truyền toàn bộ event thay vì chỉ value
   };
 
   return (

@@ -1,13 +1,16 @@
 import React from 'react';
 import './QuestionBox.css';
-import img1 from "../../assets/image/avatar_1.jpg";
 
-const QuestionBox = ({ username, reputation, followers, title, tags, date, views, answers, likes }) => {
+const QuestionBox = ({ img, username, reputation, followers, title, tags, date, views, answers, likes }) => {
   return (
     <div className="question-box">
       <div className="user-info">
         <div className="icon-container">
-          <img className="icon-styles" src={img1} alt="avatar"></img>
+          {img ? (
+            <img className="icon-styles" src={img} alt="avatar" />
+          ) : (
+            <div className="placeholder-avatar"> </div>
+          )}
         </div>
         <span className="username">{username}</span>
         <div className="details-container">
