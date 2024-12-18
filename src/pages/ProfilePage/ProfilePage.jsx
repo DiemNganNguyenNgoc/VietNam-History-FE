@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ActivityTab from "./ActivityTab";
 import ProfileTab from "./ProfileTab";
+import { useSelector } from "react-redux";
 
 
 
 function ProfilePage() {
+  const user = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
@@ -21,7 +23,7 @@ function ProfilePage() {
           </div>
           <div className="col-9">
             <div className="row">
-          <h2 className="mt-3">Nguyễn Văn A</h2>
+          <h2 className="mt-3">{"Nguyễn Văn A" || user.name}</h2>
           </div>
           <div className="row">
             <div className="col">

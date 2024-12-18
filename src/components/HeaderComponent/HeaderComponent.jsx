@@ -1,49 +1,57 @@
-import React, { useEffect } from 'react'
-import { Styles } from '../../style';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { Popover} from 'antd';
+import React, { useEffect, useState } from "react";
+import { Styles } from "../../style";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Popover } from "antd";
 import * as UserService from "../../services/UserService";
 import { resetUser } from "../../redux/slides/userSlide";
 
 const HeaderComponent = () => {
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
-  const navigate = useNavigate()
-  const user = useSelector((state) => state.user)
-  const dispatch = useDispatch()
-  const handleNavigateLogin = () =>{
-    navigate('/login')
-  }
+  const [img, setImg] = useState("");
+  const [name, setName] = useState("");
+
+  const handleNavigateLogin = () => {
+    navigate("/login");
+  };
 
   const handleLogout = async () => {
     try {
       await UserService.logoutUser();
       dispatch(resetUser());
       localStorage.clear();
-      alert('Logout successful');
+      alert("Logout successful");
     } catch (error) {
-      console.error('Logout failed', error);
- 
+      console.error("Logout failed", error);
     }
-  }
+  };
 
-  const handleNavigateUserProfile = () =>{
-    navigate('/profile')
-  }
+  const handleNavigateUserProfile = () => {
+    navigate("/profile");
+  };
 
   const content = (
     <div>
-      {['Logout', 'User Profile'].map((item, index) => (
+      {["Logout", "User Profile"].map((item, index) => (
         <p
           key={index}
-          onClick={item === 'Logout' ? handleLogout : item === 'User Profile' ? handleNavigateUserProfile: null}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = '#C5E3FC')}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = 'transparent')}
+          onClick={
+            item === "Logout"
+              ? handleLogout
+              : item === "User Profile"
+              ? handleNavigateUserProfile
+              : null
+          }
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
           style={{
-            padding: '10px',
+            padding: "10px",
             margin: 0,
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
+            cursor: "pointer",
+            transition: "background-color 0.3s",
           }}
         >
           {item}
@@ -51,56 +59,105 @@ const HeaderComponent = () => {
       ))}
     </div>
   );
-  
+
   useEffect(() => {
-    console.log('User state:', user); // To debug the user state after logout
-  }, [user]);  
+    // console.log("User state:", user); // To debug the user state after logout
+    setName(user?.name);
+    setImg(user?.img);
+  }, [user]);
 
   return (
-    <><nav className="navbar" style={{ backgroundColor: '#023E73' }} >
-      <div class="container">
-        <a className="navbar-brand" href="#">
-          SHARING-CODE
-        </a>
+    <>
+      <nav className="navbar" style={{ backgroundColor: "#023E73" }}>
+        <div className="container">
+          <a className="navbar-brand" href="#">
+            SHARING-CODE
+          </a>
 
-        <input class="form-control" type="text" placeholder="Search question" style={{ width: '500px', height: '35px' }}></input>
+          <input
+            class="form-control"
+            type="text"
+            placeholder="Search question"
+            style={{ width: "500px", height: "35px" }}
+          ></input>
 
-        <div>
-          <div className="btn">
-            {user?.name ? (
-              <>
-              <Popover content={content} trigger="click" >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
-                <span style={{ marginTop: '0px', fontSize: '15px', fontWeight: '500', color: '#FFFFFF' }}>
-                  {user.name}
-                </span>
-              </div>
-              </Popover>
-              </>
-            ) : (
-              <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}}>
-            <i class="bi bi-person-circle" style={Styles.iconHeader}></i>
+          <div>
+            <div className="btn">
+              {user?.name ? (
+                <>
+                  <Popover content={content} trigger="click">
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <i
+                        class="bi bi-person-circle"
+                        style={Styles.iconHeader}
+                      ></i>
+                      <span
+                        style={{
+                          marginTop: "0px",
+                          fontSize: "15px",
+                          fontWeight: "500",
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        {user.name}
+                      </span>
+                    </div>
+                  </Popover>
+                </>
+              ) : (
+                <div
+                  onClick={handleNavigateLogin}
+                  style={{ cursor: "pointer" }}
+                >
+                  {img ? (
+                    <img
+                      src={img}
+                      alt="avatar"
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <i
+                      className="bi bi-person-circle"
+                      style={Styles.iconHeader}
+                    ></i>
+                  )}
+                </div>
+              )}
             </div>
-            )}
-          </div>
-          <div className="btn">
-            <i class="bi bi-bell-fill" style={Styles.iconHeader}></i>
-          </div>
-          <div className="btn">
-            <i class="bi bi-trophy-fill" style={Styles.iconHeader}></i>
-          </div>
-          <div className="btn">
-            <i class="bi bi-question-circle-fill" style={Styles.iconHeader}></i>
+            <div className="btn">
+              <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
+            </div>
+            <div className="btn">
+              <i className="bi bi-trophy-fill" style={Styles.iconHeader}></i>
+            </div>
+            <div className="btn">
+              <i
+                className="bi bi-question-circle-fill"
+                style={Styles.iconHeader}
+              ></i>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    {/* <hr style={{ background: 'black', height: '2px', border: 'none' }} /> */}
+      {/* <hr style={{ background: 'black', height: '2px', border: 'none' }} /> */}
 
       {/* Tại chưa dẫn link nên nó cảnh báo thôi, kh sao đâu nha */}
-      <nav className="navbar" style={{ backgroundColor: '#023E73', height: '65px' }}>
+      <nav
+        className="navbar"
+        style={{ backgroundColor: "#023E73", height: "65px" }}
+      >
         <div class="container">
           <ul class="nav nav-underline">
             <li class="nav-item">
@@ -128,15 +185,20 @@ const HeaderComponent = () => {
           </ul>
           <ul class="nav nav-underline">
             <li class="nav-item">
-              <a class="nav-link" href="/otheruserprofile" style={Styles.textHeader}>
+              <a
+                class="nav-link"
+                href="/otheruserprofile"
+                style={Styles.textHeader}
+              >
                 <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
               </a>
             </li>
           </ul>
         </div>
-      </nav></>
+      </nav>
+    </>
   );
-}
+};
 
 export default HeaderComponent;

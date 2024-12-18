@@ -8,8 +8,8 @@ import * as UserService from "../../services/UserService";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import { jwtDecode } from 'jwt-decode';
-import { useDispatch } from 'react-redux'
+import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slides/userSlide";
 
 const LogInPage = () => {
@@ -26,37 +26,35 @@ const LogInPage = () => {
   const handleForgotPassword = () => {
     navigate("/forgot-password");
   };
-  
-  const mutation = useMutationHook(
-    data => {
-      // Check if the email contains "admin"
-      if (data.email.includes("admin")) {
-        // Use AdminService for admin login
-        return AdminService.loginAdmin(data);
-      } else {
-        // Use UserService for user login
-        return UserService.loginUser(data);
-      }
+
+  const mutation = useMutationHook((data) => {
+    // Check if the email contains "admin"
+    if (data.email.includes("admin")) {
+      // Use AdminService for admin login
+      return AdminService.loginAdmin(data);
+    } else {
+      // Use UserService for user login
+      return UserService.loginUser(data);
     }
-  );
+  });
   const { data, isLoading, isSuccess } = mutation;
 
   useEffect(() => {
     if (isSuccess) {
-      localStorage.setItem('access_token', JSON.stringify(data?.access_token))
+      localStorage.setItem("access_token", JSON.stringify(data?.access_token));
       if (data?.access_token) {
-        const decoded = jwtDecode(data?.access_token)
-        if(decoded?.id) {
-          handleGetDetailsUser(decoded?.id, data?.access_token)
+        const decoded = jwtDecode(data?.access_token);
+        if (decoded?.id) {
+          handleGetDetailsUser(decoded?.id, data?.access_token);
         }
       }
     }
-  }, [isSuccess])
+  }, [isSuccess]);
 
   const handleGetDetailsUser = async (id, token) => {
-    const res = await UserService.getDetailsUser(id, token)
-    dispatch(updateUser({ ...res?.data, access_token: token }))
-  }
+    const res = await UserService.getDetailsUser(id, token);
+    dispatch(updateUser({ ...res?.data, access_token: token }));
+  };
 
   // Check if all fields are filled to enable the button
   const isFormValid =
@@ -145,7 +143,6 @@ const LogInPage = () => {
               }}
             >
               <FormComponent
-                id="emailInput"
                 name="email"
                 label="Email"
                 type="email"
@@ -155,7 +152,6 @@ const LogInPage = () => {
               ></FormComponent>
 
               <FormComponent
-                id="passwordInput"
                 name="password"
                 label="Password"
                 type="password"
@@ -163,7 +159,9 @@ const LogInPage = () => {
                 value={formData.password}
                 onChange={handleChange}
               ></FormComponent>
-              {data?.status === 'ERR' && <span style={{ color: 'red'}}>{data?.message}</span>}
+              {data?.status === "ERR" && (
+                <span style={{ color: "red" }}>{data?.message}</span>
+              )}
 
               {/* hiện thông báo lỗi */}
               {errorMessage && (
