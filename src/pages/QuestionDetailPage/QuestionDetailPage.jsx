@@ -1,7 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import TextEditor from "../AskQuestionPage/partials/TextEditor";
 
 const QuestionDetails = () => {
+  const [showTextArea, setShowTextArea]= useState(false);
+  const handleClickAnswer =()=>{
+   
+      setShowTextArea(!showTextArea);
+    };
+    const ExtraComponent = () => (
+      <div>
+        <TextEditor></TextEditor>
+        <ButtonComponent textButton='Post answer '/>
+        <ButtonComponent textButton='Cancel' onClick={handleClickAnswer}/>
+      </div>
+    );
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -156,6 +170,8 @@ const QuestionDetails = () => {
           </p>
         </div>
         {/* Thêm các câu trả lời khác */}
+        <ButtonComponent textButton="Add an answer" onClick={handleClickAnswer}></ButtonComponent>
+          {showTextArea && <ExtraComponent/>}
       </div>
     </div>
   );
