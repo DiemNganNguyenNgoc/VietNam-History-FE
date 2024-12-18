@@ -36,7 +36,7 @@ export const userSlide = createSlice({
         password = "",
         access_token,
       } = action.payload;
-      state.id = _id;
+
       state.name = name || email;
       state.email = email;
       state.phone = phone;
@@ -49,6 +49,7 @@ export const userSlide = createSlice({
       state.gender = gender;
       state.password = password;
       state.access_token = access_token;
+      state.id = _id;
     },
     resetUser: (state) => {
       state.id = "";

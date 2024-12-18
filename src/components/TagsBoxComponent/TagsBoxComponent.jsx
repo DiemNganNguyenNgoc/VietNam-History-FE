@@ -13,7 +13,7 @@ const TagsBoxComponent = ({ tagsname, description, quantity }) => {
         </div>
         <div className="quantity">
 
-          {quantity}  questions
+          {quantity} questions
 
          
         </div>

@@ -1,7 +1,6 @@
-import { React, useState } from 'react'
-import SortBtn from '../../components/SortBtn/SortBtn';
+import { React, useState } from 'react';
 import QuestionFilter from '../../components/QuestionFilter/QuestionFilter';
-import QuestionHolder from '../../components/QuestionHolder/QuestionHolder';
+import SortBtn from '../../components/SortBtn/SortBtn';
 
 const TagsDetailPage = () => {
     const [filters, setFilters] = useState({
@@ -58,7 +57,7 @@ const TagsDetailPage = () => {
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', width: '100%' }}>
                 <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
             </div>
-            <QuestionHolder />
+            
         </div>
     );
 

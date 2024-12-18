@@ -10,13 +10,22 @@ import { useMutationHook } from '../../hooks/useMutationHook';
 import * as TagService from '../../services/TagService';
 import { useQuery } from '@tanstack/react-query';
 import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
+import { useSelector } from 'react-redux';
 
 const TagsPage = () => {
-    //state cho form
+    // Lấy thông tin user từ Redux
+    const user = useSelector((state) => state.user);
+
+    // State cho form
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [userTag, setIdUser] = useState('');
     const [showModal, setShowModal] = useState(false);
+
+    // Sử dụng useNavigate để chuyển trang
     const navigate = useNavigate();
+
+    // Hàm cập nhật state từ input
     const handleOnChangeName = (value) => setName(value);
     const handleOnChangeDes = (value) => setDescription(value);
 
@@ -30,7 +39,7 @@ const TagsPage = () => {
     const mutation = useMutationHook(data => TagService.addTag(data));
     const { data, isLoading, isSuccess, isError } = mutation;
 
-    // Lấy danh sách đơn vị từ API
+    // Lấy danh sách tag từ API
     const getAllTag = async () => {
         const res = await TagService.getAllTag();
         return res.data;
@@ -41,6 +50,14 @@ const TagsPage = () => {
         queryFn: getAllTag,
     });
 
+    // Gán idUser từ Redux vào state
+    useEffect(() => {
+        if (user?.id) {
+            setIdUser(user.id);
+        }
+    }, [user]);
+
+    // Xử lý kết quả sau khi thêm tag
     useEffect(() => {
         if (isSuccess && data?.status !== 'ERR') {
             message.success();
@@ -53,15 +70,21 @@ const TagsPage = () => {
         }
     }, [isSuccess, isError, navigate]);
 
+    // Mở modal thêm tag
     const handleAddTag = () => {
-        setShowModal(true); // Mở modal khi muốn thêm tag
+        setShowModal(true);
     };
 
+    // Lưu tag mới
     const onSave = async () => {
-        await mutation.mutateAsync({ name, description });
-
+        if (!userTag) {
+            alert("User ID is missing. Please log in again.");
+            return;
+        }
+        await mutation.mutateAsync({ name, description, userTag });
     };
 
+    // Đóng modal và reset form
     const onCancel = () => {
         alert('Cancel adding the tag!');
         resetForm();
@@ -103,41 +126,24 @@ const TagsPage = () => {
             <div className="container">
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-5">
                     {isLoadingTag ? (
-                        <tr>
-                            <td colSpan="4" className="text-center">
-                                <LoadingComponent />
-                            </td>
-                        </tr>
+                        <LoadingComponent />
                     ) : tags && tags.length > 0 ? (
                         tags.map((tag) => (
                             <div className="col-6 col-md-4 col-lg-2 mb-4" key={tag._id}>
                                 <TagsBoxComponent
                                     tagsname={tag.name}
                                     description={tag.description}
-                                    // quantity={tag.quantity}
+                                    quantity={tag.usedCount}
                                 />
                             </div>
                         ))
                     ) : (
-                        <tr>
-                            <td colSpan="4" className="text-center">
-                                Không có dữ liệu để hiển thị.
-                            </td>
-                        </tr>
+                        <p>Không có dữ liệu để hiển thị.</p>
                     )}
-                    {/* {tags.map((tag) => (
-                        <div className="col-6 col-md-4 col-lg-2 mb-4" key={tag._id}>
-                            <TagsBoxComponent
-                                tagsname={tag.name}
-                                description={tag.description}
-                                quantity={tag.quantity}
-                            />
-                        </div>
-                    ))} */}
                 </div>
             </div>
 
-            {/* Modal để thêm tag mới */}
+            {/* Modal thêm tag mới */}
             <ModalComponent
                 isOpen={showModal}
                 title="ADD NEW TAG"
@@ -171,4 +177,4 @@ const TagsPage = () => {
     );
 };
 
-export default TagsPage;
+export default TagsPage;  
