@@ -108,7 +108,7 @@ const ProfileTab = () => {
         githubLink: user?.githubLink || "",
         address: user?.address || "",
         gender: user?.gender || "",
-        password: "", // Không lưu lại mật khẩu trong form
+        password: user?.password || "", // Không lưu lại mật khẩu trong form
       });
     }
   }, [user]);
@@ -156,22 +156,22 @@ const ProfileTab = () => {
     dispatch(updateUser({ ...res?.data, access_token: token }));
   };
 
-  useEffect(() => {
-    if (mutation.isSuccess) {
-      handleGetDetailsUser(user?.id, user?.access_token);
-      setStatusMessage({
-        type: "Success",
-        message: "Cập nhật thông tin thành công",
-      });
-      alert(statusMessage?.message);
-    } else if (mutation.isError) {
-      setStatusMessage({
-        type: "Error",
-        message: mutation.error?.message || "Cập nhật thông tin thất bại",
-      });
-      alert(statusMessage?.message);
-    }
-  }, [mutation.isSuccess, mutation.isError, mutation.error]);
+  // useEffect(() => {
+  //   if (mutation.isSuccess) {
+  //     handleGetDetailsUser(user?.id, user?.access_token);
+  //     setStatusMessage({
+  //       type: "Success",
+  //       message: "Cập nhật thông tin thành công",
+  //     });
+  //     alert(statusMessage?.message);
+  //   } else if (mutation.isError) {
+  //     setStatusMessage({
+  //       type: "Error",
+  //       message: mutation.error?.message || "Cập nhật thông tin thất bại",
+  //     });
+  //     alert(statusMessage?.message);
+  //   }
+  // }, [mutation.isSuccess, mutation.isError, mutation.error]);
 
   //   const handleImgChange = async ({ fileList }) => {
   //     const file = fileList[0];
@@ -180,6 +180,27 @@ const ProfileTab = () => {
   //     }
   //     setImg(file.preview);
   //   };
+
+  useEffect(() => {
+    if (mutation.isSuccess) {
+      handleGetDetailsUser(user?.id, user?.access_token);
+      setStatusMessage({
+        type: "Success",
+        message: "Cập nhật thông tin thành công",
+      });
+    } else if (mutation.isError) {
+      setStatusMessage({
+        type: "Error",
+        message: mutation.error?.message || "Cập nhật thông tin thất bại",
+      });
+    }
+  }, [mutation.isSuccess, mutation.isError, mutation.error]);
+  
+  useEffect(() => {
+    if (statusMessage) {
+      alert(statusMessage.message);
+    }
+  }, [statusMessage]);
 
   const handleImgChange = async ({ fileList }) => {
     const file = fileList[0];
@@ -245,6 +266,7 @@ const ProfileTab = () => {
                     height: "80px",
                     borderRadius: "50%",
                     objectFit: "cover",
+                    boxShadow: "0px 0px 5px rgba(0,0,0,0.2)"
                   }}
                 />
               )}
