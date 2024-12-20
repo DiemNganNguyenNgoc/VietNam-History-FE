@@ -1,21 +1,160 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
-import TextEditor from "../AskQuestionPage/partials/TextEditor";
+import TextEditor from "../QuestionDetailPage/partials/TextEditor";
+import Compressor from 'compressorjs';
+import { useSelector } from 'react-redux';
+import { useMutationHook } from '../../hooks/useMutationHook';
+import * as message from "../../components/MessageComponent/MessageComponent";
+import * as AnswerService from "../../services/AnswerService";
+
 
 const QuestionDetails = () => {
-  const [showTextArea, setShowTextArea]= useState(false);
-  const handleClickAnswer =()=>{
-   
-      setShowTextArea(!showTextArea);
+  const [showTextArea, setShowTextArea] = useState(false);
+    const handleContent = (value) => {
+      setContent(value);
     };
-    const ExtraComponent = () => (
-      <div>
-        <TextEditor></TextEditor>
-        <ButtonComponent textButton='Post answer '/>
-        <ButtonComponent textButton='Cancel' onClick={handleClickAnswer}/>
+  const [content, setContent] = useState('');
+  const [userQues, setIdUser] = useState('');
+  const [idQues, setIdQues] = useState('');
+  const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
+  const user = useSelector((state) => state.user);
+  const question = useSelector((state) => state.question);
+  const mutation = useMutationHook(data => AnswerService.addAns(data));
+  const { data, isLoading, isSuccess, isError } = mutation;
+
+  
+   useEffect(() => {
+      if (isSuccess && data?.status !== 'ERR') {
+        message.success();
+        alert('Answer has been added successfully!');
+      }
+      if (isError) {
+        message.error();
+      }
+    }, [isSuccess, isError]);
+    
+   useEffect(() => {
+      if (user?.id) {
+        setIdUser(user.id);
+      }
+    }, [user]);
+
+    useEffect(() => {
+      if (question?.id) {
+        setIdQues(question.id);
+      }
+    }, [question]);
+
+
+    //them cau tra loi
+  const handleAddAnswerClick = async () => {
+    // Kiểm tra nếu không có ảnh được chọn
+    if (imageSrcs.length > 0) {
+      // Lưu ảnh vào câu hỏi trước khi gửi
+      const imageUrls = imageSrcs.map(src => src);  // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
+    }
+
+    if (!userQues) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+    if (!idQues) {
+      alert("Question ID is missing. Please log in again.");
+      return;
+    }
+
+    const answerData = {
+      content,
+      userQues,
+      //idQues,
+      id:"1",
+      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+
+    };
+
+    await mutation.mutateAsync(answerData);
+  };
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach((file) => {
+      new Compressor(file, {
+        quality: 0.6, // Quality (60%)
+        maxWidth: 800, // Max width
+        maxHeight: 800, // Max height
+        success(result) {
+          // Tạo URL tạm cho các ảnh đã nén
+          const compressedImage = URL.createObjectURL(result);
+          setImageSrcs(prevImages => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
+        },
+        error(err) {
+          console.error(err);
+        }
+      });
+    });
+  };
+
+  // Xử lý xóa ảnh
+  const handleRemoveImage = (index) => {
+    const newImageSrcs = [...imageSrcs];
+    newImageSrcs.splice(index, 1);
+    setImageSrcs(newImageSrcs);
+  };
+
+  const handleClickAnswer = () => {
+
+    setShowTextArea(!showTextArea);
+  };
+  const ExtraComponent = () => (
+    <div>
+      <div className="input" style={{ marginTop: '30px' }}>
+        <h1 className="label">Upload Images</h1>
+        <input type="file" multiple onChange={handleImageUpload} />
+        {imageSrcs.length > 0 && (
+          <div>
+            <h3>Preview Images</h3>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {imageSrcs.map((src, index) => (
+                <div key={index} style={{ position: 'relative' }}>
+                  <img
+                    src={src}
+                    alt={`Uploaded preview ${index}`}
+                    style={{
+                      width: '500px',  // Adjusted size
+                      height: 'auto',  // Keep aspect ratio
+                      margin: '10px',
+                      objectFit: 'cover', // To ensure images are properly scaled
+                    }}
+                  />
+                  <button
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      right: '0',
+                      backgroundColor: 'red',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                    }}
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    X
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    );
+      <TextEditor onChange={handleContent}></TextEditor>
+      <ButtonComponent textButton='Post answer ' onClick={handleAddAnswerClick}/>
+      <ButtonComponent textButton='Cancel' onClick={handleClickAnswer} />
+    </div>
+  );
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -171,7 +310,7 @@ const QuestionDetails = () => {
         </div>
         {/* Thêm các câu trả lời khác */}
         <ButtonComponent textButton="Add an answer" onClick={handleClickAnswer}></ButtonComponent>
-          {showTextArea && <ExtraComponent/>}
+        {showTextArea && <ExtraComponent />}
       </div>
     </div>
   );
