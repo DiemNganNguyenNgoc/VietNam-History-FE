@@ -7,15 +7,12 @@ import { useSelector } from 'react-redux';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as message from "../../components/MessageComponent/MessageComponent";
 import * as AnswerService from "../../services/AnswerService";
-
+import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
 
 const QuestionDetails = () => {
   const [showTextArea, setShowTextArea] = useState(false);
-    const handleContent = (value) => {
-      setContent(value);
-    };
   const [content, setContent] = useState('');
-  const [userQues, setIdUser] = useState('');
+  const [userAns, setIdUser] = useState('');
   const [idQues, setIdQues] = useState('');
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
@@ -23,58 +20,31 @@ const QuestionDetails = () => {
   const mutation = useMutationHook(data => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
-  
-   useEffect(() => {
-      if (isSuccess && data?.status !== 'ERR') {
-        message.success();
-        alert('Answer has been added successfully!');
-      }
-      if (isError) {
-        message.error();
-      }
-    }, [isSuccess, isError]);
-    
-   useEffect(() => {
-      if (user?.id) {
-        setIdUser(user.id);
-      }
-    }, [user]);
-
-    useEffect(() => {
-      if (question?.id) {
-        setIdQues(question.id);
-      }
-    }, [question]);
-
-
-    //them cau tra loi
-  const handleAddAnswerClick = async () => {
-    // Kiểm tra nếu không có ảnh được chọn
-    if (imageSrcs.length > 0) {
-      // Lưu ảnh vào câu hỏi trước khi gửi
-      const imageUrls = imageSrcs.map(src => src);  // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
-    }
-
-    if (!userQues) {
-      alert("User ID is missing. Please log in again.");
-      return;
-    }
-    if (!idQues) {
-      alert("Question ID is missing. Please log in again.");
-      return;
-    }
-
-    const answerData = {
-      content,
-      userQues,
-      //idQues,
-      id:"1",
-      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
-
-    };
-
-    await mutation.mutateAsync(answerData);
+  const handleContent = (value) => {
+    setContent(value);
   };
+
+  useEffect(() => {
+    if (isSuccess && data?.status !== 'ERR') {
+      message.success();
+      alert('Answer has been added successfully!');
+    }
+    if (isError) {
+      message.error();
+    }
+  }, [isSuccess, isError]);
+
+  useEffect(() => {
+    if (user?.id) {
+      setIdUser(user.id);
+    }
+  }, [user]);
+
+  // useEffect(() => {
+  //   if (question?.id) {
+  //     setIdQues(question.id);
+  //   }
+  // }, [question]);
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -103,10 +73,13 @@ const QuestionDetails = () => {
     setImageSrcs(newImageSrcs);
   };
 
+  //CLick de hien ra textEditor
   const handleClickAnswer = () => {
 
     setShowTextArea(!showTextArea);
   };
+
+  //Xu li khi click add an answer thi xuat hien textEditor
   const ExtraComponent = () => (
     <div>
       <div className="input" style={{ marginTop: '30px' }}>
@@ -150,11 +123,68 @@ const QuestionDetails = () => {
           </div>
         )}
       </div>
-      <TextEditor onChange={handleContent}></TextEditor>
-      <ButtonComponent textButton='Post answer ' onClick={handleAddAnswerClick}/>
-      <ButtonComponent textButton='Cancel' onClick={handleClickAnswer} />
+
+      <div className="input" style={{ marginTop: '30px' }}>
+        <h1 className="label">
+          Problem details <span className="asterisk">*</span>
+        </h1>
+        <h2 className="description">
+          Introduce the problem and expand on what you put in the title. Minimum 20 characters.
+        </h2>
+        <TextEditor
+          value={content}
+          onChange={handleContent}
+          placeholder="Describe the problem here..."
+        />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          marginTop: '30px',
+        }}
+      >
+        <ButtonComponent textButton="Cancel" onClick={handleCancelClick} />
+        <LoadingComponent isLoading={isLoading}>
+          <ButtonComponent textButton="Submit question" onClick={handlePostAnswerClick} />
+        </LoadingComponent>
+      </div>
     </div>
   );
+
+  const handleCancelClick = () => {
+    alert("Cancel adding the question!");
+    
+  }
+  //them cau tra loi
+  const handlePostAnswerClick = async () => {
+    // Kiểm tra nếu không có ảnh được chọn
+    if (imageSrcs.length > 0) {
+      // Lưu ảnh vào câu hỏi trước khi gửi
+      const imageUrls = imageSrcs.map(src => src);  // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
+    }
+
+    if (!userAns) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+    // if (!idQues) {
+    //   alert("Question ID is missing. Please log in again.");
+    //   return;
+    // }
+
+    const answerData = {
+      content,
+      userAns,
+      idQues: "11",
+      //id:"1",
+      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+
+    };
+
+    await mutation.mutateAsync(answerData);
+  };
+
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
