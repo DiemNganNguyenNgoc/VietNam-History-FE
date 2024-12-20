@@ -5,7 +5,7 @@ import QuestionFilter from '../../components/QuestionFilter/QuestionFilter';
 import SortBtn from '../../components/SortBtn/SortBtn';
 import QuestionBox from '../../components/QuestionBox/QuestionBox';
 import * as QuestionService from "../../services/QuestionService";
-import * as UserService from "../../services/UserService"; // Giả sử bạn có dịch vụ UserService
+import * as UserService from "../../services/UserService";
 import { useQuery } from '@tanstack/react-query';
 
 const QuestionPage = () => {
@@ -31,43 +31,60 @@ const QuestionPage = () => {
     return res.data;
   };
 
-  // const getUserInfo = async (userQuesId) => {
-  //   const res = await UserService.getDetailsUser(userQuesId); // Hàm này cần được định nghĩa trong UserService
-  //   return res.data;
-  // };
+  const getUserInfo = async (userQuesId) => {
+    if (!userQuesId) {
+      throw new Error("ID người dùng không hợp lệ.");
+    }
+    const res = await UserService.getDetailsUser(userQuesId); // Hàm này cần được định nghĩa trong UserService
+    return res.data;
+  };
 
-  // const { isLoading: isLoadingQues, data: questions, error } = useQuery({
-  //   queryKey: ['questions'],
-  //   queryFn: getAllQues,
-  // });
+  const { isLoading: isLoadingQues, data: questions, error } = useQuery({
+    queryKey: ['questions'],
+    queryFn: getAllQues,
+  });
 
-  // useEffect(() => {
-  //   if (questions) {
-  //     // Giả sử questions có nhiều câu hỏi và mỗi câu hỏi có userQues
-  //     const fetchUserInfo = async () => {
-  //       const userInfos = await Promise.all(
-  //         questions.map(async (question) => {
-  //           const userData = await getUserInfo(question.userQues);
-  //           return { ...userData, questionId: question._id }; // Lưu trữ thông tin người dùng
-  //         })
-  //       );
-  //       const userInfoMap = {}; // Đối tượng để lưu trữ dữ liệu người dùng theo ID câu hỏi
-  //       userInfos.forEach((user) => {
-  //         userInfoMap[user.questionId] = user; // Gán thông tin người dùng vào userInfoMap
-  //       });
-  //       setUserInfo(userInfoMap); // Lưu dữ liệu vào userInfoMap
-  //     };
-  //     fetchUserInfo();
-  //   }
-  // }, [questions]);
+  useEffect(() => {
+    if (Array.isArray(questions) && questions.length > 0) {
+      const fetchUserInfo = async () => {
+        const userInfos = await Promise.all(
+          questions.map(async (question) => {
+            const userQuesId = question.userQues; // ID người dùng
+  
+            // Kiểm tra ID người dùng trước khi gọi API
+            if (!userQuesId) {
+              console.error(`Lỗi: ID người dùng không hợp lệ cho câu hỏi ${question._id}`);
+              return { username: "Unknown", reputation: 0, followers: 0, questionId: question._id }; // Trả về dữ liệu mặc định
+            }
+  
+            try {
+              const userData = await getUserInfo(userQuesId); // Lấy thông tin người dùng
+              return { ...userData, questionId: question._id }; // Lưu trữ thông tin người dùng
+            } catch (error) {
+              console.error("Lỗi khi lấy thông tin người dùng:", error.message);
+              return { username: "Unknown", reputation: 0, followers: 0, questionId: question._id }; // Trả về dữ liệu mặc định khi lỗi
+            }
+          })
+        );
+  
+        const userInfoMap = {}; // Đối tượng để lưu trữ dữ liệu người dùng theo ID câu hỏi
+        userInfos.forEach((user) => {
+          userInfoMap[user.questionId] = user; // Gán thông tin người dùng vào userInfoMap
+        });
+        setUserInfo(userInfoMap); // Cập nhật lại state userInfo
+      };
+      fetchUserInfo();
+    }
+  }, [questions]);
+  
 
-  // if (isLoadingQues) {
-  //   return <div>Loading...</div>;
-  // }
+  if (isLoadingQues) {
+    return <div>Loading...</div>;
+  }
 
-  // if (error) {
-  //   return <div>Error loading questions: {error.message}</div>;
-  // }
+  if (error) {
+    return <div>Error loading questions: {error.message}</div>;
+  }
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
@@ -128,14 +145,9 @@ const QuestionPage = () => {
         </div>
         {/* Render các câu hỏi */}
         <div style={{ marginTop: '20px' }}>
-          {/* {Array.isArray(questions) && questions.length > 0 ? (
+          {Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
-              const user = userInfo[question._id]; // Truy xuất thông tin người dùng từ userInfoMap
-
-              // Check if user data exists
-              if (!user) {
-                return <p key={question._id}>Loading user info...</p>;
-              }
+              const user = userInfo[question._id] || {}; // Tránh truy cập vào undefined
 
               return (
                 <QuestionBox
@@ -154,7 +166,7 @@ const QuestionPage = () => {
             })
           ) : (
             <p>No questions available.</p>
-          )} */}
+          )}
         </div>
       </div>
     </div>

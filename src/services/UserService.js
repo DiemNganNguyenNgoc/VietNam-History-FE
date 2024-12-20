@@ -56,7 +56,7 @@ export const signupUser = async (data) => {
   }
 };
 
-export const getDetailsUser = async (id, access_token) => {
+export const getDetailsUser = async (id) => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`)
   return res.data
 };
