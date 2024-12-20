@@ -1,9 +1,15 @@
 import React from "react";
 
-const FormComponent = (props) => {
-  const handleOnChangeInput = (e) => {
-    props.onChange(e.target.value); // Truyền toàn bộ event thay vì chỉ value
-  };
+const FormComponent = ({
+  onChange = () => {},
+  value = "",
+  name = "",
+  placeholder = "",
+  ...props
+}) => {
+  // const handleOnChangeInput = (e) => {
+  //   props.onChange(e); // Truyền toàn bộ event thay vì chỉ value
+  // };
 
   return (
     <div style={{ marginBottom: "10px" }}>
@@ -14,10 +20,11 @@ const FormComponent = (props) => {
         {props.label}
       </label>
       <input
-        name={props.name} // Đảm bảo `name` được truyền vào
-        value={props.value}
-        placeholder={props.placeholder}
-        type={props.type}
+        id={props.id || name}
+        name={name}
+        value={value}
+        placeholder={placeholder}
+        type={props.type || "text"}
         style={{
           padding: "0 20px",
           backgroundColor: "#F2F5FF",
@@ -27,7 +34,8 @@ const FormComponent = (props) => {
           border: "none",
           borderRadius: "10px",
         }}
-        onChange={handleOnChangeInput}
+        onChange={(e) => onChange(e)}
+        {...props}
       />
     </div>
   );

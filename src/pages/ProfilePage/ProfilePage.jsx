@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ActivityTab from "./ActivityTab";
 import ProfileTab from "./ProfileTab";
+import { useSelector } from "react-redux";
 
 
 
 function ProfilePage() {
+  const user = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
@@ -14,14 +16,21 @@ function ProfilePage() {
       <div className="row ">
         <div className="col-3">
           <img
-            src="https://via.placeholder.com/150"
+            src={user.img}
             alt="Avatar"
             className="rounded-circle"
+            style={{
+              width: "150px",
+              height: "150px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              boxShadow: "0px 0px 10px rgba(0,0,0,0.2)"
+            }}
           />
           </div>
           <div className="col-9">
             <div className="row">
-          <h2 className="mt-3">Nguyễn Văn A</h2>
+          <h2 className="mt-3">{user.name}</h2>
           </div>
           <div className="row">
             <div className="col">
