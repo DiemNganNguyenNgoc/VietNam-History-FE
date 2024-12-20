@@ -13,7 +13,11 @@ const initialState = {
   address: "",
   gender: "",
   password: "",
+
   access_token: "",
+  allUser: [], // Danh sách tất cả các Question
+  detailUser: {},
+  
 };
 
 export const userSlide = createSlice({
@@ -66,9 +70,17 @@ export const userSlide = createSlice({
       state.password = "";
       state.access_token = "";
     },
+    setAllUser: (state, action) => {
+      state.allUser = action.payload; // Lưu danh sách Question từ API
+    },
+    setDetailUser: (state, action) => {
+      state.detailUser = action.payload;
+    },
+
   },
 });
 
-export const { updateUser, resetUser } = userSlide.actions;
+export const { updateUser, resetUser, setDetailUser, setAllUser } =
+  userSlide.actions;
 
 export default userSlide.reducer;

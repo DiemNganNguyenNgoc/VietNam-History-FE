@@ -15,7 +15,7 @@ import StatisticActivityPage from "../pages/StatisticPage/StatisticActivityPage"
 import AskQuestionPage from "../pages/AskQuestionPage/AskQuestionPage";
 import ProfileAdmin from "../AdminPage/ProfileAdmin/Profile_Admin";
 import QuestionAdmin from "../AdminPage/QuestionAdmin/QuestionAdmin";
-import UsersAdmin from "../AdminPage/UsersAdmin/UsersAdmin"
+import UsersAdmin from "../AdminPage/UsersAdmin/UsersAdmin";
 import QuestionDetailPage from "../pages/QuestionDetailPage/QuestionDetailPage";
 import QuestionDetailAdmin from "../AdminPage/QuestionDetailAdmin/QuestionDetailAdmin";
 import TagAdmin from "../AdminPage/TagAdmin/TagAdmin";
@@ -103,9 +103,9 @@ export const routes = [
     isShowHeader: true,
   },
   {
-    path: '/askquestion',
+    path: "/askquestion",
     page: AskQuestionPage,
-    isShowHeader: true
+    isShowHeader: true,
   },
 
   {
@@ -113,21 +113,25 @@ export const routes = [
     page: ProfileAdmin,
     isShowHeader: true,
   },
+
   {
     path: "admin/question",
     page: QuestionAdmin,
     isShowHeader: true,
   },
+
   {
     path: "admin/user",
     page: UsersAdmin,
     isShowHeader: true,
   },
+
   {
-    path: "/questiondetail",
+    path: "/question-detail/:questionId",
     page: QuestionDetailPage,
     isShowHeader: true,
   },
+
   {
     path: "/admin/questiondetail",
     page: QuestionDetailAdmin,
