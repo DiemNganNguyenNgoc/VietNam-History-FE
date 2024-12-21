@@ -1,5 +1,7 @@
 import axios from "axios"
 
+export const axiosJWT = axios.create()
+
 export const addTag=async(data)=>{
     const res =await axios.post(`${process.env.REACT_APP_API_URL_BACKEND}/tag/create`, data)
     return res.data
@@ -13,7 +15,7 @@ export const getAllTag = async(data)=>{
 
 export const getDetailsTag = async (id) => {
     try {
-      const res = await axios.get(
+      const res = await axiosJWT.get(
         `${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${id}`
       );
       return res.data;

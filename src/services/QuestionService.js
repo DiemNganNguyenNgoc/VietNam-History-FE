@@ -19,7 +19,7 @@ export const getAllQues = async (data) => {
 
 export const getDetailsQuestion = async (id) => {
   try {
-    const res = await axios.get(
+    const res = await axiosJWT.get(
       `${process.env.REACT_APP_API_URL_BACKEND}/question/get-detail-question/${id}`
     );
     return res.data;

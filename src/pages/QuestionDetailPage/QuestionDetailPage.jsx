@@ -8,6 +8,8 @@ import { useMutationHook } from "../../hooks/useMutationHook";
 import * as message from "../../components/MessageComponent/MessageComponent";
 import * as AnswerService from "../../services/AnswerService";
 import * as UserService from "../../services/UserService";
+import * as TagService from "../../services/TagService";
+import * as QuestionService from "../../services/QuestionService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -15,7 +17,6 @@ import {
   setDetailQuestion,
 } from "../../redux/slides/questionSlide";
 import { setDetailUser } from "../../redux/slides/userSlide";
-import * as QuestionService from "../../services/QuestionService";
 import { setAllTag } from "../../redux/slides/tagSlide";
 
 const QuestionDetails = () => {
@@ -29,7 +30,7 @@ const QuestionDetails = () => {
   const user = useSelector((state) => state.user);
   // console.log("user", user)
 
-  const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
+  // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
 
   // const question = useSelector((state) => state.question);
   const dispatch = useDispatch();
@@ -41,16 +42,21 @@ const QuestionDetails = () => {
   const detailAsker = useSelector((state) => state.question.detailAsker);
   console.log("detailAsker", detailAsker);
 
+  const allTags = useSelector((state) => state.tag.allTag);
+  console.log("allTags", allTags);
+
   const mutation = useMutationHook((data) => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
+  //lấy thông tin người hỏi
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        if (questionDetail.userQues) {
+        if (questionDetail?.data?.userQues) {
           const userDetails = await UserService.getDetailsUser(
-            questionDetail.userQues
+            questionDetail.data.userQues
           );
+          console.log("userDetails", userDetails);
           dispatch(setDetailAsker(userDetails)); // Lưu thông tin người hỏi vào Redux
         }
       } catch (error) {
@@ -59,8 +65,9 @@ const QuestionDetails = () => {
     };
 
     fetchUserDetails();
-  }, [dispatch, questionDetail.userQues]);
+  }, [dispatch, questionDetail?.data?.userQues]);
 
+  //lấy thông tin câu hỏi
   useEffect(() => {
     // console.log("Question ID:", questionId);
     const fetchQuestionDetail = async () => {
@@ -76,12 +83,26 @@ const QuestionDetails = () => {
     fetchQuestionDetail();
   }, [dispatch, questionId]);
 
-  //Lấy tên tag
+  //Lấy thông tin tag
+  useEffect(() => {
+    const fetchTagsDetails = async () => {
+      if (questionDetail?.data?.tags?.length) {
+        try {
+          const tagDetails = await Promise.all(
+            questionDetail.data.tags.map((tagId) =>
+              TagService.getDetailsTag(tagId)
+            )
+          );
+          dispatch(setAllTag(tagDetails));
+        } catch (error) {
+          console.error("Error fetching tag details:", error);
+        }
+      }
+    };
 
-  const getTagNameById = (tagId) => {
-    const tag = setAllTag.find((t) => t._id === tagId); // `allTags` từ Redux hoặc API
-    return tag ? tag.name : "Unknown Tag";
-  };
+    console.log("");
+    fetchTagsDetails();
+  }, [dispatch, questionDetail?.data?.tags]);
 
   // useEffect(() => {
   //   if (!questionDetail?.id) {
@@ -248,7 +269,7 @@ const QuestionDetails = () => {
     const answerData = {
       content,
       userAns,
-      idQues: "11",
+      idQues: questionId,
       //id:"1",
       images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
     };
@@ -261,7 +282,7 @@ const QuestionDetails = () => {
       {/* Phần người đăng */}
       <div className="d-flex align-items-center mb-4">
         <img
-          src={detailAsker?.img || "https://via.placeholder.com/50"}
+          src={detailAsker.data?.img || "https://via.placeholder.com/50"}
           alt="User Avatar"
           className="rounded-circle me-3"
           style={{
@@ -271,7 +292,7 @@ const QuestionDetails = () => {
           }}
         />
         <div>
-          <strong>{detailAsker?.name || "Anonymous"}</strong>
+          <strong>{detailAsker.data?.name || "Anonymous"}</strong>
           <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
             Asked {questionDetail.data?.createdAt || "Unknown time"}
           </p>
@@ -294,7 +315,7 @@ const QuestionDetails = () => {
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
-        <p>{questionDetail.content || "No content provided"}</p>
+        <p>{questionDetail.data?.content || "No content provided"}</p>
         <div className="bg-dark text-white p-3 rounded">
           {questionDetail.data?.images?.map((img, index) => (
             <img
@@ -309,15 +330,16 @@ const QuestionDetails = () => {
         <div className="bg-light border rounded p-2">
           <code>9 8 7 6 5 4 3 2 1 0</code>
         </div>
-        <p className="mt-3">
-          Where is this defined in the standard, and where has it come from?
-        </p>
+        <p className="mt-3">{questionDetail.data?.note || ""}</p>
 
         {/* Tags chủ đề */}
         <div className="mt-4">
-          {questionDetail.tags?.map((tagId, index) => (
-            <span key={index} className="badge bg-primary me-2">
-              {getTagNameById(tagId)}
+          {questionDetail.tags?.map((tag, index) => (
+            <span
+              key={tag.id || tag._id || index}
+              className="badge bg-primary me-2"
+            >
+              {tag.name}
             </span>
           ))}
         </div>

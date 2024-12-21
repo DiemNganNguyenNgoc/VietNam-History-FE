@@ -2,18 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   id: "",
-  title: "",
-  content: "",
-  note: "",
-  upVoteCount: 0,
-  downVoteCount: 0,
-  answerCount: 0,
-  view: 0,
-  reportCount: 0,
-  active: true,
-  userQues: "",
-  images: [],
-  tags: [],
+  name: "",
+  description: "",
+  usedCount: 0,
+  userTag: "",
   access_token: "",
   allTag: [], // Danh sách tất cả các Tag
   detailTag: {
@@ -41,50 +33,26 @@ export const tagSlide = createSlice({
     updateTag: (state, action) => {
       const {
         _id = "",
-        title = "",
-        content = "",
-        note = "",
-        upVoteCount = 0,
-        downVoteCount = 0,
-        answerCount = 0,
-        view = 0,
-        reportCount = 0,
-        active = true,
-        userQues = "",
-        images = [],
-        tags = [],
+        name = "",
+        description = "",
+        usedCount = 0,
+        userTag = "",
         access_token,
       } = action.payload;
 
-      state.title = title;
-      state.content = content;
-      state.note = note;
-      state.upVoteCount = upVoteCount;
-      state.downVoteCount = downVoteCount;
-      state.answerCount = answerCount;
-      state.view = view;
-      state.reportCount = reportCount;
-      state.active = active;
-      state.userQues = userQues;
-      state.images = images;
-      state.tags = tags;
+      state.name = name;
+      state.description = description;
+      state.usedCount = usedCount;
+      state.userTag = userTag;
       state.access_token = access_token;
       state.id = _id;
     },
     resetTag: (state) => {
       state.id = "";
-      state.title = "";
-      state.content = "";
-      state.note = "";
-      state.upVoteCount = 0;
-      state.downVoteCount = 0;
-      state.answerCount = 0;
-      state.view = 0;
-      state.reportCount = 0;
-      state.active = 0;
-      state.userQues = "";
-      state.images = [];
-      state.tags = [];
+      state.name = "";
+      state.description = "";
+      state.usedCount = 0;
+      state.userTag = "";
       state.access_token = "";
     },
     setAllTag: (state, action) => {
@@ -113,11 +81,7 @@ export const tagSlide = createSlice({
   },
 });
 
-export const {
-  updateTag,
-  resetTag,
-  setAllTag,
-  setDetailTag,
-} = tagSlide.actions;
+export const { updateTag, resetTag, setAllTag, setDetailTag } =
+  tagSlide.actions;
 
 export default tagSlide.reducer;
