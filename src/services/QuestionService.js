@@ -17,6 +17,12 @@ export const getAllQues = async (data) => {
   return res.data;
 };
 
+export const getAllQuesByTag = async (tagId) => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?tag=${tagId}`);
+  return res.data;
+};
+
 export const getDetailsQuestion = async (id) => {
   try {
     const res = await axiosJWT.get(

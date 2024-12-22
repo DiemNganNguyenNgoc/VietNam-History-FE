@@ -92,7 +92,7 @@ export const routes = [
   },
 
   {
-    path: "/tagsdetail",
+    path: "/tagsdetail/:tagId",
     page: TagsDetailPage,
     isShowHeader: true,
   },
