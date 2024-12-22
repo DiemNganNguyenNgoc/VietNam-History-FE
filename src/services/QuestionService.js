@@ -34,3 +34,21 @@ export const getDetailsQuestion = async (id) => {
     }
   }
 };
+
+export const getQuestionsByUserId = async (userId) => {
+  try {
+    const res = await axiosJWT.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/user/${userId}`
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
+

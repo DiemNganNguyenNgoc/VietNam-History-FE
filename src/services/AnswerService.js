@@ -5,7 +5,9 @@ export const addAns=async(data)=>{
     return res.data
 }
 
-export const getAllAns=async(data)=>{
-    const res =await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-all`, data)
+export const getAllAns=async(id)=>{
+    const res =await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-all/${id}`)
     return res.data
 }
+
+

@@ -5,6 +5,7 @@ import FormComponent from "../../components/FormComponent/FormComponent";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
+import * as QuestionService from "../../services/QuestionService";
 import { updateUser } from "../../redux/slides/userSlide";
 import { Upload } from "antd";
 import { getBase64 } from "../../utils";
@@ -14,8 +15,11 @@ const ProfileTab = () => {
   //   console.log("User state:", user);
   const dispatch = useDispatch();
 
+// Lấy userId từ localStorage
+  const [questionCount, setQuestionCount] = useState(0); 
   const [statusMessage, setStatusMessage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  
 
   //   const [name, setName] = useState(user?.name);
   //   const [email, setEmail] = useState(user?.email);
@@ -41,6 +45,11 @@ const ProfileTab = () => {
     address: "",
     gender: "",
     password: "",
+    reportCount: 0,
+    followerCount: 0,   
+    followingCount: 0,
+    savedCount: 0,
+    reputation: 0,
   });
 
   const mutation = useMutationHook((data) => {
@@ -109,6 +118,11 @@ const ProfileTab = () => {
         address: user?.address || "",
         gender: user?.gender || "",
         password: user?.password || "", // Không lưu lại mật khẩu trong form
+        reportCount: user?.reportCount || 0,
+        followerCount: user?.followerCount || 0,   
+        followingCount: user?.followingCount || 0,
+        savedCount: user?.savedCount || 0,
+        reputation: user?.reputation || 0,
       });
     }
   }, [user]);
@@ -213,6 +227,31 @@ const ProfileTab = () => {
     }
   };
 
+  useEffect(() => {
+    // Hàm lấy số lượng câu hỏi
+    const fetchQuestionCount = async () => {
+      try {
+        // Gọi API để lấy câu hỏi theo userId
+        const response = await QuestionService.getQuestionsByUserId(user.id);
+        
+        // Nếu có dữ liệu, cập nhật số lượng câu hỏi
+        setQuestionCount(response?.total || 0); 
+      } catch (error) {
+        // Nếu có lỗi, cập nhật thông báo lỗi
+        setStatusMessage({
+          type: "Error",
+          message: error.message || "Đã xảy ra lỗi khi tải dữ liệu.",
+        });
+      }
+    };
+  
+    // Gọi hàm fetch khi userId thay đổi
+    if (user.id) {
+      fetchQuestionCount();
+    }
+  
+  }, [user.id]); // Chạy lại khi userId thay đổi
+  
   return (
     <div className="row">
       <div className="col-3">
@@ -222,23 +261,23 @@ const ProfileTab = () => {
           <table className="table table-borderless">
             <tbody style={{ verticalAlign: "middle" }}>
               <tr>
-                <td className="fw-bold fs-5">280</td>
-                <td className="fw-bold fs-5">20</td>
+                <td className="fw-bold fs-5">{formData.reputation}</td>
+                <td className="fw-bold fs-5">{formData.followerCount}</td>
               </tr>
               <tr className="row-2">
                 <td className="text-muted">reputation</td>
                 <td className="text-muted">followers</td>
               </tr>
               <tr>
-                <td className="fw-bold fs-5">11</td>
-                <td className="fw-bold fs-5">20</td>
+                <td className="fw-bold fs-5">{formData.savedCount}</td>
+                <td className="fw-bold fs-5">{formData.followingCount}</td>
               </tr>
               <tr className="row-2">
                 <td className="text-muted">saved</td>
                 <td className="text-muted">following</td>
               </tr>
               <tr>
-                <td className="fw-bold fs-5">12</td>
+                <td className="fw-bold fs-5">{questionCount}</td>
                 <td className="fw-bold fs-5">12</td>
               </tr>
               <tr className="row-2">

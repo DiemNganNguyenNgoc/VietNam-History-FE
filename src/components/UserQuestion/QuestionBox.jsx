@@ -1,7 +1,10 @@
 import React from 'react';
 import './QuestionBox.css';
+import * as QuestionService from "../../services/QuestionService";
+import { useSelector } from "react-redux";
 
-const QuestionBox = ({ title, tags, date, views, answers, likes }) => {
+const QuestionBox = ({ title, date, views, answers, likes }) => {
+  const user = useSelector((state) => state.user);
   return (
     <div className="question-box">
       <div className="question-content">
@@ -15,9 +18,9 @@ const QuestionBox = ({ title, tags, date, views, answers, likes }) => {
         <div className="title-and-tags">
           <h3 className="question_title">{title}</h3>
           <div className="tags-container">
-            {tags.map((tag, index) => (
-              <span key={index} className="tag-item">{tag}</span>
-            ))}
+            
+              <span className="tag-item">{"tag"}</span>
+            
           </div>
         </div>
         <div className="date-container">

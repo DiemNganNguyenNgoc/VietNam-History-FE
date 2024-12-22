@@ -160,7 +160,8 @@ const QuestionDetails = () => {
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success();
-      alert('Question has been added successfully!');
+      alert('Answer has been added successfully!');
+      
     
     }
     if (isError) {
