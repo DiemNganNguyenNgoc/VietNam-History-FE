@@ -13,6 +13,11 @@ const initialState = {
   address: "",
   gender: "",
   password: "",
+  reportCount: "",
+  followerCount: "",   
+  followingCount: "",
+  savedCount: "",
+  reputation: "",
 
   access_token: "",
   allUser: [], // Danh sách tất cả các Question
@@ -38,6 +43,11 @@ export const userSlide = createSlice({
         address = "",
         gender = "",
         password = "",
+        reportCount = "",
+        followerCount = "",   
+        followingCount = "",
+        savedCount = "",
+        reputation =  "",
         access_token,
       } = action.payload;
 
@@ -52,6 +62,11 @@ export const userSlide = createSlice({
       state.address = address;
       state.gender = gender;
       state.password = password;
+      state.reportCount = reportCount;
+      state.followerCount = followerCount;
+      state.followingCount = followingCount;
+      state.savedCount = savedCount;
+      state.reputation = reputation;
       state.access_token = access_token;
       state.id = _id;
     },
@@ -69,6 +84,11 @@ export const userSlide = createSlice({
       state.gender = "";
       state.password = "";
       state.access_token = "";
+      state.reportCount = "";
+      state.followerCount = "";
+      state.followingCount = "";
+      state.savedCount = "";
+      state.reputation = "";
     },
     setAllUser: (state, action) => {
       state.allUser = action.payload; // Lưu danh sách Question từ API
