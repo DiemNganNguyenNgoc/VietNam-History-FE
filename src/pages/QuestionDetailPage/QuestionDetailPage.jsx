@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
-import TextEditor from "../QuestionDetailPage/partials/TextEditor";
 import Compressor from "compressorjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutationHook } from "../../hooks/useMutationHook";
@@ -18,14 +17,14 @@ import {
 } from "../../redux/slides/questionSlide";
 import { setDetailUser } from "../../redux/slides/userSlide";
 import { setAllTag } from "../../redux/slides/tagSlide";
+import AnswerEditor from "../../components/AnswerComponent/AnswerComponent"
 
 const QuestionDetails = () => {
   const navigate = useNavigate();
-
   const [showTextArea, setShowTextArea] = useState(false);
   const [content, setContent] = useState("");
   const [userAns, setIdUser] = useState("");
-  const [idQues, setIdQues] = useState("");
+  const [userQues, setuserQues] = useState("");
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
   // console.log("user", user)
@@ -111,9 +110,9 @@ const QuestionDetails = () => {
   //   }
   // }, [questionDetail.detailQuestion, navigate]);
 
-  const handleContent = (value) => {
+  const handleContentChange = useCallback((value) => {
     setContent(value);
-  };
+  }, []);
 
   useEffect(() => {
     if (isSuccess && data?.status !== "ERR") {
@@ -137,145 +136,61 @@ const QuestionDetails = () => {
   //   }
   // }, [question]);
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-
-    files.forEach((file) => {
-      new Compressor(file, {
-        quality: 0.6, // Quality (60%)
-        maxWidth: 800, // Max width
-        maxHeight: 800, // Max height
-        success(result) {
-          // Tạo URL tạm cho các ảnh đã nén
-          const compressedImage = URL.createObjectURL(result);
-          setImageSrcs((prevImages) => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
-        },
-        error(err) {
-          console.error(err);
-        },
+   const handleImageUpload = (event) => {
+      const files = Array.from(event.target.files);
+  
+      files.forEach((file) => {
+        new Compressor(file, {
+          quality: 0.6, // Quality (60%)
+          maxWidth: 800, // Max width
+          maxHeight: 800, // Max height
+          success(result) {
+            // Tạo URL tạm cho các ảnh đã nén
+            const compressedImage = URL.createObjectURL(result);
+            setImageSrcs(prevImages => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
+          },
+          error(err) {
+            console.error(err);
+          }
+        });
       });
-    });
-  };
+    };
 
   // Xử lý xóa ảnh
-  const handleRemoveImage = (index) => {
-    const newImageSrcs = [...imageSrcs];
-    newImageSrcs.splice(index, 1);
-    setImageSrcs(newImageSrcs);
-  };
+  const handleRemoveImage = useCallback((index) => {
+    setImageSrcs((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
-  //CLick de hien ra textEditor
-  const handleClickAnswer = () => {
-    setShowTextArea(!showTextArea);
-  };
 
-  //Xu li khi click add an answer thi xuat hien textEditor
-  const ExtraComponent = () => (
-    <div>
-      <div className="input" style={{ marginTop: "30px" }}>
-        <h1 className="label">Upload Images</h1>
-        <input type="file" multiple onChange={handleImageUpload} />
-        {imageSrcs.length > 0 && (
-          <div>
-            <h3>Preview Images</h3>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-              {imageSrcs.map((src, index) => (
-                <div key={index} style={{ position: "relative" }}>
-                  <img
-                    src={src}
-                    alt={`Uploaded preview ${index}`}
-                    style={{
-                      width: "500px", // Adjusted size
-                      height: "auto", // Keep aspect ratio
-                      margin: "10px",
-                      objectFit: "cover", // To ensure images are properly scaled
-                    }}
-                  />
-                  <button
-                    style={{
-                      position: "absolute",
-                      top: "0",
-                      right: "0",
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "50%",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                    }}
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    X
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="input" style={{ marginTop: "30px" }}>
-        <h1 className="label">
-          Problem details <span className="asterisk">*</span>
-        </h1>
-        <h2 className="description">
-          Introduce the problem and expand on what you put in the title. Minimum
-          20 characters.
-        </h2>
-        <TextEditor
-          value={content}
-          onChange={handleContent}
-          placeholder="Describe the problem here..."
-        />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "30px",
-        }}
-      >
-        <ButtonComponent textButton="Cancel" onClick={handleCancelClick} />
-        <LoadingComponent isLoading={isLoading}>
-          <ButtonComponent
-            textButton="Submit question"
-            onClick={handlePostAnswerClick}
-          />
-        </LoadingComponent>
-      </div>
-    </div>
-  );
-
-  const handleCancelClick = () => {
-    alert("Cancel adding the question!");
-  };
   //them cau tra loi
-  const handlePostAnswerClick = async () => {
-    // Kiểm tra nếu không có ảnh được chọn
-    if (imageSrcs.length > 0) {
-      // Lưu ảnh vào câu hỏi trước khi gửi
-      const imageUrls = imageSrcs.map((src) => src); // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
-    }
-
-    if (!userAns) {
+  const handlePostAnswerClick = useCallback(async () => {
+    if (!user?.id) {
       alert("User ID is missing. Please log in again.");
       return;
     }
-    // if (!idQues) {
-    //   alert("Question ID is missing. Please log in again.");
-    //   return;
-    // }
+    if (!questionDetail?.data?.userQues) {
+      alert("Question owner's ID is missing.");
+      return;
+    }
 
     const answerData = {
       content,
-      userAns,
-      idQues: questionId,
-      //id:"1",
-      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+      userAns: user, // ID người trả lời
+      question: questionDetail, // ID câu hỏi
+      images: imageSrcs, // Hình ảnh đính kèm
     };
-
+    console.log("result",answerData )
     await mutation.mutateAsync(answerData);
-  };
+   
+  });
+
+
+  const handleCancelClick = useCallback(() => {
+    alert("Cancel adding the question!");
+  }, []);
+  const handleClickAnswer = useCallback(() => {
+    setShowTextArea((prev) => !prev);
+  }, []);
 
   return (
     <div className="container my-4">
@@ -436,7 +351,17 @@ const QuestionDetails = () => {
           textButton="Add an answer"
           onClick={handleClickAnswer}
         ></ButtonComponent>
-        {showTextArea && <ExtraComponent />}
+        {showTextArea && <AnswerEditor
+          content={content}
+          onContentChange={handleContentChange}
+          onCancel={handleCancelClick}
+          isLoading={isLoading}
+          imageSrcs={imageSrcs}
+          onImageUpload={handleImageUpload}
+          onRemoveImage={handleRemoveImage}
+          onSubmit={handlePostAnswerClick}
+         
+        />}
       </div>
     </div>
   );

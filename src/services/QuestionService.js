@@ -3,7 +3,7 @@ export const axiosJWT = axios.create();
 
 export const addQues = async (data) => {
   const res = await axios.post(
-    `${process.env.REACT_APP_API_URL_BACKEND}/question/create-queston`,
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/create-question`,
     data
   );
   return res.data;
