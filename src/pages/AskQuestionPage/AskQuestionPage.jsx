@@ -30,6 +30,13 @@ const AskQuestionPage = () => {
     return res?.data || []; // Trả về mảng rỗng nếu không có dữ liệu
   };
 
+  useEffect(() => {
+    console.log("user:", user);
+    if (user?.id) {
+      setIdUser(user.id);
+    }
+  }, [user]);
+
   const { isLoading: isTagLoading, data: tagsData } = useQuery({
     queryKey: ["tagsData"],
     queryFn: getAllTag,
@@ -43,11 +50,7 @@ const AskQuestionPage = () => {
     }))
     : [];
 
-  useEffect(() => {
-    if (user?.id) {
-      setIdUser(user.id);
-    }
-  }, [user]);
+  
 
   const handleTitle = (value) => {
     setTitle(value);

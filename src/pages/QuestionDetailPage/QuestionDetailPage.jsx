@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import Comment from "../../components/Comment/CommentComponent"
 import Compressor from "compressorjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutationHook } from "../../hooks/useMutationHook";
@@ -9,8 +10,13 @@ import * as AnswerService from "../../services/AnswerService";
 import * as UserService from "../../services/UserService";
 import * as TagService from "../../services/TagService";
 import * as QuestionService from "../../services/QuestionService";
+import * as CommentService from "../../services/CommentService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+
+
 import {
   setDetailAsker,
   setDetailQuestion,
@@ -23,10 +29,13 @@ const QuestionDetails = () => {
   const navigate = useNavigate();
   const [showTextArea, setShowTextArea] = useState(false);
   const [content, setContent] = useState("");
-  const [userAns, setIdUser] = useState("");
-  const [userQues, setuserQues] = useState("");
+  const [userAns, setIdUser] = useState('');
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
+
+  const [idQues, setIdQues] = useState("");
+  const [userCom, setIdUserCom] = useState('');
+  const [TextCom, setTextCom] = useState('');
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -47,6 +56,9 @@ const QuestionDetails = () => {
   const mutation = useMutationHook(data => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
+  const mutationComment = useMutationHook(data => CommentService.addComment(data));
+    const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
+
   //lấy thông tin người hỏi
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -62,6 +74,8 @@ const QuestionDetails = () => {
         console.error("Error fetching user details:", error);
       }
     };
+
+
 
     fetchUserDetails();
   }, [dispatch, questionDetail?.data?.userQues]);
@@ -117,10 +131,16 @@ const QuestionDetails = () => {
 
 
   useEffect(() => {
-    if (user?.id) {
-      setIdUser(user.id);
-    }
-  }, [user]);
+    console.log("user:", user);
+      if (user?.id) {
+        setIdUser(user.id);
+      }
+    }, [user]);
+
+  // Nhận text comment
+  const handleTextCom = (value) => {
+    setTextCom(value);
+  };
 
   // useEffect(() => {
   //   if (question?.id) {
@@ -193,6 +213,53 @@ const QuestionDetails = () => {
     setShowTextArea((prev) => !prev);
   }, []);
 
+  useEffect(() => {
+    if (isSuccessCom && dataCom?.status !== 'ERR') {
+      message.success();
+      alert('Comment has been added successfully!');
+      navigate("/Comment")
+    }
+    if (isErrorCom) {
+      message.error();
+    }
+  }, [isSuccessCom, isErrorCom]);
+
+  //Lấy tất cả comment
+  const getAllCom = async () => {
+    const res = await CommentService.getAllComment(questionId);
+    return res.data;
+  };
+
+  const {
+    isLoading: isLoadingQues,
+    data: commentQuess,
+    error,
+  } = useQuery({
+    queryKey: ["commentQuess"],
+    queryFn: getAllCom,
+  });
+
+  const handleAddCommentClick = async ( ) => {
+    
+    if (!userAns) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+
+    const commentData = {
+     
+      TextCom,
+      userAns,
+      questionId,
+      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+      
+    };
+
+    await mutationComment.mutateAsync(commentData);
+    TextCom = "";
+  };
+
+
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -264,47 +331,38 @@ const QuestionDetails = () => {
       {/* Phần bình luận */}
       <div className="mb-4">
         <h5 className="mb-3">Comments</h5>
-        <div className="border-bottom pb-2 mb-2">
-          <div className="d-flex align-items-center mb-2">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="Commenter Avatar"
-              className="rounded-circle me-2"
-              width="40"
-              height="40"
-            />
-            <strong>Skware Folux</strong>
-          </div>
-          <p className="mb-1">
-            The most dangerous feature of this construct is that it starts with
-            9 instead of 10. The same is true for `for (int x = 10; x--{">"}
-            0;)`.
-          </p>
-          <p className="text-muted" style={{ fontSize: "0.9em" }}>
-            Friday 5:36 Apr 26
-          </p>
-        </div>
-        <div className="border-bottom pb-2 mb-2">
-          <div className="d-flex align-items-center mb-2">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="Commenter Avatar"
-              className="rounded-circle me-2"
-              width="40"
-              height="40"
-            />
-            <strong>Anonymous</strong>
-          </div>
-          <p className="mb-1">
-            I think it's valid in any language which has postfix --. This is 40
-            year-old running joke. Every 2-3 years there is a question about it
-            XD
-          </p>
-          <p className="text-muted" style={{ fontSize: "0.9em" }}>
-            Friday 5:36 Apr 26
-          </p>
-        </div>
+        {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
+            commentQuess.map((commentQues) => {
+              //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
+
+              return (
+                <div
+                  key={commentQues._id}
+                  onClick={() => handleAddCommentClick(userAns)}
+                >
+                  <Comment
+                    
+                  />
+                </div>
+              );
+            })
+          ) : (
+            <p>No conmment available.</p>
+          )}
       </div>
+      <div className="mt-4">
+        <textarea
+          className="form-control"
+          placeholder="Add a comment"
+          rows="2"
+          value={TextCom}
+          onChange={(e) => handleTextCom(e.target.value)}
+        ></textarea>
+      </div>
+      <ButtonComponent
+            textButton="Submit comment"
+            onClick={handleAddCommentClick}
+          />
 
       {/* Danh sách câu trả lời */}
       <div>
