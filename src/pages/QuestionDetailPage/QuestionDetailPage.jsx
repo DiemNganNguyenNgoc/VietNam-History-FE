@@ -44,7 +44,7 @@ const QuestionDetails = () => {
   const allTags = useSelector((state) => state.tag.allTag);
   console.log("allTags", allTags);
 
-  const mutation = useMutationHook((data) => AnswerService.addAns(data));
+  const mutation = useMutationHook(data => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
   //lấy thông tin người hỏi
@@ -114,15 +114,7 @@ const QuestionDetails = () => {
     setContent(value);
   }, []);
 
-  useEffect(() => {
-    if (isSuccess && data?.status !== "ERR") {
-      message.success();
-      alert("Answer has been added successfully!");
-    }
-    if (isError) {
-      message.error();
-    }
-  }, [isSuccess, isError]);
+
 
   useEffect(() => {
     if (user?.id) {
@@ -136,25 +128,25 @@ const QuestionDetails = () => {
   //   }
   // }, [question]);
 
-   const handleImageUpload = (event) => {
-      const files = Array.from(event.target.files);
-  
-      files.forEach((file) => {
-        new Compressor(file, {
-          quality: 0.6, // Quality (60%)
-          maxWidth: 800, // Max width
-          maxHeight: 800, // Max height
-          success(result) {
-            // Tạo URL tạm cho các ảnh đã nén
-            const compressedImage = URL.createObjectURL(result);
-            setImageSrcs(prevImages => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
-          },
-          error(err) {
-            console.error(err);
-          }
-        });
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach((file) => {
+      new Compressor(file, {
+        quality: 0.6, // Quality (60%)
+        maxWidth: 800, // Max width
+        maxHeight: 800, // Max height
+        success(result) {
+          // Tạo URL tạm cho các ảnh đã nén
+          const compressedImage = URL.createObjectURL(result);
+          setImageSrcs(prevImages => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
+        },
+        error(err) {
+          console.error(err);
+        }
       });
-    };
+    });
+  };
 
   // Xử lý xóa ảnh
   const handleRemoveImage = useCallback((index) => {
@@ -163,26 +155,34 @@ const QuestionDetails = () => {
 
 
   //them cau tra loi
+
+
+  useEffect(() => {
+    if (isSuccess && data?.status !== 'ERR') {
+      message.success();
+      alert('Question has been added successfully!');
+    
+    }
+    if (isError) {
+      message.error();
+    }
+  }, [isSuccess, isError]);
+
   const handlePostAnswerClick = useCallback(async () => {
     if (!user?.id) {
       alert("User ID is missing. Please log in again.");
       return;
     }
-    if (!questionDetail?.data?.userQues) {
-      alert("Question owner's ID is missing.");
-      return;
-    }
 
     const answerData = {
       content,
-      userAns: user, // ID người trả lời
-      question: questionDetail, // ID câu hỏi
-      images: imageSrcs, // Hình ảnh đính kèm
+      userAns: user.id,
+      question: questionId,
+      images: imageSrcs,
     };
-    console.log("result",answerData )
+
     await mutation.mutateAsync(answerData);
-   
-  });
+  }, [content, imageSrcs, mutation, questionId, user]);
 
 
   const handleCancelClick = useCallback(() => {
@@ -360,7 +360,7 @@ const QuestionDetails = () => {
           onImageUpload={handleImageUpload}
           onRemoveImage={handleRemoveImage}
           onSubmit={handlePostAnswerClick}
-         
+
         />}
       </div>
     </div>
