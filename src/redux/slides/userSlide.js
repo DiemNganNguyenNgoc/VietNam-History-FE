@@ -13,11 +13,13 @@ const initialState = {
   address: "",
   gender: "",
   password: "",
+  followerCount: 0,
+  followingCount: 0,
 
   access_token: "",
-  allUser: [], // Danh sách tất cả các Question
+  allUser: [], // Danh sách tất cả các user
   detailUser: {},
-  
+  allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại
 };
 
 export const userSlide = createSlice({
@@ -38,6 +40,8 @@ export const userSlide = createSlice({
         address = "",
         gender = "",
         password = "",
+        followerCount = 0,
+        followingCount = 0,
         access_token,
       } = action.payload;
 
@@ -52,6 +56,8 @@ export const userSlide = createSlice({
       state.address = address;
       state.gender = gender;
       state.password = password;
+      state.followingCount = followingCount;
+      state.followerCount = followerCount;
       state.access_token = access_token;
       state.id = _id;
     },
@@ -68,6 +74,8 @@ export const userSlide = createSlice({
       state.address = "";
       state.gender = "";
       state.password = "";
+      state.followerCount = 0;
+      state.followingCount = 0;
       state.access_token = "";
     },
     setAllUser: (state, action) => {
@@ -76,11 +84,18 @@ export const userSlide = createSlice({
     setDetailUser: (state, action) => {
       state.detailUser = action.payload;
     },
-
+    setAllUsersExceptSelf: (state, action) => {
+      state.allUsersExceptSelf = action.payload;
+    },
   },
 });
 
-export const { updateUser, resetUser, setDetailUser, setAllUser } =
-  userSlide.actions;
+export const {
+  updateUser,
+  resetUser,
+  setDetailUser,
+  setAllUser,
+  setAllUsersExceptSelf,
+} = userSlide.actions;
 
 export default userSlide.reducer;
