@@ -187,7 +187,7 @@ const HeaderComponent = () => {
             <li class="nav-item">
               <a
                 class="nav-link"
-                href="/otheruserprofile"
+                href="/other-list-user"
                 style={Styles.textHeader}
               >
                 <i class="bi bi-people-fill" style={Styles.iconHeader}></i>

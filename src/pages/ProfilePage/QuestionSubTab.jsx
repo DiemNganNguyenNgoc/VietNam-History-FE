@@ -1,13 +1,44 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import QuestionHolder from "../../components/UserQuestion/QuestionHolder";
 import "../../css/QuestionSubTab.css";
+import * as QuestionService from "../../services/QuestionService";
+import { useSelector } from "react-redux";
+
 
 const QuestionSubTab = (questionQuantity) => {
-  questionQuantity = 3;
+  const [questionCount, setQuestionCount] = useState(0); 
+  const [statusMessage, setStatusMessage] = useState(null);
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+      // Hàm lấy số lượng câu hỏi
+      const fetchQuestionCount = async () => {
+        try {
+          // Gọi API để lấy câu hỏi theo userId
+          const response = await QuestionService.getQuestionsByUserId(user.id);
+          
+          // Nếu có dữ liệu, cập nhật số lượng câu hỏi
+          setQuestionCount(response?.total || 0); 
+        } catch (error) {
+          // Nếu có lỗi, cập nhật thông báo lỗi
+          setStatusMessage({
+            type: "Error",
+            message: error.message || "Đã xảy ra lỗi khi tải dữ liệu.",
+          });
+        }
+      };
+    
+      // Gọi hàm fetch khi userId thay đổi
+      if (user.id) {
+        fetchQuestionCount();
+      }
+    
+    }, [user.id]);
+
   return (
     <div>
       <div className="title">
-        <h3>Questions {questionQuantity} </h3>
+        <h3>Questions {questionCount} </h3>
       </div>
       <div className="question-list">
         <QuestionHolder></QuestionHolder>
