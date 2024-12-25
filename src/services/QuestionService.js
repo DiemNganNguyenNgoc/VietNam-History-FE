@@ -65,3 +65,30 @@ export const getQuestionsByUserId = async (userId) => {
   }
 };
 
+export const updateAnswerCount = async (id, data) => {
+  try {
+    const res = await axiosJWT.put(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/update-answercount/${id}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          //token: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return res.data; // Trả dữ liệu nếu thành công
+  } catch (error) {
+    // Nếu API trả về lỗi, ném lỗi với thông tin chi tiết
+    if (error.response) {
+      // API trả về response
+      throw {
+        // status: error.response.data?.status || "ERR",
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      // Lỗi không có response (ví dụ lỗi mạng)
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
