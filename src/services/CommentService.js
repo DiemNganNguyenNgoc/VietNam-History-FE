@@ -3,7 +3,7 @@ export const axiosJWT = axios.create();
 
 export const addComment = async (data) => {
   const res = await axios.post(
-    `${process.env.REACT_APP_API_URL_BACKEND}/comment/create-queston`,
+    `${process.env.REACT_APP_API_URL_BACKEND}/comment/create-comment`,
     data
   );
   return res.data;

@@ -131,7 +131,7 @@ const QuestionDetails = () => {
 
 
   useEffect(() => {
-    console.log("user:", user);
+      console.log("user:", user);
       if (user?.id) {
         setIdUser(user.id);
       }
@@ -190,14 +190,14 @@ const QuestionDetails = () => {
   }, [isSuccess, isError]);
 
   const handlePostAnswerClick = useCallback(async () => {
-    if (!user?.id) {
+    if (!userAns) {
       alert("User ID is missing. Please log in again.");
       return;
     }
 
     const answerData = {
       content,
-      userAns: user.id,
+      userAns,
       question: questionId,
       images: imageSrcs,
     };
@@ -338,7 +338,7 @@ const QuestionDetails = () => {
               return (
                 <div
                   key={commentQues._id}
-                  onClick={() => handleAddCommentClick(userAns)}
+                  //onClick={() => handleAddCommentClick}
                 >
                   <Comment
                     
