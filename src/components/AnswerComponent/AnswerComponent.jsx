@@ -26,7 +26,7 @@ const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel,
                     />
                     <button
                       style={{
-                        position: "absolute",
+                       // position: "absolute",
                         top: "0",
                         right: "0",
                         backgroundColor: "red",
@@ -49,16 +49,13 @@ const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel,
   
         <div className="input" style={{ marginTop: "30px" }}>
           <h1 className="label">
-            Problem details <span className="asterisk">*</span>
+            Answer details <span className="asterisk">*</span>
           </h1>
-          <h2 className="description">
-            Introduce the problem and expand on what you put in the title. Minimum
-            20 characters.
-          </h2>
+
           <TextEditor
             value={content}
             onChange={onContentChange}
-            placeholder="Describe the problem here..."
+            placeholder="Write your answer here..."
           />
         </div>
         <div style={{ display: "flex", justifyContent: "center", marginTop: "30px" }}>
