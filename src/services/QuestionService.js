@@ -41,6 +41,13 @@ export const getDetailsQuestion = async (id) => {
   }
 };
 
+export const updateQuestion = async (id, data) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-question/${id}`,data
+  );
+  return res.data;
+};
+
 export const getQuestionsByUserId = async (userId) => {
   try {
     const res = await axiosJWT.get(

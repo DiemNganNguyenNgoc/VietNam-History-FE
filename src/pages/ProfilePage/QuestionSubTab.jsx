@@ -9,18 +9,16 @@ const QuestionSubTab = (questionQuantity) => {
   const [questionCount, setQuestionCount] = useState(0); 
   const [statusMessage, setStatusMessage] = useState(null);
   const user = useSelector((state) => state.user);
+  
 
   useEffect(() => {
       // Hàm lấy số lượng câu hỏi
       const fetchQuestionCount = async () => {
         try {
-          // Gọi API để lấy câu hỏi theo userId
           const response = await QuestionService.getQuestionsByUserId(user.id);
-          
-          // Nếu có dữ liệu, cập nhật số lượng câu hỏi
+        
           setQuestionCount(response?.total || 0); 
         } catch (error) {
-          // Nếu có lỗi, cập nhật thông báo lỗi
           setStatusMessage({
             type: "Error",
             message: error.message || "Đã xảy ra lỗi khi tải dữ liệu.",
