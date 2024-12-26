@@ -117,7 +117,7 @@ export const routes = [
   },
 
   {
-    path: "admin/profile",
+    path: "/admin/profile",
     page: ProfileAdmin,
     isShowHeader: true,
   },

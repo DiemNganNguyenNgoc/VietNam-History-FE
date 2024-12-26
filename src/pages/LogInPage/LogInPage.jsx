@@ -11,6 +11,7 @@ import LoadingComponent from "../../components/LoadingComponent/LoadingComponent
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../../redux/slides/userSlide";
+import { updateAdmin } from "../../redux/slides/adminSlide";
 
 const LogInPage = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +31,12 @@ const LogInPage = () => {
   const mutation = useMutationHook((data) => {
     // Check if the email contains "admin"
     if (data.email.includes("admin")) {
+      // console.log(
+      //   "AdminService.loginAdmin(data): ",
+      //   AdminService.loginAdmin(data)
+      // );
       // Use AdminService for admin login
+      // console.log("data.email.includes admins", data.email.includes("admin"));
       return AdminService.loginAdmin(data);
     } else {
       // Use UserService for user login
@@ -41,12 +47,22 @@ const LogInPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      localStorage.setItem("access_token", JSON.stringify(data?.access_token));
-      if (data?.access_token) {
-        const decoded = jwtDecode(data?.access_token);
-        if (decoded?.id) {
-          handleGetDetailsUser(decoded?.id, data?.access_token);
+      const token = data?.access_token;
+      localStorage.setItem("access_token", JSON.stringify(token));
+
+      if (token) {
+        const decoded = jwtDecode(token); // Giải mã token để kiểm tra vai trò
+        console.log("decoded", decoded);
+
+        if (decoded?.isAdmin) {
+          console.log("Admin login detected.");
+          handleGetDetailsAdmin(decoded?.id, token);
+        } else {
+          console.log("User login detected.");
+          handleGetDetailsUser(decoded?.id, token);
         }
+      } else {
+        console.error("Token not available.");
       }
     }
   }, [isSuccess]);
@@ -54,6 +70,11 @@ const LogInPage = () => {
   const handleGetDetailsUser = async (id, token) => {
     const res = await UserService.getDetailsUser(id, token);
     dispatch(updateUser({ ...res?.data, access_token: token }));
+  };
+
+  const handleGetDetailsAdmin = async (id, token) => {
+    const res = await AdminService.getDetailsAdmin(id, token);
+    dispatch(updateAdmin({ ...res?.data, access_token: token }));
   };
 
   // Check if all fields are filled to enable the button

@@ -9,7 +9,10 @@ import "./OtherListUserPage.css";
 const OtherListUserPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  // console.log("user", user);
+  
   const { allUser } = useSelector((state) => state.user);
+  console.log("allUser", allUser);
 
   useEffect(() => {
     const fetchUsers = async () => {

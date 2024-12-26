@@ -23,6 +23,7 @@ const initialState = {
   allUser: [], // Danh sách tất cả các user
   detailUser: {},
   allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại
+  followers: []
 };
 
 export const userSlide = createSlice({
@@ -99,6 +100,9 @@ export const userSlide = createSlice({
     setAllUsersExceptSelf: (state, action) => {
       state.allUsersExceptSelf = action.payload;
     },
+    addFollow: (state, action) => {
+      state.followers.push(action.payload); // Thêm người theo dõi vào danh sách
+    },
   },
 });
 
@@ -108,6 +112,7 @@ export const {
   setDetailUser,
   setAllUser,
   setAllUsersExceptSelf,
+  addFollow
 } = userSlide.actions;
 
 export default userSlide.reducer;
