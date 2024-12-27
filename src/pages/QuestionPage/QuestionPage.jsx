@@ -34,13 +34,6 @@ const QuestionPage = () => {
     return res.data;
   };
 
-  // const getUserInfo = async (userQuesId) => {
-  //   if (!userQuesId) {
-  //     throw new Error("ID người dùng không hợp lệ.");
-  //   }
-  //   const res = await UserService.getDetailsUser(userQuesId); // Hàm này cần được định nghĩa trong UserService
-  //   return res.data;
-  // };
 
   const {
     isLoading: isLoadingQues,
@@ -51,50 +44,6 @@ const QuestionPage = () => {
     queryFn: getAllQues,
   });
 
-  // useEffect(() => {
-  //   if (Array.isArray(questions) && questions.length > 0) {
-  //     const fetchUserInfo = async () => {
-  //       const userInfos = await Promise.all(
-  //         questions.map(async (question) => {
-  //           const userQuesId = question.userQues; // ID người dùng
-
-  //           // Kiểm tra ID người dùng trước khi gọi API
-  //           if (!userQuesId) {
-  //             console.error(
-  //               `Lỗi: ID người dùng không hợp lệ cho câu hỏi ${question._id}`
-  //             );
-  //             return {
-  //               username: "Unknown",
-  //               reputation: 0,
-  //               followers: 0,
-  //               questionId: question._id,
-  //             }; // Trả về dữ liệu mặc định
-  //           }
-
-  //           try {
-  //             const userData = await getUserInfo(userQuesId); // Lấy thông tin người dùng
-  //             return { ...userData, questionId: question._id }; // Lưu trữ thông tin người dùng
-  //           } catch (error) {
-  //             console.error("Lỗi khi lấy thông tin người dùng:", error.message);
-  //             return {
-  //               username: "Unknown",
-  //               reputation: 0,
-  //               followers: 0,
-  //               questionId: question._id,
-  //             }; // Trả về dữ liệu mặc định khi lỗi
-  //           }
-  //         })
-  //       );
-
-  //       const userInfoMap = {}; 
-  //       userInfos.forEach((user) => {
-  //         userInfoMap[user.questionId] = user;
-  //       });
-  //       setUserInfo(userInfoMap); 
-  //     };
-  //     fetchUserInfo();
-  //   }
-  // }, [questions]);
    // Lấy thông tin người dùng dựa trên userId từ câu hỏi
       const getUserDetails = async (userId) => {
           if (!userId) return null; 

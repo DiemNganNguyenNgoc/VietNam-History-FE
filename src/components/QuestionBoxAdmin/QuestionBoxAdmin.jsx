@@ -1,14 +1,50 @@
 import React from 'react';
 import './QuestionBoxAdmin.css';
-import img1 from "../../assets/image/avatar_1.jpg";
-import { Button } from 'bootstrap';
+import { Popover } from 'antd';
 
-const QuestionBoxAdmin = ({ username, reputation, followers, title, tags, date, views, answers, likes }) => {
+const QuestionBoxAdmin = ({ img, username, reputation, followers, title, tags, date, views, answers, likes,onHidden ,onDelete}) => {
+
+  const content = (
+    <div>
+      {["Hidden", "Delete"].map((item, index) => (
+        <p
+          key={index}
+          onClick={(e) => {
+            e.stopPropagation(); // Ngăn sự kiện click lan ra phần tử cha
+            if (item === "Hidden") {
+              onHidden();
+            } else if (item === "Delete") {
+              onDelete && onDelete();
+            }
+          }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+          style={{
+            padding: "10px",
+            margin: 0,
+            cursor: "pointer",
+            transition: "background-color 0.3s",
+          }}
+        >
+          {item}
+        </p>
+      ))}
+    </div>
+  );
+
+  const handlePopoverClick = (e) => {
+    e.stopPropagation(); // Ngăn sự kiện click lan ra phần tử cha
+  };
+
   return (
     <div className="question-box">
       <div className="user-info">
         <div className="icon-container">
-          <img className="icon-styles" src={img1} alt="avatar"></img>
+          {img ? (
+            <img className="icon-styles" src={img} alt="avatar" />
+          ) : (
+            <div className="placeholder-avatar"> </div>
+          )}
         </div>
         <span className="username">{username}</span>
         <div className="details-container">
@@ -41,11 +77,24 @@ const QuestionBoxAdmin = ({ username, reputation, followers, title, tags, date, 
           <span className="date-item">{date}</span>
         </div>
       </div>
-      <div className='delete-container'>
-        
-          <i class="bi bi-x-circle" ></i>
 
-      </div>
+      <div className="btn">
+          <Popover content={content} trigger="click">
+            <div
+              onClick={handlePopoverClick} // Ngăn lan sự kiện
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <i
+                className="bi bi-three-dots-vertical"
+                style={{ color: '#777' }}
+              ></i>
+            </div>
+          </Popover>
+        </div>
     </div>
   );
 };
