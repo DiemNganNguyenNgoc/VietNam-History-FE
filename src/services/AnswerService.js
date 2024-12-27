@@ -14,7 +14,6 @@ export const getAllAns = async (id) => {
 
 // Lấy câu trả lời theo ID câu hỏi
 export const getAnswersByQuestionId = async (questionId) => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answers/get-by-question/${questionId}`);
-    console.log("DATA!@#", res.data)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-question/${questionId}`);
     return res.data;
 };
