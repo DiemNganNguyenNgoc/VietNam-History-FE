@@ -48,7 +48,7 @@ const HeaderComponent = () => {
           onClick={
             item === "Logout"
               ? handleLogout
-              : item === "User Profile"
+              : item === "Profile"
               ? handleNavigateUserProfile
               : null
           }
