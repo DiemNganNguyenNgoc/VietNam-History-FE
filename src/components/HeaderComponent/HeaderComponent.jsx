@@ -37,7 +37,11 @@ const HeaderComponent = () => {
   };
 
   const handleNavigateUserProfile = () => {
-    navigate("/profile");
+    if (admin?.isAdmin) {
+      navigate("/admin/profile");
+    } else {
+      navigate("/profile");
+    }
   };
 
   const content = (
@@ -71,7 +75,7 @@ const HeaderComponent = () => {
     // console.log("User state:", user); // To debug the user state after logout
     setName(user?.name || admin?.name);
     setImg(user?.img || admin?.img);
-  }, [user]);
+  }, [user, admin]);
 
   return (
     <>
@@ -207,7 +211,7 @@ const HeaderComponent = () => {
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="/admin/profile"
+                  href="/admin/manage"
                   style={Styles.textHeader}
                 >
                   <i class="bi bi-people-fill" style={Styles.iconHeader}></i>

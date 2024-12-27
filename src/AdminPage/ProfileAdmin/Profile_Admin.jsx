@@ -48,16 +48,6 @@ function ProfileAdmin() {
                 Profile
               </button>
             </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link ${
-                  activeTab === "activity" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("activity")}
-              >
-                Activity
-              </button>
-            </li>
           </ul>
         </div>
       </div>
