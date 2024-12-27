@@ -125,13 +125,25 @@ const QuestionDetails = () => {
   // }, [questionDetail.detailQuestion, navigate]);
   // Lấy danh sách câu trả lời
   const fetchAnswers = async () => {
-    
     try {
-      console.log("questionId from useParams:", questionDetail.data);
+      console.log("questionId from useParams:", questionId);
 
-      const response = await AnswerService.getAnswersByQuestionId( questionId);
+      const response = await AnswerService.getAnswersByQuestionId(questionId);
       console.log("Fetched answers:", response);
-      setAnswers(response.data); // Cập nhật danh sách câu trả lời
+      setAnswers(response.data.data); // Cập nhật danh sách câu trả lời
+      // In từng câu trả lời trong mảng answers
+      response.data.data.forEach((answer, index) => {
+        console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
+        console.log("Content:", answer.content); // In ra nội dung câu trả lời
+        console.log("Created At:", answer.createdAt); // In ra thời gian tạo câu trả lời
+        // Nếu câu trả lời có ảnh, in ra đường dẫn ảnh
+        if (answer.images) {
+          answer.images.forEach((img, imgIndex) => {
+            console.log(`Image ${imgIndex + 1}:`, img);
+          });
+        }
+      });
+
     } catch (error) {
       console.error("Error fetching answers:", error);
     }
@@ -215,11 +227,14 @@ const QuestionDetails = () => {
     };
 
     await mutation.mutateAsync(answerData);
+       // Clear input and image after successfully posting an answer
+       setContent("");  // Reset the content
+       setImageSrcs([]); // Clear the images
   }, [content, imageSrcs, mutation, questionId, user]);
-  
-    useEffect(() => {
+
+  useEffect(() => {
     fetchAnswers(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
-  }, [ questionId]);
+  }, [questionId]);
 
 
   const handleCancelClick = useCallback(() => {
@@ -393,14 +408,17 @@ const QuestionDetails = () => {
                   height="40"
                 />
                 <div>
-                  <strong>{user.userName}</strong>
+                  
+                </div>
+                <div>
+                  <strong>{answer.userAns}</strong>
                   <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
                     Answered {new Date(answer.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
               <p>{answer.content}</p>
-              {answer.images && answer.images.map((img, imgIndex) => (
+              {answer.images.map((img, imgIndex) => (
                 <img key={imgIndex} src={img} alt={`Answer Image ${imgIndex}`} className="img-fluid rounded my-2" />
               ))}
             </div>
