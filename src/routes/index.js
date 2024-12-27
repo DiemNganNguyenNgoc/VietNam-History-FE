@@ -21,6 +21,7 @@ import QuestionDetailAdmin from "../AdminPage/QuestionDetailAdmin/QuestionDetail
 import TagAdmin from "../AdminPage/TagAdmin/TagAdmin";
 import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
+import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 export const routes = [
   {
     path: "/",
@@ -119,6 +120,12 @@ export const routes = [
   {
     path: "/admin/profile",
     page: ProfileAdmin,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/admin/add-admin",
+    page: SignUpAdminPage,
     isShowHeader: true,
   },
 

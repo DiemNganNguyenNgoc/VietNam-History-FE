@@ -8,10 +8,12 @@ import { getBase64 } from "../../utils";
 import { useMutationHook } from "../../hooks/useMutationHook";
 import * as AdminService from "../../services/AdminService";
 import { Upload } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const ProfileTab = () => {
   const admin = useSelector((state) => state.admin);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Lấy adminId từ localStorage
   const [statusMessage, setStatusMessage] = useState(null);
@@ -136,16 +138,30 @@ const ProfileTab = () => {
       }));
     }
   };
+
+  const handleAddAdmin = () => {
+    navigate("/admin/add-admin");
+  };
   return (
     <div className="row">
-      <h3
-        className="title-profile"
-        style={{
-          marginLeft: "20px",
-        }}
+      <div
+        className="d-flex justify-content-between "
+        style={{ marginBottom: "20px" }}
       >
-        PROFILE
-      </h3>
+        <h3
+          className="title-profile"
+          style={{
+            marginLeft: "20px",
+          }}
+        >
+          PROFILE
+        </h3>
+        <ButtonComponent
+          textButton="Add Admin"
+          type="button"
+          onClick={handleAddAdmin}
+        />
+      </div>
       <div
         className="col-9"
         style={{

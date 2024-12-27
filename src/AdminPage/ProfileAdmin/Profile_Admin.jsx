@@ -4,6 +4,7 @@ import ActivityTab from "../../pages/ProfilePage/ActivityTab";
 import ProfileTabAdmin from "./ProfileTabAdmin";
 import QuestionAdmin from "../QuestionAdmin/QuestionAdmin";
 import { useSelector } from "react-redux";
+import SignUpAdminPage from "./SignUpAdminPage";
 
 function ProfileAdmin() {
   const admin = useSelector((state) => state.admin);
@@ -65,6 +66,7 @@ function ProfileAdmin() {
       <div className="row mt-4">
         <div className="col-12">
           <ProfileTabAdmin></ProfileTabAdmin>
+          {/* <SignUpAdminPage></SignUpAdminPage> */}
         </div>
       </div>
     </div>
