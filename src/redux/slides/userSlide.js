@@ -20,6 +20,8 @@ const initialState = {
   savedCount: "",
   reputation: "",
   access_token: "",
+  answerCount: 0,
+  quesCount:0,
   allUser: [], // Danh sách tất cả các user
   detailUser: {},
   allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại

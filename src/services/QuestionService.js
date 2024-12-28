@@ -76,7 +76,6 @@ export const getQuestionsByUserId = async (userId) => {
 export const updateAnswerCount = async (questionId, newAnswerCount) => {
   const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
   });
-  console.log("ID")
   return response.data;
 };
 

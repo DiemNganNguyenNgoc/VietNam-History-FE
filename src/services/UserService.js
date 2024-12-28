@@ -169,3 +169,13 @@ export const updateQuesCount = async (userId) => {
     throw error;
   }
 };
+
+// Trong hàm updateQuesCount
+export const updateAnswerCount = async (userId) => {
+  try {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/user/update-answer-count/${userId}`);
+    return response.data;  // Đảm bảo trả về dữ liệu đúng
+  } catch (error) {
+    throw error;
+  }
+};
