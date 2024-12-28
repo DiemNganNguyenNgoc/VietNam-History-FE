@@ -90,7 +90,7 @@
   }
   
   .data-table tbody tr:nth-child(even) {
-    background-color: #e8f4ff;
+    background-color: #ffff;
   }
   
   .data-table tbody tr:nth-child(odd) {
@@ -103,10 +103,13 @@
     background-color: white;
     color: red;
     font-weight: bold;
+    margin-top: 10px;
   }
   .view-profile{
     border: none;
     background-color: white;
     color: #787878;
     font-weight: bold;
+    margin-top: 10px;
+    margin-left: 5px;
   }
