@@ -97,8 +97,8 @@
     background-color: #fff;
   }
 
-  .delete-profile{
-    margin-left: 20px;
+  .ban-profile{
+    margin-left: 15px;
     border: none;
     background-color: white;
     color: red;
@@ -111,5 +111,15 @@
     color: #787878;
     font-weight: bold;
     margin-top: 10px;
-    margin-left: 5px;
+  
   }
+  .No{
+    width: 4rem;
+  }
+  .userName{
+    width: 12rem;
+  }
+  .email{
+    width: 16rem;
+  }
+
