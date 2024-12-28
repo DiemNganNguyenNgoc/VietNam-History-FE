@@ -3,6 +3,7 @@ import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
 import '../../css/AskQuestionPage.css';
 import TextEditor from './partials/TextEditor';
 import * as TagService from "../../services/TagService";
+import * as UserService from "../../services/UserService";
 import * as QuestionService from "../../services/QuestionService";
 import { useQuery } from '@tanstack/react-query';
 import FormSelectComponent from '../../components/FormSelectComponent/FormSelectComponent';
@@ -111,6 +112,9 @@ const AskQuestionPage = () => {
   const mutation = useMutationHook(data => QuestionService.addQues(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
+  const mutationUpdate = useMutationHook(id => UserService.updateQuesCount(id));
+  const { data: dataUpdate, isLoading:isLoadingUpdate, isSuccess: isSuccessUpdate, isError: isErrorUpdate } = mutationUpdate;
+
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success();
@@ -120,7 +124,18 @@ const AskQuestionPage = () => {
     if (isError) {
       message.error();
     }
-  }, [isSuccess, isError]);
+  }, [isSuccess, isError, data]);
+
+  useEffect(() => {
+    if (isSuccessUpdate && dataUpdate?.status !== 'ERR') {
+      message.success();
+      alert('a');
+      //navigate("/question")
+    }
+    if (isErrorUpdate) {
+      message.error();
+    }
+  }, [isSuccessUpdate, isErrorUpdate, dataUpdate]);
 
   const handleAskQuestionClick = async () => {
     // Kiểm tra nếu không có tag được chọn
@@ -128,18 +143,12 @@ const AskQuestionPage = () => {
       alert("Please select at least 1 tag.");
       return;
     }
-
-    // Kiểm tra nếu không có ảnh được chọn
-    if (imageSrcs.length > 0) {
-      // Lưu ảnh vào câu hỏi trước khi gửi
-      const imageUrls = imageSrcs.map(src => src);  // Tạm thời dùng src, thực tế sẽ cần upload ảnh nếu cần
-    }
-
+  
     if (!userQues) {
       alert("User ID is missing. Please log in again.");
       return;
     }
-
+  
     const questionData = {
       title,
       content,
@@ -148,9 +157,19 @@ const AskQuestionPage = () => {
       images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
       tags: selectedTags, // Truyền mảng tag đã chọn vào câu hỏi
     };
+  
+    try {
+      // Gửi dữ liệu câu hỏi
+      await mutation.mutateAsync(questionData);
+      await mutationUpdate.mutateAsync(userQues);
+  
 
-    await mutation.mutateAsync(questionData);
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred while processing your request.");
+    }
   };
+  
 
   const handleCancelClick = () => {
     alert("Cancel adding the question!");

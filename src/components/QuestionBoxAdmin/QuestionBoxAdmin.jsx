@@ -2,39 +2,20 @@ import React from 'react';
 import './QuestionBoxAdmin.css';
 import { Popover } from 'antd';
 
-const QuestionBoxAdmin = ({ img, username, reputation, followers, title, tags, date, views, answers, likes,onHidden ,onDelete}) => {
-
-  const content = (
-    <div>
-      {["Hidden", "Delete"].map((item, index) => (
-        <p
-          key={index}
-          onClick={(e) => {
-            e.stopPropagation(); // Ngăn sự kiện click lan ra phần tử cha
-            if (item === "Hidden") {
-              onHidden();
-            } else if (item === "Delete") {
-              onDelete && onDelete();
-            }
-          }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-          style={{
-            padding: "10px",
-            margin: 0,
-            cursor: "pointer",
-            transition: "background-color 0.3s",
-          }}
-        >
-          {item}
-        </p>
-      ))}
-    </div>
-  );
-
-  const handlePopoverClick = (e) => {
-    e.stopPropagation(); // Ngăn sự kiện click lan ra phần tử cha
-  };
+const QuestionBoxAdmin = ({
+  img,
+  username,
+  reputation,
+  followers,
+  title,
+  tags,
+  date,
+  views,
+  answers,
+  likes,
+  onDelete,
+  isHidden, // Thêm trạng thái hiện tại
+}) => {
 
   return (
     <div className="question-box">
@@ -76,25 +57,24 @@ const QuestionBoxAdmin = ({ img, username, reputation, followers, title, tags, d
         <div className="date-container">
           <span className="date-item">{date}</span>
         </div>
+
+        {/* Hiển thị thông báo nếu câu hỏi đang bị ẩn */}
+        {!isHidden && (
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px" }}>
+            This question was hidden by the user.
+          </div>
+        )}
       </div>
 
-      <div className="btn">
-          <Popover content={content} trigger="click">
-            <div
-              onClick={handlePopoverClick} // Ngăn lan sự kiện
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <i
-                className="bi bi-three-dots-vertical"
-                style={{ color: '#777' }}
-              ></i>
-            </div>
-          </Popover>
-        </div>
+      <div>
+        <button
+          className="btn btn-sm btn-light"
+          onClick={onDelete} // Truyền event vào hàm
+        >
+          <i className="bi bi-trash text-danger"></i>
+        </button>
+
+      </div>
     </div>
   );
 };

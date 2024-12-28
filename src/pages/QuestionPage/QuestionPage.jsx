@@ -39,6 +39,11 @@ const QuestionPage = () => {
   //const [userInfo, setUserInfo] = useState({});
   const [users, setUsers] = useState({});
   const [tags, setTags] = useState({});
+<<<<<<< HEAD
+=======
+
+  const navigate = useNavigate();
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
 
   // Lấy danh sách câu hỏi từ API
   const getAllQues = async () => {
@@ -101,12 +106,15 @@ const QuestionPage = () => {
       fetchUsersAndTags();
     }
   }, [questions]);
+<<<<<<< HEAD
 
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem("allSaved")) || [];
     setSavedList(savedData.map((item) => item.question));
     dispatch(setAllSaved(savedData));
   }, [dispatch]);
+=======
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
 
   if (isLoadingQues) {
     return <div>Loading...</div>;
@@ -246,7 +254,10 @@ const QuestionPage = () => {
         <div style={{ marginTop: "20px" }}>
           {Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
+<<<<<<< HEAD
               // console.log("question", question);
+=======
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
                 <div
@@ -254,12 +265,17 @@ const QuestionPage = () => {
                   onClick={() => handleQuestionClick(question._id)}
                 >
                   <QuestionBox
+<<<<<<< HEAD
                     id={question._id}
                     userQues={question.userQues}
+=======
+                    img={user?.img || ""}
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
                     username={user?.name || "Unknown"}
                     reputation={user?.reputation || 0}
                     followers={user?.followerCount || 0}
                     title={question.title}
+<<<<<<< HEAD
                     tags={
                       question.tags
                         ? question.tags.map(
@@ -267,10 +283,14 @@ const QuestionPage = () => {
                           )
                         : []
                     } // Lấy tên tag từ tags map
+=======
+                    tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
                     date={question.updatedAt}
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}
+<<<<<<< HEAD
                     isLiked={savedList.includes(question._id)}
                     isSaved={allSaved.some(
                       (saved) => saved.question === question._id
@@ -285,6 +305,8 @@ const QuestionPage = () => {
                       );
                       if (savedItem) handleUnsave(savedItem._id); // Truyền `_id` của bài đã lưu
                     }}
+=======
+>>>>>>> 9c4ae3a13e542dacfb2aac358a973f02dbbed78e
                   />
                 </div>
               );

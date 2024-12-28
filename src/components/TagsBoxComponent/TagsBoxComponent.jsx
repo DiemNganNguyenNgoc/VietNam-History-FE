@@ -3,20 +3,17 @@ import './TagsBoxComponent.css';
 
 const TagsBoxComponent = ({ tagsname, description, quantity }) => {
   return (
-    <div className="tags-box">
-      <div className="row">
-        <div className="tagsname">
-          {tagsname}
+    <div className="card shadow-sm">
+      <div className="card-body">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <h5 className="card-title text-primary mb-0">{tagsname}</h5>
         </div>
-        <div className="description">
+        <p className="card-text text-muted" style={{ fontSize: "14px" }}>
           {description}
-        </div>
-        <div className="quantity">
-
+        </p>
+        <span className="text-secondary" style={{ fontSize: "13px" }}>
           {quantity} questions
-
-         
-        </div>
+        </span>
       </div>
     </div>
 

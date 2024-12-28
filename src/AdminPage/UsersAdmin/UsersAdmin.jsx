@@ -1,25 +1,51 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import SearchBtn from '../../components/SearchBtn/SearchBtn'
 import NewUserBtn from '../../components/NewUserBtn/NewUserBtn'
 import "../../css/UsersAdmin.css"
+import { getAllUser } from "../../services/UserService"; // API để lấy allUser
+import { setAllUser } from "../../redux/slides/userSlide";
 
 
 const UsersAdmin = () => {
-    const [dataUsers, setDataUser] = useState([
-        { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-        { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-        { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-        { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-        { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-        { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-        { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-        { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-        { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-        { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-        { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-        { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-      ]);
+    // const [dataUsers, setDataUser] = useState([
+    //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
+    //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
+    //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
+    //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
+    //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
+    //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
+    //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
+    //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
+    //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
+    //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
+    //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
+    //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
+    //   ]);
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    // console.log("user", user);
+    
+    const { allUser } = useSelector((state) => state.user);
+    console.log("allUser", allUser);
+  
+    useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const response = await getAllUser(); // Gọi API lấy toàn bộ người dùng
+          dispatch(setAllUser(response.data)); // Lưu vào Redux
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        }
+      };
+  
+      fetchUsers();
+    }, [dispatch]);
+  
+    // Lọc bỏ người dùng hiện tại ra khỏi danh sách
+    const filteredUsers = allUser.filter((u) => u._id !== user.id);
+
     return (
         <div className='container mt-4'>
             <h1 className='title'>USER</h1>
@@ -44,9 +70,9 @@ const UsersAdmin = () => {
                   <th>Username</th>
                   <th>Email</th>
                   <th>Phone number</th>
-                  <th>Questions</th>
-                  <th>Answers</th>
+                  {/* <th>Questions</th> */}
                   <th>Reputation</th>
+                  <th>Report</th>
                   <th></th>
                 </tr>
               </thead>
@@ -54,15 +80,16 @@ const UsersAdmin = () => {
             <div className="table-body-scroll">
               <table className="data-table">
                 <tbody>
-                {dataUsers.map((row, index) => (
+                {filteredUsers.map((row, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{row.username}</td>
+                      <td>{row.name}</td>
                       <td>{row.email}</td>
-                      <td>{row.phonenumber}</td>
-                      <td>{row.questions}</td>
-                      <td>{row.answers}</td>
+                      <td>{row.phone}</td>
+                      {/* <td>{row.questions}</td>
+                      <td>{row.answers}</td> */}
                       <td>{row.reputation}</td>
+                      <td>{row.reportCount}</td>
                       <button className='view-profile'>View</button>
                       <button className='delete-profile'>Delete</button>
                     </tr>

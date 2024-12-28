@@ -50,14 +50,14 @@ const TagsDetailPage = () => {
     }, [tagId]);
 
     // Lấy danh sách câu hỏi theo tag
-    const getAllTag = async (tagId) => {
+    const getAllQues = async (tagId) => {
         const res = await QuestionService.getAllQuesByTag(tagId);
         return res.data;
     };
 
     const { isLoading: isLoadingQues, data: questions } = useQuery({
         queryKey: ["questions", tagId],
-        queryFn: () => getAllTag(tagId),
+        queryFn: () => getAllQues(tagId),
     });
 
     // Lấy thông tin người dùng dựa trên userId từ câu hỏi

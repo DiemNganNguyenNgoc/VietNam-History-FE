@@ -22,6 +22,8 @@ import {
 import { setDetailUser } from "../../redux/slides/userSlide";
 import { setAllTag } from "../../redux/slides/tagSlide";
 import AnswerEditor from "../../components/AnswerComponent/AnswerComponent"
+import parse from 'html-react-parser';
+
 
 const QuestionDetails = () => {
   const navigate = useNavigate();
@@ -31,8 +33,8 @@ const QuestionDetails = () => {
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
   const [answers, setAnswers] = useState([]); // State để lưu trữ danh sách câu trả lời
-  // const [idQues, setIdQues] = useState("");
-  // const [userCom, setIdUserCom] = useState('');
+  const [idQues, setIdQues] = useState("");
+  const [userCom, setIdUserCom] = useState('');
   const [TextCom, setTextCom] = useState('');
   // console.log("user", user)
 
@@ -41,6 +43,7 @@ const QuestionDetails = () => {
   // const question = useSelector((state) => state.question);
   const dispatch = useDispatch();
   const { questionId } = useParams(); // Lấy ID câu hỏi từ URL
+
   // Lấy dữ liệu chi tiết của câu hỏi từ Redux store
   const questionDetail = useSelector((state) => state.question.detailQuestion);
   console.log("Question Detail:", questionDetail);
@@ -120,28 +123,28 @@ const QuestionDetails = () => {
   //   }
   // }, [questionDetail.detailQuestion, navigate]);
 
+
   // Lấy danh sách câu trả lời
-  const fetchAnswers = async () => {
+  const fetchAnswersWithUserDetails = async () => {
     try {
       const response = await AnswerService.getAnswersByQuestionId(questionId);
-      setAnswers(response.data.data); // Cập nhật danh sách câu trả lời
-      // // In từng câu trả lời trong mảng answers
-      // response.data.data.forEach((answer, index) => {
-      //   console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
-      //   console.log("Content:", answer.content); // In ra nội dung câu trả lời
-      //   console.log("Created At:", answer.createdAt); // In ra thời gian tạo câu trả lời
-      //   // Nếu câu trả lời có ảnh, in ra đường dẫn ảnh
-      //   if (answer.images) {
-      //     answer.images.forEach((img, imgIndex) => {
-      //       console.log(`Image ${imgIndex + 1}:`, img);
-      //     });
-      //   }
-      // });
-
+      const answersWithUserDetails = await Promise.all(
+        response.data.data.map(async (answer) => {
+          const userName = await fetchUserDetails(answer.userAns);
+          return { ...answer, userName };
+        })
+      );
+      setAnswers(answersWithUserDetails); // Cập nhật danh sách câu trả lời với tên người dùng
     } catch (error) {
-      console.error("Error fetching answers:", error);
+      console.error("Error fetching answers with user details:", error);
     }
   };
+  
+  // Gọi hàm này thay cho `fetchAnswers`
+  useEffect(() => {
+    fetchAnswersWithUserDetails();
+  }, [questionId]);
+  
 
   //handle answer content
   const handleContentChange = (value) => {
@@ -149,11 +152,11 @@ const QuestionDetails = () => {
       setContent(value);
     }
   };
-  
 
 
+  //useEffect lay thong tin user
   useEffect(() => {
-    console.log("user:", user);
+
     if (user?.id) {
       setIdUser(user.id);
     }
@@ -197,18 +200,30 @@ const QuestionDetails = () => {
   }, []);
 
 
-  //them cau tra loi
+  //useEffect them cau tra loi
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success();
       alert('Answer has been added successfully!');
-      fetchAnswers(); // Cập nhật danh sách câu trả lời sau khi thêm
+      fetchAnswersWithUserDetails(); // Cập nhật danh sách câu trả lời sau khi thêm
     }
     if (isError) {
       message.error();
     }
   }, [isSuccess, isError]);
 
+  const mutationUpdate = useMutationHook(id => UserService.updateAnswerCount(id));
+  const { data: dataUpdate, isLoading: isLoadingUpdate, isSuccess: isSuccessUpdate, isError: isErrorUpdate } = mutationUpdate;
+
+  //useEffect cho update answerCount cua User
+  useEffect(() => {
+    if (isSuccessUpdate && dataUpdate?.status !== 'ERR') {
+      message.success();
+    }
+    if (isErrorUpdate) {
+      message.error();
+    }
+  }, [isSuccessUpdate, isErrorUpdate, dataUpdate]);
   //Click them answer 
   const handlePostAnswerClick = useCallback(async () => {
     if (!user?.id) {
@@ -235,13 +250,14 @@ const QuestionDetails = () => {
         // Reset nội dung và ảnh
         setContent("");
         setImageSrcs([]);
-        
-          // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
-          const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
-          await QuestionService.updateAnswerCount(questionId, updatedAnswerCount );
-          
+
+        // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
+        const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
+        await QuestionService.updateAnswerCount(questionId, updatedAnswerCount);
+        //Cập nhật số câu trả lời của người dùng đã post 
+        await mutationUpdate.mutateAsync(userAns);
         // Gọi hàm fetchAnswers để cập nhật danh sách câu trả lời
-        fetchAnswers();
+        fetchAnswersWithUserDetails();
 
         // Hiển thị thông báo thành công
         message.success("Answer has been added successfully!");
@@ -252,18 +268,29 @@ const QuestionDetails = () => {
       console.error("Error while posting answer:", error);
       message.error("An error occurred. Please try again.");
     }
-  }, [content, imageSrcs, mutation, questionDetail.data?.answerCount, questionId, user, fetchAnswers]);
+  }, [content, imageSrcs, mutation, questionDetail.data?.answerCount, questionId, user, fetchAnswersWithUserDetails]);
 
-  console.log("COUNT", questionDetail.data)
+  // console.log("COUNT", questionDetail.data)
 
   useEffect(() => {
-    fetchAnswers(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
+    fetchAnswersWithUserDetails(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
   }, [questionId]);
 
 
   const handleCancelClick = useCallback(() => {
     alert("Cancel adding the question!");
   }, []);
+
+  //Ham thay thong tin user theo ID
+  const fetchUserDetails = async (userId) => {
+    try {
+      const userDetails = await UserService.getDetailsUser(userId);
+      return userDetails?.data?.name || "Unknown User"; // Lấy tên hoặc giá trị mặc định
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return "Unknown User"; // Giá trị fallback
+    }
+  };
 
 
   useEffect(() => {
@@ -435,15 +462,19 @@ const QuestionDetails = () => {
 
                 </div>
                 <div>
-                  <strong>{answer.userAns}</strong>
+                  <strong>{answer.userName || "Loading..."}</strong>
                   <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
                     Answered {new Date(answer.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
-              <p>{answer.content}</p>
-              {answer.images.map((img, imgIndex) => (
-                <img key={imgIndex} src={img} alt={`Answer Image ${imgIndex}`} className="img-fluid rounded my-2" />
+              <p>{parse(answer.content)}</p>
+              {answer.images?.map((img, index) => (
+                <img
+                src={img || "https://via.placeholder.com/150"}
+                alt={`Answer Image ${index}`}
+                //className="img-fluid rounded my-2"
+              />
               ))}
             </div>
           ))

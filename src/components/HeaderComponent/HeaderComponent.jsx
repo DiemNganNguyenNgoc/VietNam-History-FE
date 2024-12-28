@@ -214,7 +214,7 @@ const HeaderComponent = () => {
                   href="/admin/manage"
                   style={Styles.textHeader}
                 >
-                  <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
+                  <i class="bi bi-gear" style={Styles.iconHeader}></i>
                   Manage System
                 </a>
               </li>

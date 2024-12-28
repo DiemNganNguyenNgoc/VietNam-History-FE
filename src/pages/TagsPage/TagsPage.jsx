@@ -8,6 +8,7 @@ import SortBtn_Tags from '../../components/SortBtn/SortBtn_Tags';
 import TagsBoxComponent from '../../components/TagsBoxComponent/TagsBoxComponent';
 import { useMutationHook } from '../../hooks/useMutationHook';
 import * as TagService from '../../services/TagService';
+import * as QuestionService from '../../services/QuestionService';
 import { useQuery } from '@tanstack/react-query';
 import LoadingComponent from '../../components/LoadingComponent/LoadingComponent';
 import { useSelector } from 'react-redux';
@@ -23,6 +24,9 @@ const TagsPage = () => {
         userTag: "",
     });
     const [showModal, setShowModal] = useState(false);
+
+    // State lưu danh sách tags cùng số lượng câu hỏi
+    const [tagsWithCount, setTagsWithCount] = useState([]);
 
     // Sử dụng useNavigate để chuyển trang
     const navigate = useNavigate();
@@ -55,13 +59,27 @@ const TagsPage = () => {
     // Lấy danh sách tag từ API
     const getAllTag = async () => {
         const res = await TagService.getAllTag();
-        console.log('API response:', res); 
         return res.data;
+    };
+
+    const getAllQuesByTag = async (tagId) => {
+        const res = await QuestionService.getAllQuesByTag(tagId);
+        return res.data.length; // Trả về số lượng câu hỏi
     };
 
     const { isLoading: isLoadingTag, data: tags } = useQuery({
         queryKey: ['tags'],
         queryFn: getAllTag,
+        onSuccess: async (tags) => {
+            // Sau khi lấy danh sách tags, gọi API để lấy số lượng câu hỏi
+            const updatedTags = await Promise.all(
+                tags.map(async (tag) => {
+                    const usedCount = await getAllQuesByTag(tag._id);
+                    return { ...tag, usedCount };
+                })
+            );
+            setTagsWithCount(updatedTags);
+        },
     });
 
     // Xử lý kết quả sau khi thêm tag
@@ -84,14 +102,10 @@ const TagsPage = () => {
 
     // Lưu tag mới
     const handleSaveTag = async () => {
-        //console.log('form', formData)
-
         if (!formData.userTag) {
             alert("User ID is missing. Please log in again.");
             return;
         }
-
-
         await mutation.mutateAsync(formData);
     };
 
@@ -143,8 +157,8 @@ const TagsPage = () => {
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-5">
                     {isLoadingTag ? (
                         <LoadingComponent />
-                    ) : tags && tags.length > 0 ? (
-                        tags.map((tag) => (
+                    ) : tagsWithCount && tagsWithCount.length > 0 ? (
+                        tagsWithCount.map((tag) => (
                             <div
                                 className="col-6 col-md-4 col-lg-2 mb-4" 
                                 key={tag._id}

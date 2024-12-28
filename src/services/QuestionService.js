@@ -24,6 +24,12 @@ export const getAllQuesByTag = async (tagId) => {
   return res.data;
 };
 
+export const toggleActiceQues = async (quesId) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/toggle-active/${quesId}`);
+  return res.data;
+};
+
 export const getDetailsQuestion = async (id) => {
   try {
     const res = await axiosJWT.get(
@@ -68,15 +74,35 @@ export const getQuestionsByUserId = async (userId) => {
 };
 
 export const updateAnswerCount = async (questionId, newAnswerCount) => {
+
   console.log("hhhh", newAnswerCount);
   console.log("ID", questionId);
-  const response = await axios.put(
-    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`,
-    { answerCount: newAnswerCount }
-  );
-  console.log("ID");
+
+
+  const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
+  });
   return response.data;
 };
+
+
+export const getQuestionsFromUserAnswers = async (userId) => {
+  try {
+    const res = await axiosJWT.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/answers/user/${userId}`
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
+
+
 
 // export const updateAnswerCount = async (id, data) => {
 //   try {
