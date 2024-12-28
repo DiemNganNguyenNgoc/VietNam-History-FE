@@ -30,11 +30,18 @@ export const getAllTagByUser = async (userId) => {
 
 
 export const getDetailsTag = async (tagId) => {
-  const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`
+  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`
   );
   return res.data;
-
 };
+
+export const deleteTag = async (tagId) => {
+  const res = await axios.delete(`${process.env.REACT_APP_API_URL_BACKEND}/tag/delete/${tagId}`
+  );
+  return res.data;
+};
+
+
 
 // export const getDetailsTag = async (tagId) => {
 //   try {

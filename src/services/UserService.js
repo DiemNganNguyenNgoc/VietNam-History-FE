@@ -159,3 +159,13 @@ export const addFollower = async (id, access_token) => {
   console.log("res", res.data);
   return res.data;
 };
+
+// Trong hàm updateQuesCount
+export const updateQuesCount = async (userId) => {
+  try {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/user/update-ques-count/${userId}`);
+    return response.data;  // Đảm bảo trả về dữ liệu đúng
+  } catch (error) {
+    throw error;
+  }
+};

@@ -86,6 +86,32 @@ const QuestionHolder = () => {
     navigate(`/update-question/${questionId}`);
   };
 
+    const handleToggleHidden = async (quesId, currentStatus) => {
+      const isConfirmed = window.confirm(
+        `Are you sure you want to ${currentStatus ? 'hide' : 'show'} this question?`
+      );
+  
+      if (!isConfirmed) return;
+  
+      if (!quesId) {
+        console.error("Question ID is missing");
+        return;
+      }
+  
+      try {
+        const res = await QuestionService.toggleActiceQues(quesId);
+        console.log("Successfully toggled question status:", res.data);
+        
+        // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
+        const updatedQuestions = questions.map((question) => 
+          question._id === quesId ? { ...question, active: !currentStatus } : question
+        );
+        setQuestions(updatedQuestions);
+      } catch (error) {
+        console.error("Failed to toggle question status:", error.response?.data || error.message);
+      }
+    };
+
   return (
     <div style={{ padding: '20px' }}>
       {questions.map((question) => (
@@ -99,6 +125,8 @@ const QuestionHolder = () => {
             answers={question.answerCount}
             likes={question.upVoteCount}
             onUpdate={() => handleOnUpdate(question._id)}
+            isHidden={question.active}
+            onHidden={() => handleToggleHidden(question._id, question.active)} 
           />
         </div>
       ))}

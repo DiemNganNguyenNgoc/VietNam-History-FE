@@ -23,6 +23,12 @@ export const getAllQuesByTag = async (tagId) => {
   return res.data;
 };
 
+export const toggleActiceQues = async (quesId) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/toggle-active/${quesId}`);
+  return res.data;
+};
+
 export const getDetailsQuestion = async (id) => {
   try {
     const res = await axiosJWT.get(
@@ -68,8 +74,6 @@ export const getQuestionsByUserId = async (userId) => {
 };
 
 export const updateAnswerCount = async (questionId, newAnswerCount) => {
-  console.log("hhhh", newAnswerCount)
-  console.log("ID", questionId)
   const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
   });
   console.log("ID")
