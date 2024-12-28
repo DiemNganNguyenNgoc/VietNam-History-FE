@@ -1,38 +1,74 @@
 import React, { useEffect, useState } from 'react';
 import QuestionBox from '../../components/UserQuestion/QuestionBox';
 import * as QuestionService from "../../services/QuestionService";
-import { useSelector } from "react-redux";// Giả sử bạn đã tạo một service để gọi API
+import * as TagService from "../../services/TagService";
+import { useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom';
 
 const QuestionHolder = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tags, setTags] = useState({});
+  const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
 
-  // Hàm để lấy câu hỏi từ API
   const fetchQuestions = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true); // Bắt đầu tải dữ liệu
-      const response = await QuestionService.getQuestionsByUserId(user.id); // Gọi API
+      const response = await QuestionService.getQuestionsByUserId(user?.id);
       if (response.status === 'OK') {
-        setQuestions(response.data); // Cập nhật danh sách câu hỏi
+        setQuestions(response.data);
       } else {
         setError('Không thể tải câu hỏi');
       }
     } catch (err) {
       setError(err.message || 'Đã xảy ra lỗi khi tải câu hỏi');
     } finally {
-      setLoading(false); // Kết thúc tải dữ liệu
+      setLoading(false);
     }
   };
 
-  // Gọi hàm fetch khi userId thay đổi
+  const getTagDetails = async (tagId) => {
+    try {
+      const res = await TagService.getDetailsTag(tagId);
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching tag details:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
-    if (user.id) {
+    const fetchUsersAndTags = async () => {
+      const tagMap = {};
+      if (Array.isArray(questions)) {
+        for (let question of questions) {
+          if (question.tags) {
+            for (let tagId of question.tags) {
+              if (!tagMap[tagId]) {
+                const tag = await getTagDetails(tagId);
+                tagMap[tagId] = tag;
+              }
+            }
+          }
+        }
+      }
+      setTags(tagMap);
+    };
+
+    if (questions.length > 0) {
+      fetchUsersAndTags();
+    }
+  }, [questions]);
+
+  useEffect(() => {
+    if (user?.id) {
       fetchQuestions();
     }
-  }, [user.id]);
+  }, [user?.id]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -42,18 +78,29 @@ const QuestionHolder = () => {
     return <div>Error: {error}</div>;
   }
 
+  const handleQuestionClick = (questionId) => {
+    navigate(`/question-detail/${questionId}`);
+  };
+
+  const handleOnUpdate = (questionId) => {
+    navigate(`/update-question/${questionId}`);
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       {questions.map((question) => (
-        <QuestionBox
-          key={question._id} // Sử dụng _id từ API
-          title={question.title}
-          tags={"question.tags"}
-          date={new Date(question.createdAt).toLocaleString()}
-          views={question.view}
-          answers={question.answerCount}
-          likes={question.upVoteCount} // Có thể cần điều chỉnh nếu API trả về khác
-        />
+        <div key={question._id} onClick={() => handleQuestionClick(question._id)}>
+          <QuestionBox
+            key={question._id}
+            title={question.title}
+            tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || "Unknown Tag") : []}
+            date={new Date(question.createdAt).toLocaleString()}
+            views={question.view}
+            answers={question.answerCount}
+            likes={question.upVoteCount}
+            onUpdate={() => handleOnUpdate(question._id)}
+          />
+        </div>
       ))}
     </div>
   );

@@ -20,6 +20,7 @@ import QuestionDetailPage from "../pages/QuestionDetailPage/QuestionDetailPage";
 import QuestionDetailAdmin from "../AdminPage/QuestionDetailAdmin/QuestionDetailAdmin";
 import TagAdmin from "../AdminPage/TagAdmin/TagAdmin";
 import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
+import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
 export const routes = [
   {
     path: "/",
@@ -106,6 +107,12 @@ export const routes = [
   {
     path: "/askquestion",
     page: AskQuestionPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/update-question/:id",
+    page: UpdateQuestionPage,
     isShowHeader: true,
   },
 

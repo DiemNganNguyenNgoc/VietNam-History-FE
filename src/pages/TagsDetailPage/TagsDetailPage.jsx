@@ -39,7 +39,8 @@ const TagsDetailPage = () => {
         const fetchTagDetails = async () => {
             try {
                 const res = await TagService.getDetailsTag(tagId);
-                setTagDetails(res.data); // Lưu dữ liệu vào state
+                setTagDetails(res.data);
+                //setUsedCount (res.data.length), // Lưu dữ liệu vào state
             } catch (error) {
                 console.error("Error fetching tag details:", error);
             }
@@ -61,9 +62,9 @@ const TagsDetailPage = () => {
 
     // Lấy thông tin người dùng dựa trên userId từ câu hỏi
     const getUserDetails = async (userId) => {
-        if (!userId) return null; // Nếu không có userId, trả về null
+        if (!userId) return null; 
         const res = await UserService.getDetailsUser(userId);
-        return res.data; // Giả sử trả về dữ liệu người dùng
+        return res.data; 
     };
 
     // Lấy thông tin tag dựa trên tagId
@@ -112,7 +113,7 @@ const TagsDetailPage = () => {
     }
 
     const handleQuestionClick = (questionId) => {
-        navigate(`/question-detail/${questionId}`); // Chuyển hướng đến trang chi tiết câu hỏi
+        navigate(`/question-detail/${questionId}`);
     };
 
     return (
@@ -145,7 +146,7 @@ const TagsDetailPage = () => {
             <div className="row" style={{ marginTop: "30px" }}>
                 <div className="col">
                     <p style={{ fontSize: "25px", color: "#666666" }}>
-                        {tagDetails.usedCount} questions
+                        {questions.length} questions
                     </p>
                 </div>
                 <div className="col">
@@ -175,7 +176,7 @@ const TagsDetailPage = () => {
                                 <QuestionBox
                                     username={user?.name || "Unknown"}
                                     reputation={user?.reputation || 0}
-                                    followers={user?.followers || 0}
+                                    followers={user?.followerCount || 0}
                                     title={question.title}
                                     tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
                                     date={question.updatedAt}

@@ -14,7 +14,7 @@ import * as CommentService from "../../services/CommentService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-
+import { addAnswer } from '../../redux/slides/AnswerSlice'; // Import action
 
 
 import {
@@ -32,7 +32,7 @@ const QuestionDetails = () => {
   const [userAns, setIdUser] = useState('');
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
-
+  const [answers, setAnswers] = useState([]); // State để lưu trữ danh sách câu trả lời
   const [idQues, setIdQues] = useState("");
   const [userCom, setIdUserCom] = useState('');
   const [TextCom, setTextCom] = useState('');
@@ -56,8 +56,8 @@ const QuestionDetails = () => {
   const mutation = useMutationHook(data => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
-  const mutationComment = useMutationHook(data => CommentService.addComment(data));
-    const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
+  const mutationComment = useMutationHook(dataCom => CommentService.addComment(dataCom));
+  const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
 
   //lấy thông tin người hỏi
   useEffect(() => {
@@ -86,7 +86,7 @@ const QuestionDetails = () => {
     const fetchQuestionDetail = async () => {
       try {
         const data = await QuestionService.getDetailsQuestion(questionId); // Gọi API để lấy chi tiết câu hỏi
-        // console.log("Data Question:", data);
+        console.log("Data Question:", data);
         dispatch(setDetailQuestion(data)); // Lưu dữ liệu vào Redux
       } catch (error) {
         console.error("Error fetching question detail:", error);
@@ -123,19 +123,34 @@ const QuestionDetails = () => {
   //     navigate("/question");
   //   }
   // }, [questionDetail.detailQuestion, navigate]);
+  // Lấy danh sách câu trả lời
+  const fetchAnswers = async () => {
+    
+    try {
+      console.log("questionId from useParams:", questionDetail.data);
 
-  const handleContentChange = useCallback((value) => {
+      const response = await AnswerService.getAnswersByQuestionId( questionId);
+      console.log("Fetched answers:", response);
+      setAnswers(response.data); // Cập nhật danh sách câu trả lời
+    } catch (error) {
+      console.error("Error fetching answers:", error);
+    }
+  };
+
+
+
+  const handleContentChange = (value) => {
     setContent(value);
-  }, []);
+  };
 
 
 
   useEffect(() => {
-      console.log("user:", user);
-      if (user?.id) {
-        setIdUser(user.id);
-      }
-    }, [user]);
+    console.log("user:", user);
+    if (user?.id) {
+      setIdUser(user.id);
+    }
+  }, [user]);
 
   // Nhận text comment
   const handleTextCom = (value) => {
@@ -175,14 +190,11 @@ const QuestionDetails = () => {
 
 
   //them cau tra loi
-
-
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success();
       alert('Answer has been added successfully!');
-      
-    
+      fetchAnswers(); // Cập nhật danh sách câu trả lời sau khi thêm
     }
     if (isError) {
       message.error();
@@ -190,8 +202,8 @@ const QuestionDetails = () => {
   }, [isSuccess, isError]);
 
   const handlePostAnswerClick = useCallback(async () => {
-    if (!userAns) {
-      alert("User ID is missing. Please log in again.");
+    if (!user?.id) {
+      alert("User  ID is missing. Please log in again.");
       return;
     }
 
@@ -204,14 +216,16 @@ const QuestionDetails = () => {
 
     await mutation.mutateAsync(answerData);
   }, [content, imageSrcs, mutation, questionId, user]);
+  
+    useEffect(() => { 
+    fetchAnswers(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
+  }, [ questionId]);
 
 
   const handleCancelClick = useCallback(() => {
     alert("Cancel adding the question!");
   }, []);
-  const handleClickAnswer = useCallback(() => {
-    setShowTextArea((prev) => !prev);
-  }, []);
+
 
   useEffect(() => {
     if (isSuccessCom && dataCom?.status !== 'ERR') {
@@ -239,25 +253,24 @@ const QuestionDetails = () => {
     queryFn: getAllCom,
   });
 
-  const handleAddCommentClick = async ( ) => {
-    
+  const handleAddCommentClick = useCallback( async () => {
+
     if (!userAns) {
       alert("User ID is missing. Please log in again.");
       return;
     }
 
     const commentData = {
-     
-      TextCom,
-      userAns,
-      questionId,
-      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
-      
+
+      content : TextCom,
+      user : userAns,
+      answer : questionId
+
     };
 
     await mutationComment.mutateAsync(commentData);
     TextCom = "";
-  };
+  }, [content, mutationComment, answers, user]);
 
 
   return (
@@ -332,23 +345,23 @@ const QuestionDetails = () => {
       <div className="mb-4">
         <h5 className="mb-3">Comments</h5>
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
-            commentQuess.map((commentQues) => {
-              //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
+          commentQuess.map((commentQues) => {
+            //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
 
-              return (
-                <div
-                  key={commentQues._id}
-                  //onClick={() => handleAddCommentClick}
-                >
-                  <Comment
-                    
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <p>No conmment available.</p>
-          )}
+            return (
+              <div
+                key={commentQues._id}
+                onClick={() => handleAddCommentClick(userAns)}
+              >
+                <Comment
+
+                />
+              </div>
+            );
+          })
+        ) : (
+          <p>No conmment available.</p>
+        )}
       </div>
       <div className="mt-4">
         <textarea
@@ -360,57 +373,42 @@ const QuestionDetails = () => {
         ></textarea>
       </div>
       <ButtonComponent
-            textButton="Submit comment"
-            onClick={handleAddCommentClick}
-          />
+        textButton="Submit comment"
+        onClick={handleAddCommentClick}
+      />
 
       {/* Danh sách câu trả lời */}
       <div>
         <h5 className="mb-3">{questionDetail.data?.answerCount} Answers</h5>
-        <div className="p-3 border rounded mb-3">
-          <div className="d-flex align-items-center mb-2">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="Answerer Avatar"
-              className="rounded-circle me-2"
-              width="40"
-              height="40"
-            />
-            <div>
-              <strong>Bradley Mackey</strong>
-              <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
-                Answered Nov 8, 2022 at 21:16
-              </p>
+        {Array.isArray(answers) && answers.length > 0 ? (
+          answers.map((answer, index) => (
+            <div key={index} className="p-3 border rounded mb-3">
+              <div className="d-flex align-items-center mb-2">
+                <img
+                  src="https://via.placeholder.com/40"
+                  alt="Answerer Avatar"
+                  className="rounded-circle me-2"
+                  width="40"
+                  height="40"
+                />
+                <div>
+                  <strong>{user.userName}</strong>
+                  <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
+                    Answered {new Date(answer.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <p>{answer.content}</p>
+              {answer.images && answer.images.map((img, imgIndex) => (
+                <img key={imgIndex} src={img} alt={`Answer Image ${imgIndex}`} className="img-fluid rounded my-2" />
+              ))}
             </div>
-          </div>
-          <p>
-            This is not an operator. It is in fact two separate operators, --
-            and &gt;.
-          </p>
-          <p>
-            The code in the condition decrements x, while returning x's original
-            (not decremented) value, and then compares the original value with
-            0, using the &gt; operator.
-          </p>
-          <pre>
-            <code>
-              // To better understand, the statement could be written as
-              follows:
-              <br />
-              while ((x--) &gt; 0)
-            </code>
-          </pre>
-          <p>
-            I think you wouldn’t really need the parentheses around --, though
-            it does further enforce the separation.
-          </p>
-        </div>
+          ))
+        ) : (
+          <p>No answers available.</p>
+        )}
         {/* Thêm các câu trả lời khác */}
-        <ButtonComponent
-          textButton="Add an answer"
-          onClick={handleClickAnswer}
-        ></ButtonComponent>
-        {showTextArea && <AnswerEditor
+        <AnswerEditor
           content={content}
           onContentChange={handleContentChange}
           onCancel={handleCancelClick}
@@ -420,7 +418,7 @@ const QuestionDetails = () => {
           onRemoveImage={handleRemoveImage}
           onSubmit={handlePostAnswerClick}
 
-        />}
+        />
       </div>
     </div>
   );

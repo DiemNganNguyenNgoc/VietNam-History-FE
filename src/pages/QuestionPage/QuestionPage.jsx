@@ -7,6 +7,7 @@ import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
 import { useQuery } from "@tanstack/react-query";
+import * as TagService from "../../services/TagService";
 
 const QuestionPage = () => {
   const [filters, setFilters] = useState({
@@ -21,7 +22,9 @@ const QuestionPage = () => {
     the_following_tags: false,
   });
 
-  const [userInfo, setUserInfo] = useState({}); // Khởi tạo userInfo là đối tượng rỗng thay vì mảng
+  //const [userInfo, setUserInfo] = useState({});
+      const [users, setUsers] = useState({});
+      const [tags, setTags] = useState({});
 
   const navigate = useNavigate();
 
@@ -31,13 +34,13 @@ const QuestionPage = () => {
     return res.data;
   };
 
-  const getUserInfo = async (userQuesId) => {
-    if (!userQuesId) {
-      throw new Error("ID người dùng không hợp lệ.");
-    }
-    const res = await UserService.getDetailsUser(userQuesId); // Hàm này cần được định nghĩa trong UserService
-    return res.data;
-  };
+  // const getUserInfo = async (userQuesId) => {
+  //   if (!userQuesId) {
+  //     throw new Error("ID người dùng không hợp lệ.");
+  //   }
+  //   const res = await UserService.getDetailsUser(userQuesId); // Hàm này cần được định nghĩa trong UserService
+  //   return res.data;
+  // };
 
   const {
     isLoading: isLoadingQues,
@@ -48,50 +51,96 @@ const QuestionPage = () => {
     queryFn: getAllQues,
   });
 
-  useEffect(() => {
-    if (Array.isArray(questions) && questions.length > 0) {
-      const fetchUserInfo = async () => {
-        const userInfos = await Promise.all(
-          questions.map(async (question) => {
-            const userQuesId = question.userQues; // ID người dùng
+  // useEffect(() => {
+  //   if (Array.isArray(questions) && questions.length > 0) {
+  //     const fetchUserInfo = async () => {
+  //       const userInfos = await Promise.all(
+  //         questions.map(async (question) => {
+  //           const userQuesId = question.userQues; // ID người dùng
 
-            // Kiểm tra ID người dùng trước khi gọi API
-            if (!userQuesId) {
-              console.error(
-                `Lỗi: ID người dùng không hợp lệ cho câu hỏi ${question._id}`
-              );
-              return {
-                username: "Unknown",
-                reputation: 0,
-                followers: 0,
-                questionId: question._id,
-              }; // Trả về dữ liệu mặc định
-            }
+  //           // Kiểm tra ID người dùng trước khi gọi API
+  //           if (!userQuesId) {
+  //             console.error(
+  //               `Lỗi: ID người dùng không hợp lệ cho câu hỏi ${question._id}`
+  //             );
+  //             return {
+  //               username: "Unknown",
+  //               reputation: 0,
+  //               followers: 0,
+  //               questionId: question._id,
+  //             }; // Trả về dữ liệu mặc định
+  //           }
 
-            try {
-              const userData = await getUserInfo(userQuesId); // Lấy thông tin người dùng
-              return { ...userData, questionId: question._id }; // Lưu trữ thông tin người dùng
-            } catch (error) {
-              console.error("Lỗi khi lấy thông tin người dùng:", error.message);
-              return {
-                username: "Unknown",
-                reputation: 0,
-                followers: 0,
-                questionId: question._id,
-              }; // Trả về dữ liệu mặc định khi lỗi
-            }
-          })
-        );
+  //           try {
+  //             const userData = await getUserInfo(userQuesId); // Lấy thông tin người dùng
+  //             return { ...userData, questionId: question._id }; // Lưu trữ thông tin người dùng
+  //           } catch (error) {
+  //             console.error("Lỗi khi lấy thông tin người dùng:", error.message);
+  //             return {
+  //               username: "Unknown",
+  //               reputation: 0,
+  //               followers: 0,
+  //               questionId: question._id,
+  //             }; // Trả về dữ liệu mặc định khi lỗi
+  //           }
+  //         })
+  //       );
 
-        const userInfoMap = {}; // Đối tượng để lưu trữ dữ liệu người dùng theo ID câu hỏi
-        userInfos.forEach((user) => {
-          userInfoMap[user.questionId] = user; // Gán thông tin người dùng vào userInfoMap
-        });
-        setUserInfo(userInfoMap); // Cập nhật lại state userInfo
+  //       const userInfoMap = {}; 
+  //       userInfos.forEach((user) => {
+  //         userInfoMap[user.questionId] = user;
+  //       });
+  //       setUserInfo(userInfoMap); 
+  //     };
+  //     fetchUserInfo();
+  //   }
+  // }, [questions]);
+   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
+      const getUserDetails = async (userId) => {
+          if (!userId) return null; 
+          const res = await UserService.getDetailsUser(userId);
+          return res.data; 
       };
-      fetchUserInfo();
-    }
-  }, [questions]);
+  
+      // Lấy thông tin tag dựa trên tagId
+      const getTagDetails = async (tagId) => {
+          const res = await TagService.getDetailsTag(tagId);
+          return res.data;
+      };
+  
+      useEffect(() => {
+          const fetchUsersAndTags = async () => {
+              const userMap = {};
+              const tagMap = {};
+  
+              if (Array.isArray(questions)) {
+                  for (let question of questions) {
+                      // Lấy thông tin người dùng từ userId
+                      if (question.userQues) {
+                          const user = await getUserDetails(question.userQues);
+                          userMap[question.userQues] = user;
+                      }
+  
+                      // Lấy thông tin tag từ tagId
+                      if (question.tags) {
+                          for (let tagId of question.tags) {
+                              if (!tagMap[tagId]) {
+                                  const tag = await getTagDetails(tagId);
+                                  tagMap[tagId] = tag;
+                              }
+                          }
+                      }
+                  }
+              }
+  
+              setUsers(userMap);
+              setTags(tagMap);
+          };
+  
+          if (questions) {
+              fetchUsersAndTags();
+          }
+      }, [questions]);
 
   if (isLoadingQues) {
     return <div>Loading...</div>;
@@ -177,33 +226,31 @@ const QuestionPage = () => {
         </div>
         {/* Render các câu hỏi */}
         <div style={{ marginTop: "20px" }}>
-          {Array.isArray(questions) && questions.length > 0 ? (
-            questions.map((question) => {
-              const user = userInfo[question._id] || {}; // Tránh truy cập vào undefined
-
-              return (
-                <div
-                  key={question._id}
-                  onClick={() => handleQuestionClick(question._id)}
-                >
-                  <QuestionBox
-                    key={question._id}
-                    username={user?.username || "Unknown"}
-                    reputation={user?.reputation || 0}
-                    followers={user?.followers || 0}
-                    title={question.title}
-                    tags={question.tags || []}
-                    date={question.updatedAt}
-                    views={question.view}
-                    answers={question.answerCount}
-                    likes={question.upVoteCount}
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <p>No questions available.</p>
-          )}
+        {Array.isArray(questions) && questions.length > 0 ? (
+                    questions.map((question) => {
+                        const user = users[question.userQues]; // Lấy thông tin người dùng từ state
+                        return (
+                            <div
+                                key={question._id}
+                                onClick={() => handleQuestionClick(question._id)}
+                            >
+                                <QuestionBox
+                                    username={user?.name || "Unknown"}
+                                    reputation={user?.reputation || 0}
+                                    followers={user?.followerCount || 0}
+                                    title={question.title}
+                                    tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
+                                    date={question.updatedAt}
+                                    views={question.view}
+                                    answers={question.answerCount}
+                                    likes={question.upVoteCount}
+                                />
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p>No questions available.</p>
+                )}
         </div>
       </div>
     </div>
