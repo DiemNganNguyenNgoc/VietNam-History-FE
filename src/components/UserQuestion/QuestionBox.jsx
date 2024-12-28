@@ -2,7 +2,7 @@ import { Popover } from 'antd';
 import React from 'react';
 import './QuestionBox.css';
 
-const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDelete }) => {
+const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDelete, onHidden, isHidden }) => {
   const content = (
     <div>
       {["Update", "Delete"].map((item, index) => (
@@ -28,6 +28,24 @@ const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDel
           {item}
         </p>
       ))}
+
+      {/* Thêm nút "Show" hoặc "Hidden" vào Popover */}
+      <p
+        onClick={(e) => {
+          e.stopPropagation(); // Ngăn sự kiện click lan ra phần tử cha
+          onHidden && onHidden();
+        }}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+        style={{
+          padding: "10px",
+          margin: 0,
+          cursor: "pointer",
+          transition: "background-color 0.3s",
+        }}
+      >
+        {isHidden ?  "Hidden" :"Show"}
+      </p>
     </div>
   );
 
@@ -57,6 +75,13 @@ const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDel
         <div className="date-container">
           <span className="date-item">{date}</span>
         </div>
+
+                {/* Hiển thị thông báo nếu câu hỏi bị ẩn */}
+                {!isHidden && (
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginBottom: "10px" }}>
+            Câu hỏi này đã bị ẩn
+          </div>
+        )}
 
         <div className="btn">
           <Popover content={content} trigger="click">

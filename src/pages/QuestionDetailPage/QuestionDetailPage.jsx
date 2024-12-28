@@ -15,8 +15,6 @@ import LoadingComponent from "../../components/LoadingComponent/LoadingComponent
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { addAnswer } from '../../redux/slides/AnswerSlice'; // Import action
-
-
 import {
   setDetailAsker,
   setDetailQuestion,
@@ -33,8 +31,9 @@ const QuestionDetails = () => {
   const [imageSrcs, setImageSrcs] = useState([]); // Chứa nhiều ảnh đã chọn
   const user = useSelector((state) => state.user);
   const [answers, setAnswers] = useState([]); // State để lưu trữ danh sách câu trả lời
-  const [idQues, setIdQues] = useState("");
-  const [userCom, setIdUserCom] = useState('');
+  // const [idQues, setIdQues] = useState("");
+  // const [userCom, setIdUserCom] = useState('');
+  const [comments, setComments] = useState([]); 
   const [TextCom, setTextCom] = useState('');
   // console.log("user", user)
 
@@ -74,8 +73,6 @@ const QuestionDetails = () => {
         console.error("Error fetching user details:", error);
       }
     };
-
-
 
     fetchUserDetails();
   }, [dispatch, questionDetail?.data?.userQues]);
@@ -123,26 +120,60 @@ const QuestionDetails = () => {
   //     navigate("/question");
   //   }
   // }, [questionDetail.detailQuestion, navigate]);
+
   // Lấy danh sách câu trả lời
   const fetchAnswers = async () => {
-    
     try {
-      console.log("questionId from useParams:", questionDetail.data);
+      const response = await AnswerService.getAnswersByQuestionId(questionId);
+      setAnswers(response.data.data); // Cập nhật danh sách câu trả lời
+      // // In từng câu trả lời trong mảng answers
+      // response.data.data.forEach((answer, index) => {
+      //   console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
+      //   console.log("Content:", answer.content); // In ra nội dung câu trả lời
+      //   console.log("Created At:", answer.createdAt); // In ra thời gian tạo câu trả lời
+      //   // Nếu câu trả lời có ảnh, in ra đường dẫn ảnh
+      //   if (answer.images) {
+      //     answer.images.forEach((img, imgIndex) => {
+      //       console.log(`Image ${imgIndex + 1}:`, img);
+      //     });
+      //   }
+      // });
 
-      const response = await AnswerService.getAnswersByQuestionId( questionId);
-      console.log("Fetched answers:", response);
-      setAnswers(response.data); // Cập nhật danh sách câu trả lời
     } catch (error) {
       console.error("Error fetching answers:", error);
     }
   };
 
+  // Lấy danh sách bình luận
+  const fetchComments = async () => {
+    try {
+      const response = await CommentService.getCommentByQuestionId(questionId);
+      setComments(response.data.data); // Cập nhật danh sách câu trả lời
+      // // In từng câu trả lời trong mảng answers
+      // response.data.data.forEach((answer, index) => {
+      //   console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
+      //   console.log("Content:", answer.content); // In ra nội dung câu trả lời
+      //   console.log("Created At:", answer.createdAt); // In ra thời gian tạo câu trả lời
+      //   // Nếu câu trả lời có ảnh, in ra đường dẫn ảnh
+      //   if (answer.images) {
+      //     answer.images.forEach((img, imgIndex) => {
+      //       console.log(`Image ${imgIndex + 1}:`, img);
+      //     });
+      //   }
+      // });
 
-
-  const handleContentChange = (value) => {
-    setContent(value);
+    } catch (error) {
+      console.error("Error fetching answers:", error);
+    }
   };
 
+  //handle answer content
+  const handleContentChange = (value) => {
+    if (value !== content) {
+      setContent(value);
+    }
+  };
+  
 
 
   useEffect(() => {
@@ -163,6 +194,7 @@ const QuestionDetails = () => {
   //   }
   // }, [question]);
 
+  //Upload anh
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
 
@@ -201,25 +233,68 @@ const QuestionDetails = () => {
     }
   }, [isSuccess, isError]);
 
+  //them binh luan
+  useEffect(() => {
+    if (isSuccessCom && dataCom?.status !== 'ERR') {
+      message.success();
+      alert('Comment has been added successfully!');
+      fetchComments(); // Cập nhật danh sách câu trả lời sau khi thêm
+    }
+    if (isErrorCom) {
+      message.error();
+    }
+  }, [isSuccessCom, isErrorCom]);
+
+  //Click them answer 
   const handlePostAnswerClick = useCallback(async () => {
     if (!user?.id) {
-      alert("User  ID is missing. Please log in again.");
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+
+    if (!content.trim()) {
+      alert("Answer content cannot be empty.");
       return;
     }
 
     const answerData = {
-      content,
-      userAns,
+      content: content.trim(),
+      userAns: user.id,
       question: questionId,
       images: imageSrcs,
     };
 
-    await mutation.mutateAsync(answerData);
-  }, [content, imageSrcs, mutation, questionId, user]);
-  
-    useEffect(() => { 
+    try {
+      // Gửi API thêm câu trả lời
+      const response = await mutation.mutateAsync(answerData);
+      if (response?.status !== 'ERR') {
+        // Reset nội dung và ảnh
+        setContent("");
+        setImageSrcs([]);
+        
+          // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
+          const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
+          await QuestionService.updateAnswerCount(questionId, updatedAnswerCount );
+          
+        // Gọi hàm fetchAnswers để cập nhật danh sách câu trả lời
+        fetchAnswers();
+
+        // Hiển thị thông báo thành công
+        message.success("Answer has been added successfully!");
+      } else {
+        throw new Error(response?.message || "Failed to add answer.");
+      }
+    } catch (error) {
+      console.error("Error while posting answer:", error);
+      message.error("An error occurred. Please try again.");
+    }
+  }, [content, imageSrcs, mutation, questionDetail.data?.answerCount, questionId, user, fetchAnswers]);
+
+  console.log("COUNT", questionDetail.data)
+
+  useEffect(() => {
     fetchAnswers(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
-  }, [ questionId]);
+  }, [questionId]);
 
 
   const handleCancelClick = useCallback(() => {
@@ -240,7 +315,7 @@ const QuestionDetails = () => {
 
   //Lấy tất cả comment
   const getAllCom = async () => {
-    const res = await CommentService.getAllComment(questionId);
+    const res = await CommentService.getCommentByQuestionId(questionId);
     return res.data;
   };
 
@@ -269,7 +344,8 @@ const QuestionDetails = () => {
     };
 
     await mutationComment.mutateAsync(commentData);
-    TextCom = "";
+    setTextCom("");
+    fetchComments();
   }, [content, mutationComment, answers, user]);
 
 
@@ -343,21 +419,19 @@ const QuestionDetails = () => {
 
       {/* Phần bình luận */}
       <div className="mb-4">
-        <h5 className="mb-3">Comments</h5>
+        <h5 className="mb-3">{commentQuess.length} Comments</h5>
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
           commentQuess.map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
-
-            return (
-              <div
-                key={commentQues._id}
-                onClick={() => handleAddCommentClick(userAns)}
-              >
+          return(
+              
                 <Comment
-
+                   name = {commentQues.user.name || "Unknown"}
+                   text = {commentQues.content || "Unknown"}
+                   date={new Date(commentQues.createdAt).toLocaleString()}
                 />
-              </div>
-            );
+             
+          )
           })
         ) : (
           <p>No conmment available.</p>
@@ -379,7 +453,7 @@ const QuestionDetails = () => {
 
       {/* Danh sách câu trả lời */}
       <div>
-        <h5 className="mb-3">{questionDetail.data?.answerCount} Answers</h5>
+        <h5 className="mb-3">{answers.length} Answers</h5>
         {Array.isArray(answers) && answers.length > 0 ? (
           answers.map((answer, index) => (
             <div key={index} className="p-3 border rounded mb-3">
@@ -392,14 +466,17 @@ const QuestionDetails = () => {
                   height="40"
                 />
                 <div>
-                  <strong>{user.userName}</strong>
+
+                </div>
+                <div>
+                  <strong>{answer.userAns}</strong>
                   <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
                     Answered {new Date(answer.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
               <p>{answer.content}</p>
-              {answer.images && answer.images.map((img, imgIndex) => (
+              {answer.images.map((img, imgIndex) => (
                 <img key={imgIndex} src={img} alt={`Answer Image ${imgIndex}`} className="img-fluid rounded my-2" />
               ))}
             </div>

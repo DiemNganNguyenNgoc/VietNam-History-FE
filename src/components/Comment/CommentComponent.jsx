@@ -1,10 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import * as UserService from "../../services/UserService"
 //const user = useSelector((state) => state.user);
 
 //const commentDetail = useSelector((state) => state.question.detailComment);
   //console.log("Question Detail:", questionDetail);
 const Comment = ({id, name,img, text, date }) => {
+
+  
+
     return (
       <div className="border-bottom pb-2 mb-2">
         <div className="d-flex align-items-center mb-2">

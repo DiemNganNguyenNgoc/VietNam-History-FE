@@ -1,14 +1,31 @@
 import React from 'react';
 import './QuestionBoxAdmin.css';
-import img1 from "../../assets/image/avatar_1.jpg";
-import { Button } from 'bootstrap';
+import { Popover } from 'antd';
 
-const QuestionBoxAdmin = ({ username, reputation, followers, title, tags, date, views, answers, likes }) => {
+const QuestionBoxAdmin = ({
+  img,
+  username,
+  reputation,
+  followers,
+  title,
+  tags,
+  date,
+  views,
+  answers,
+  likes,
+  onDelete,
+  isHidden, // Thêm trạng thái hiện tại
+}) => {
+
   return (
     <div className="question-box">
       <div className="user-info">
         <div className="icon-container">
-          <img className="icon-styles" src={img1} alt="avatar"></img>
+          {img ? (
+            <img className="icon-styles" src={img} alt="avatar" />
+          ) : (
+            <div className="placeholder-avatar"> </div>
+          )}
         </div>
         <span className="username">{username}</span>
         <div className="details-container">
@@ -40,10 +57,22 @@ const QuestionBoxAdmin = ({ username, reputation, followers, title, tags, date, 
         <div className="date-container">
           <span className="date-item">{date}</span>
         </div>
+
+        {/* Hiển thị thông báo nếu câu hỏi đang bị ẩn */}
+        {!isHidden && (
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px" }}>
+            This question was hidden by the user.
+          </div>
+        )}
       </div>
-      <div className='delete-container'>
-        
-          <i class="bi bi-x-circle" ></i>
+
+      <div>
+        <button
+          className="btn btn-sm btn-light"
+          onClick={onDelete} // Truyền event vào hàm
+        >
+          <i className="bi bi-trash text-danger"></i>
+        </button>
 
       </div>
     </div>

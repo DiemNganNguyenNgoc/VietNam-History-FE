@@ -4,11 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Popover } from "antd";
 import * as UserService from "../../services/UserService";
+import * as AdminService from "../../services/AdminService";
 import { resetUser } from "../../redux/slides/userSlide";
+import { resetAdmin } from "../../redux/slides/adminSlide";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  console.log("user", user);
+
+  const admin = useSelector((state) => state.admin);
+  console.log("admin", admin);
+
   const dispatch = useDispatch();
 
   const [img, setImg] = useState("");
@@ -20,8 +27,8 @@ const HeaderComponent = () => {
 
   const handleLogout = async () => {
     try {
-      await UserService.logoutUser();
-      dispatch(resetUser());
+      (await UserService.logoutUser()) || AdminService.logoutAdmin();
+      dispatch(resetUser()) || dispatch(resetAdmin());
       localStorage.clear();
       alert("Logout successful");
     } catch (error) {
@@ -30,18 +37,22 @@ const HeaderComponent = () => {
   };
 
   const handleNavigateUserProfile = () => {
-    navigate("/profile");
+    if (admin?.isAdmin) {
+      navigate("/admin/profile");
+    } else {
+      navigate("/profile");
+    }
   };
 
   const content = (
     <div>
-      {["Logout", "User Profile"].map((item, index) => (
+      {["Logout", "Profile"].map((item, index) => (
         <p
           key={index}
           onClick={
             item === "Logout"
               ? handleLogout
-              : item === "User Profile"
+              : item === "Profile"
               ? handleNavigateUserProfile
               : null
           }
@@ -62,9 +73,9 @@ const HeaderComponent = () => {
 
   useEffect(() => {
     // console.log("User state:", user); // To debug the user state after logout
-    setName(user?.name);
-    setImg(user?.img);
-  }, [user]);
+    setName(user?.name || admin?.name);
+    setImg(user?.img || admin?.img);
+  }, [user, admin]);
 
   return (
     <>
@@ -83,7 +94,7 @@ const HeaderComponent = () => {
 
           <div>
             <div className="btn">
-              {user?.name ? (
+              {user?.name || admin?.name ? (
                 <>
                   <Popover content={content} trigger="click">
                     <div
@@ -105,7 +116,7 @@ const HeaderComponent = () => {
                           color: "#FFFFFF",
                         }}
                       >
-                        {user.name}
+                        {user.name || admin.name}
                       </span>
                     </div>
                   </Popover>
@@ -195,6 +206,20 @@ const HeaderComponent = () => {
               </a>
             </li>
           </ul>
+          {admin?.isAdmin && (
+            <ul class="nav nav-underline">
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="/admin/manage"
+                  style={Styles.textHeader}
+                >
+                  <i class="bi bi-gear" style={Styles.iconHeader}></i>
+                  Manage System
+                </a>
+              </li>
+            </ul>
+          )}
         </div>
       </nav>
     </>

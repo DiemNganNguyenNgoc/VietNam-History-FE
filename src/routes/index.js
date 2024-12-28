@@ -19,8 +19,10 @@ import UsersAdmin from "../AdminPage/UsersAdmin/UsersAdmin";
 import QuestionDetailPage from "../pages/QuestionDetailPage/QuestionDetailPage";
 import QuestionDetailAdmin from "../AdminPage/QuestionDetailAdmin/QuestionDetailAdmin";
 import TagAdmin from "../AdminPage/TagAdmin/TagAdmin";
+import ManageSystem from "../AdminPage/ProfileAdmin/ManageSystem";
 import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
+import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 export const routes = [
   {
     path: "/",
@@ -117,8 +119,14 @@ export const routes = [
   },
 
   {
-    path: "admin/profile",
+    path: "/admin/profile",
     page: ProfileAdmin,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/admin/add-admin",
+    page: SignUpAdminPage,
     isShowHeader: true,
   },
 
@@ -150,6 +158,13 @@ export const routes = [
     page: TagAdmin,
     isShowHeader: true,
   },
+
+  {
+    path: "/admin/manage",
+    page: ManageSystem,
+    isShowHeader: true,
+  },
+
   {
     path: "/other-list-user",
     page: OtherListUserPage,

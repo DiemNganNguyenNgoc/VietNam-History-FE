@@ -113,7 +113,7 @@ export const getAllUsersExceptSelf = async () => {
     `${process.env.REACT_APP_API_URL_BACKEND}/user/get-all-except-self`,
     {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Thêm token từ Local Storage
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Thêm token từ Local Storage
       },
     }
   );
@@ -143,13 +143,29 @@ export const getAllUser = async () => {
   }
 };
 
-export const followUser = async (id) => {
+export const addFollower = async (id, access_token) => {
+  console.log("access_token", access_token);
+
+  const res = await axios.post(
+    `${process.env.REACT_APP_API_URL_BACKEND}/user/add-follower/${id}`,
+    {},
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${access_token}`, // Sử dụng Authorization thay vì token
+      },
+    }
+  );
+  console.log("res", res.data);
+  return res.data;
+};
+
+// Trong hàm updateQuesCount
+export const updateQuesCount = async (userId) => {
   try {
-    const res = await axios.post(
-      `${process.env.REACT_APP_API_URL_BACKEND}/user/add-follower/${id}`
-    );
-    return res.data;
+    const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/user/update-ques-count/${userId}`);
+    return response.data;  // Đảm bảo trả về dữ liệu đúng
   } catch (error) {
-    throw error.response ? error.response.data.message : "Server Error";
+    throw error;
   }
 };
