@@ -150,7 +150,7 @@ export const routes = [
   },
 
   {
-    path: "/admin/questiondetail",
+    path: "/admin/question-detail/:questionId",
     page: QuestionDetailAdmin,
     isShowHeader: true,
   },

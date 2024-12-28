@@ -101,7 +101,7 @@ const QuestionAdmin = () => {
   };
 
   const handleQuestionClick = (questionId) => {
-    navigate(`/question-detail/${questionId}`);
+    navigate(`/admin/question-detail/${questionId}`);
   };
 
   return (
