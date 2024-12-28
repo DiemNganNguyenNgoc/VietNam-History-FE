@@ -1,9 +1,12 @@
 import React from "react";
 import QuestionHolder from "../../components/UserAnswer/QuestionHolder";
 import "../../css/AnswerSubTab.css";
+import { useSelector } from "react-redux";
 
 const AnswerSubTab = (answerQuantity) => {
-  answerQuantity = 3;
+    const user = useSelector((state) => state.user);
+  
+  answerQuantity = user?.answerCount|| 0;
   return (
     <div>
       <div className="title">
