@@ -446,7 +446,7 @@ const QuestionDetails = () => {
 
       {/* Phần bình luận */}
       <div className="mb-4">
-        <h5 className="mb-3">{commentQuess.length} Comments</h5>
+        <h5 className="mb-3"> Comments</h5>
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
           commentQuess.map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
