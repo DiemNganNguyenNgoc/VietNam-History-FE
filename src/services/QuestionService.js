@@ -19,7 +19,8 @@ export const getAllQues = async (data) => {
 
 export const getAllQuesByTag = async (tagId) => {
   const res = await axios.get(
-    `${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?tag=${tagId}`);
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?tag=${tagId}`
+  );
   return res.data;
 };
 
@@ -41,14 +42,13 @@ export const getDetailsQuestion = async (id) => {
   }
 };
 
-export const updateQuestion = async (id, data) => {
+export const updateQuestion = async (questionId, data) => {
   const res = await axios.put(
-    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-question/${id}`,data
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-question/${questionId}`,
+    data
   );
   return res.data;
 };
-
-
 
 export const getQuestionsByUserId = async (userId) => {
   try {
@@ -68,14 +68,15 @@ export const getQuestionsByUserId = async (userId) => {
 };
 
 export const updateAnswerCount = async (questionId, newAnswerCount) => {
-  console.log("hhhh", newAnswerCount)
-  console.log("ID", questionId)
-  const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
-  });
-  console.log("ID")
+  console.log("hhhh", newAnswerCount);
+  console.log("ID", questionId);
+  const response = await axios.put(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`,
+    { answerCount: newAnswerCount }
+  );
+  console.log("ID");
   return response.data;
 };
-
 
 // export const updateAnswerCount = async (id, data) => {
 //   try {
@@ -104,4 +105,3 @@ export const updateAnswerCount = async (questionId, newAnswerCount) => {
 //     }
 //   }
 // };
-
