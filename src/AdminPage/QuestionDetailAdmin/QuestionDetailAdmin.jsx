@@ -458,6 +458,7 @@ const QuestionDetails = () => {
                         className={`btn btn-sm ${answer.active ? "btn-danger" : "btn-success"}`}
                         onClick={() => handleToggleAnswerStatus(answer._id, answer.active)}
                       > {answer.active ? "Delete" : "Restore"}</button>
+                      
                     </div>
                   </div>
                 </div>
