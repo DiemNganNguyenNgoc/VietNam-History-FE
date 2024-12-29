@@ -17,3 +17,8 @@ export const getAnswersByQuestionId = async (questionId) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-question/${questionId}`);
     return res.data;
 };
+
+export const getStatisticAnswer = async (userAns, year, month) => {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-statistic?userAns=${userAns}&&year=${year}&&month=${month}`);
+    return response.data;
+  };

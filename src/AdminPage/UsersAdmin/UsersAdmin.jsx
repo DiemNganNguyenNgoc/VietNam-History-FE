@@ -48,7 +48,7 @@ const UsersAdmin = () => {
 
     return (
         <div className='container mt-4'>
-            <h1 className='title'>USER</h1>
+            <h1 className='title'>MANAGEMENT USER</h1>
             <div className='search-holder' >
                <div>
                <input class="form-control" type="text" placeholder="Search by name, email, phone number..." style={{ width: '400px', height: '40px' }}></input>

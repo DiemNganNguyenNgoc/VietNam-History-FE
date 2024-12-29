@@ -8,6 +8,7 @@ import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
 import { useQuery } from "@tanstack/react-query";
 import * as TagService from "../../services/TagService";
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 
 const QuestionPage = () => {
   const [filters, setFilters] = useState({
@@ -175,7 +176,10 @@ const QuestionPage = () => {
         </div>
         {/* Render các câu hỏi */}
         <div style={{ marginTop: "20px" }}>
-          {Array.isArray(questions) && questions.length > 0 ? (
+        {isLoadingQues ? (
+          <LoadingComponent isLoading={isLoadingQues} />
+        ) :
+          Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
@@ -199,7 +203,7 @@ const QuestionPage = () => {
               );
             })
           ) : (
-            <p>No questions available.</p>
+            <LoadingComponent isLoading={isLoadingQues} />
           )}
         </div>
       </div>

@@ -104,25 +104,44 @@ const QuestionAdmin = () => {
     navigate(`/question-detail/${questionId}`);
   };
 
+  const handleOnDelete = async (quesId, event) => {
+    event.stopPropagation(); // Ngừng sự kiện lan truyền
+
+    const isConfirmed = window.confirm("Are you sure you want to delete this question?");
+    if (isConfirmed) {
+      try {
+        await QuestionService.deleteQuestion(quesId);
+        setQuestions(questions.filter(question => question._id !== quesId));
+        alert("Question deleted successfully!");
+        navigate(-1);
+      } catch (error) {
+        console.error("Error deleting question: ", error);
+        alert("Error deleting question.");
+      }
+    }
+  };
+
+
+
+
+
   return (
     <div className="container">
-      <div style={{ color: "#023E73", marginTop: "20px", marginLeft: "20px", height: "auto", paddingRight: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h1 style={{ fontSize: "30px", marginLeft: "20px", marginTop: "20px" }}>
-            All Questions
-          </h1>
-        </div>
-        <p style={{ color: "#323538", marginTop: "10px", marginLeft: "20px", fontSize: "20px", fontWeight: "600" }}>
-          {questions.length} questions
-        </p>
-        <br />
-        <SortBtnAdmin />
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
-          <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
-        </div>
-        {/* Render các câu hỏi */}
-        <div style={{ marginTop: "20px" }}>
-          {Array.isArray(questions) && questions.length > 0 ? (
+      <h1 className='title'>MANAGEMENT QUESTIONS</h1>
+      <p style={{ color: "#323538", marginTop: "10px", marginLeft: "20px", fontSize: "20px", fontWeight: "600" }}>
+        {questions.length} questions
+      </p>
+      <br />
+      <SortBtnAdmin />
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
+        <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
+      </div>
+      {/* Render các câu hỏi */}
+      <div style={{ marginTop: "20px" }}>
+        {isLoadingQues ? (
+          <LoadingComponent isLoading={isLoadingQues} />
+        ) :
+          Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
               const user = users[question.userQues];
               return (
@@ -138,14 +157,15 @@ const QuestionAdmin = () => {
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}
+                    onDelete={(event) => handleOnDelete(question._id, event)} // Truyền event vào handleOnDelete
                   />
+
                 </div>
               );
             })
           ) : (
-            <LoadingComponent isLoading={isLoadingQues}/>
+            <LoadingComponent isLoading={isLoadingQues} />
           )}
-        </div>
       </div>
     </div>
   );

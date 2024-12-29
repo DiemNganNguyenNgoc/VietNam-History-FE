@@ -49,8 +49,14 @@ export const getDetailsQuestion = async (id) => {
 
 export const updateQuestion = async (id, data) => {
   const res = await axios.put(
-    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-question/${id}`,data
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/update-question/${id}`, data
   );
+  return res.data;
+};
+
+export const deleteQuestion = async (quesId) => {
+  const res = await axios.delete(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/delete-question/${quesId}`);
   return res.data;
 };
 
@@ -74,9 +80,15 @@ export const getQuestionsByUserId = async (userId) => {
 };
 
 export const updateAnswerCount = async (questionId, newAnswerCount) => {
-  const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
+  const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {
+    answerCount: newAnswerCount,
   });
   console.log("ID")
+  return response.data;
+};
+
+export const getStatisticQuestion = async (userQues, year, month) => {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/question/get-by-statistic?userQues=${userQues}&&year=${year}&&month=${month}`);
   return response.data;
 };
 

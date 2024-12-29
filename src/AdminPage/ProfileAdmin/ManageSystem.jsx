@@ -4,6 +4,7 @@ import TagAdmin from "../TagAdmin/TagAdmin";
 import UsersAdmin from "../UsersAdmin/UsersAdmin";
 import QuestionAdmin from "../QuestionAdmin/QuestionAdmin";
 import { useSelector } from "react-redux";
+import StatisticPage from "../../pages/StatisticPage/StatisticPage";
 
 function ManageSystem() {
   const admin = useSelector((state) => state.admin);
@@ -39,6 +40,14 @@ function ManageSystem() {
                 Users
               </button>
             </li>
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "statistic" ? "active" : ""}`}
+                onClick={() => setActiveTab("statistic")}
+              >
+                Statistic
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -49,6 +58,7 @@ function ManageSystem() {
           {activeTab === "question" && <QuestionAdmin />}
           {activeTab === "tag" && <TagAdmin />}
           {activeTab === "user" && <UsersAdmin />}
+          {activeTab === "statistic" && <StatisticPage />}
         </div>
       </div>
     </div>
