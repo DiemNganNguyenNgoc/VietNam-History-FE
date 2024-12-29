@@ -10,6 +10,7 @@ import * as AnswerService from "../../services/AnswerService";
 import * as UserService from "../../services/UserService";
 import * as TagService from "../../services/TagService";
 import * as QuestionService from "../../services/QuestionService";
+import * as QuestionVoteService from "../../services/QuestionVoteService";
 import * as CommentService from "../../services/CommentService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,6 +23,8 @@ import {
 import { setDetailUser } from "../../redux/slides/userSlide";
 import { setAllTag } from "../../redux/slides/tagSlide";
 import AnswerEditor from "../../components/AnswerComponent/AnswerComponent"
+import parse from 'html-react-parser';
+
 
 const QuestionDetails = () => {
   const navigate = useNavigate();
@@ -33,7 +36,10 @@ const QuestionDetails = () => {
   const [answers, setAnswers] = useState([]); // State để lưu trữ danh sách câu trả lời
   // const [idQues, setIdQues] = useState("");
   // const [userCom, setIdUserCom] = useState('');
+  const [comments, setComments] = useState([]); 
   const [TextCom, setTextCom] = useState('');
+  const [upVotes, setUpVotes] = useState(0); // Số lượt upvote hiện tại
+
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -41,6 +47,7 @@ const QuestionDetails = () => {
   // const question = useSelector((state) => state.question);
   const dispatch = useDispatch();
   const { questionId } = useParams(); // Lấy ID câu hỏi từ URL
+
   // Lấy dữ liệu chi tiết của câu hỏi từ Redux store
   const questionDetail = useSelector((state) => state.question.detailQuestion);
   console.log("Question Detail:", questionDetail);
@@ -54,8 +61,75 @@ const QuestionDetails = () => {
   const mutation = useMutationHook(data => AnswerService.addAns(data));
   const { data, isLoading, isSuccess, isError } = mutation;
 
-  const mutationComment = useMutationHook(data => CommentService.addComment(data));
+  const mutationComment = useMutationHook(dataCom => CommentService.addComment(dataCom));
   const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
+
+  const [voteStatus, setVoteStatus] = useState({ hasVoted: false, type: null });
+  console.log(voteStatus);
+
+  useEffect(() => {
+    // Kiểm tra trạng thái vote khi load page
+    const checkStatus = async () => {
+      try {
+        const status = await QuestionVoteService.checkVoteStatus(user?.id, questionId);
+        setVoteStatus(status.data);
+      } catch (error) {
+        console.error('Error checking vote status:', error);
+      }
+    };
+    
+    checkStatus();
+  }, [user?.id, questionId]);
+
+
+  // Hàm xử lý UpVote
+  const handleQuesUpVote = async () => {
+    try {
+      if (!voteStatus.hasVoted) {
+        // Nếu chưa vote, thực hiện upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: true, type: true });
+      } else if (voteStatus.type === true) {
+        // Nếu đã upvote, hủy upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: false, type: null });
+      } else if (voteStatus.type === false) {
+        // Nếu đã downvote, thay đổi thành upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: true, type: true });
+      }
+      // Cập nhật lại số lượng vote sau khi upvote
+      const updatedQuestion = await QuestionService.getDetailsQuestion(questionId);
+      dispatch(setDetailQuestion(updatedQuestion));
+    } catch (error) {
+      console.error('Error handling upvote:', error);
+    }
+  };
+
+  // Hàm xử lý DownVote
+  const handleQuesDownVote = async () => {
+    try {
+      if (!voteStatus.hasVoted) {
+        // Nếu chưa vote, thực hiện downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: true, type: false });
+        
+      } else if (voteStatus.type === false) {
+        // Nếu đã downvote, hủy downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: false, type: null });
+      } else if (voteStatus.type === true) {
+        // Nếu đã upvote, thay đổi thành downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: true, type: false });
+      }
+      const updatedQuestion = await QuestionService.getDetailsQuestion(questionId);
+      dispatch(setDetailQuestion(updatedQuestion));
+    } catch (error) {
+      console.error('Error handling downvote:', error);
+    }
+  };
+
 
   //lấy thông tin người hỏi
   useEffect(() => {
@@ -120,11 +194,34 @@ const QuestionDetails = () => {
   //   }
   // }, [questionDetail.detailQuestion, navigate]);
 
+
   // Lấy danh sách câu trả lời
-  const fetchAnswers = async () => {
+  const fetchAnswersWithUserDetails = async () => {
     try {
       const response = await AnswerService.getAnswersByQuestionId(questionId);
-      setAnswers(response.data.data); // Cập nhật danh sách câu trả lời
+      const answersWithUserDetails = await Promise.all(
+        response.data.data.map(async (answer) => {
+          const userName = await fetchUserDetails(answer.userAns);
+          return { ...answer, userName };
+        })
+      );
+      setAnswers(answersWithUserDetails); // Cập nhật danh sách câu trả lời với tên người dùng
+    } catch (error) {
+      console.error("Error fetching answers with user details:", error);
+    }
+  };
+  
+  // Gọi hàm này thay cho `fetchAnswers`
+  useEffect(() => {
+    fetchAnswersWithUserDetails();
+  }, [questionId]);
+  
+
+  // Lấy danh sách bình luận
+  const fetchComments = async () => {
+    try {
+      const response = await CommentService.getCommentByQuestionId(questionId);
+      setComments(response.data.data); // Cập nhật danh sách câu trả lời
       // // In từng câu trả lời trong mảng answers
       // response.data.data.forEach((answer, index) => {
       //   console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
@@ -149,11 +246,11 @@ const QuestionDetails = () => {
       setContent(value);
     }
   };
-  
 
 
+  //useEffect lay thong tin user
   useEffect(() => {
-    console.log("user:", user);
+
     if (user?.id) {
       setIdUser(user.id);
     }
@@ -197,18 +294,42 @@ const QuestionDetails = () => {
   }, []);
 
 
-  //them cau tra loi
+  //useEffect them cau tra loi
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success();
       alert('Answer has been added successfully!');
-      fetchAnswers(); // Cập nhật danh sách câu trả lời sau khi thêm
+      fetchAnswersWithUserDetails(); // Cập nhật danh sách câu trả lời sau khi thêm
     }
     if (isError) {
       message.error();
     }
   }, [isSuccess, isError]);
 
+  //them binh luan
+  useEffect(() => {
+    if (isSuccessCom && dataCom?.status !== 'ERR') {
+      message.success();
+      alert('Comment has been added successfully!');
+      fetchComments(); // Cập nhật danh sách câu trả lời sau khi thêm
+    }
+    if (isErrorCom) {
+      message.error();
+    }
+  }, [isSuccessCom, isErrorCom]);
+
+  const mutationUpdate = useMutationHook(id => UserService.updateAnswerCount(id));
+  const { data: dataUpdate, isLoading: isLoadingUpdate, isSuccess: isSuccessUpdate, isError: isErrorUpdate } = mutationUpdate;
+
+  //useEffect cho update answerCount cua User
+  useEffect(() => {
+    if (isSuccessUpdate && dataUpdate?.status !== 'ERR') {
+      message.success();
+    }
+    if (isErrorUpdate) {
+      message.error();
+    }
+  }, [isSuccessUpdate, isErrorUpdate, dataUpdate]);
   //Click them answer 
   const handlePostAnswerClick = useCallback(async () => {
     if (!user?.id) {
@@ -235,13 +356,14 @@ const QuestionDetails = () => {
         // Reset nội dung và ảnh
         setContent("");
         setImageSrcs([]);
-        
-          // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
-          const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
-          await QuestionService.updateAnswerCount(questionId, updatedAnswerCount );
-          
+
+        // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
+        const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
+        await QuestionService.updateAnswerCount(questionId, updatedAnswerCount);
+        //Cập nhật số câu trả lời của người dùng đã post 
+        await mutationUpdate.mutateAsync(userAns);
         // Gọi hàm fetchAnswers để cập nhật danh sách câu trả lời
-        fetchAnswers();
+        fetchAnswersWithUserDetails();
 
         // Hiển thị thông báo thành công
         message.success("Answer has been added successfully!");
@@ -252,18 +374,29 @@ const QuestionDetails = () => {
       console.error("Error while posting answer:", error);
       message.error("An error occurred. Please try again.");
     }
-  }, [content, imageSrcs, mutation, questionDetail.data?.answerCount, questionId, user, fetchAnswers]);
+  }, [content, imageSrcs, mutation, questionDetail.data?.answerCount, questionId, user, fetchAnswersWithUserDetails]);
 
-  console.log("COUNT", questionDetail.data)
+  // console.log("COUNT", questionDetail.data)
 
   useEffect(() => {
-    fetchAnswers(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
+    fetchAnswersWithUserDetails(); // Gọi hàm để lấy danh sách câu trả lời khi component mount
   }, [questionId]);
 
 
   const handleCancelClick = useCallback(() => {
     alert("Cancel adding the question!");
   }, []);
+
+  //Ham thay thong tin user theo ID
+  const fetchUserDetails = async (userId) => {
+    try {
+      const userDetails = await UserService.getDetailsUser(userId);
+      return userDetails?.data?.name || "Unknown User"; // Lấy tên hoặc giá trị mặc định
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return "Unknown User"; // Giá trị fallback
+    }
+  };
 
 
   useEffect(() => {
@@ -279,7 +412,7 @@ const QuestionDetails = () => {
 
   //Lấy tất cả comment
   const getAllCom = async () => {
-    const res = await CommentService.getAllComment(questionId);
+    const res = await CommentService.getCommentByQuestionId(questionId);
     return res.data;
   };
 
@@ -292,7 +425,7 @@ const QuestionDetails = () => {
     queryFn: getAllCom,
   });
 
-  const handleAddCommentClick = async () => {
+  const handleAddCommentClick = useCallback( async () => {
 
     if (!userAns) {
       alert("User ID is missing. Please log in again.");
@@ -301,18 +434,17 @@ const QuestionDetails = () => {
 
     const commentData = {
 
-      TextCom,
-      userAns,
-      questionId,
-      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
+      content : TextCom,
+      user : userAns,
+      answer : questionId
 
     };
 
     await mutationComment.mutateAsync(commentData);
-    TextCom = "";
-  };
-
-
+    setTextCom("");
+    fetchComments();
+  }, [content, mutationComment, answers, user]);
+  
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -337,17 +469,38 @@ const QuestionDetails = () => {
 
       {/* Phần tiêu đề câu hỏi */}
       <div className="mb-4">
-        <h3>{questionDetail.data?.title || "Question Title"}</h3>
-        <p className="text-secondary">
-          <span className="me-3">{questionDetail.data?.view} views</span>
-          <span className="text-success me-3">
-            +{questionDetail.data?.upVoteCount}
-          </span>
-          <span className="text-danger">
-            -{questionDetail.data?.downVoteCount}
-          </span>
-        </p>
-      </div>
+      <h3>{questionDetail.data?.title || "Question Title"}</h3>
+      <p className="text-secondary">
+        <span className="me-3">{questionDetail.data?.view} views</span>
+        <div>
+          <button
+            className="btn me-2"
+            style={{
+              backgroundColor: voteStatus.type === true ? 'green' : voteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+            }}
+            onClick={() => handleQuesUpVote()}
+          >
+            ▲
+          </button>
+          +{questionDetail.data?.upVoteCount}
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <button
+            className="btn"
+            style={{
+              backgroundColor: voteStatus.type === false ? 'red' : voteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+              marginRight: "12px",
+            }}
+            onClick={() => handleQuesDownVote()}
+          >
+            ▼
+          </button>
+          -{questionDetail.data?.downVoteCount}
+        </div>
+      </p>
+    </div>
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
@@ -383,21 +536,19 @@ const QuestionDetails = () => {
 
       {/* Phần bình luận */}
       <div className="mb-4">
-        <h5 className="mb-3">Comments</h5>
+        <h5 className="mb-3"> Comments</h5>
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
           commentQuess.map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
-
-            return (
-              <div
-                key={commentQues._id}
-                onClick={() => handleAddCommentClick(userAns)}
-              >
+          return(
+              
                 <Comment
-
+                   name = {commentQues.user.name || "Unknown"}
+                   text = {commentQues.content || "Unknown"}
+                   date={new Date(commentQues.createdAt).toLocaleString()}
                 />
-              </div>
-            );
+             
+          )
           })
         ) : (
           <p>No conmment available.</p>
@@ -435,15 +586,19 @@ const QuestionDetails = () => {
 
                 </div>
                 <div>
-                  <strong>{answer.userAns}</strong>
+                  <strong>{answer.userName || "Loading..."}</strong>
                   <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
                     Answered {new Date(answer.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
-              <p>{answer.content}</p>
-              {answer.images.map((img, imgIndex) => (
-                <img key={imgIndex} src={img} alt={`Answer Image ${imgIndex}`} className="img-fluid rounded my-2" />
+              <p>{parse(answer.content)}</p>
+              {answer.images?.map((img, index) => (
+                <img
+                src={img || "https://via.placeholder.com/150"}
+                alt={`Answer Image ${index}`}
+                //className="img-fluid rounded my-2"
+              />
               ))}
             </div>
           ))

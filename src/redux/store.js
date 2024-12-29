@@ -4,7 +4,8 @@ import userReducer from "./slides/userSlide";
 import adminReducer from "./slides/adminSlide";
 import questionReducer from "./slides/questionSlide";
 import tagReducer from "./slides/tagSlide";
-import answerReducer from "./slides/AnswerSlice"; // Import answerSlice
+import answerReducer from "./slides/AnswerSlice";
+import savedReducer from "./slides/savedSlide";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     question: questionReducer,
     tag: tagReducer,
     answer: answerReducer,
+    saved: savedReducer,
   },
 });

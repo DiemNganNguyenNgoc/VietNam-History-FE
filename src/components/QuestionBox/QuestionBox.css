@@ -1,124 +1,123 @@
 .question-box {
-    display: flex;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #F2F5FF;
-    padding: 10px;
-    margin-bottom: 10px;
-    color: #666666;
-  }
-  
-  .user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .details-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 5px;
-  }
-  
-  .icon-container {
-    margin-bottom: 0;
-  }
-  
-  .icon-styles {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .username {
-    font-size: 14px;
-    font-weight: 600;
-    color: #000;
-  }
-  
-  .question-content {
-    display: flex;
-    flex: 1;
-  }
-  
-  .like-icon {
-    font-size: 14px;
-    color: #000000;
-    margin-left: 5px;
-  }
-  
-  .heart-icon {
-    font-size: 14px;
-    color: #666666;
-    margin-left: 5px;
-  }
-  
-  .trophy-icon {
-    font-size: 14px;
-    color: #666666;
-    margin-left: 5px;
-  }
-  
-  .question-details {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-right: 20px;
-    font-size: 14px;
-    color: #000000;
-  }
-  
-  .detail-item {
-    margin-bottom: 5px;
-    margin-right: 20px;
-  }
-  
-  .title-and-tags {
-    flex: 1;
-  }
-  
-  .question_title {
-    font-size: 20px;
-    margin: 0;
-    font-weight: 600;
-    color:#023E73
-  }
-  
-  .tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 5px;
-  }
-  
-  .tag-item {
-    background-color: #C5E3FC;
-    border-radius: 10px;
-    padding: 5px 10px;
-    margin-right: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #555;
-  }
-  
-  .divider {
-    width: 1px;
-    background-color: #ccc;
-    margin: 0 20px;
-  }
-  
-  .date-container {
-    margin-top: auto;
-    text-align: right;
-  }
-  
-  .date-item {
-    font-size: 14px;
-    color: #777;
-  }
-  
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f2f5ff;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #666666;
+}
 
-  /* QuestionBox.css */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.details-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+.icon-container {
+  margin-bottom: 0;
+}
+
+.icon-styles {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
+.question-content {
+  display: flex;
+  flex: 1;
+}
+
+.like-icon {
+  font-size: 14px;
+  color: #000000;
+  margin-left: 5px;
+}
+
+.heart-icon {
+  font-size: 14px;
+  color: #666666;
+  margin-left: 5px;
+}
+
+.trophy-icon {
+  font-size: 14px;
+  color: #666666;
+  margin-left: 5px;
+}
+
+.question-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 20px;
+  font-size: 14px;
+  color: #000000;
+}
+
+.detail-item {
+  margin-bottom: 5px;
+  margin-right: 20px;
+}
+
+.title-and-tags {
+  flex: 1;
+}
+
+.question_title {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 600;
+  color: #023e73;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+
+.tag-item {
+  background-color: #c5e3fc;
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.divider {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 20px;
+}
+
+.date-container {
+  margin-top: auto;
+  text-align: right;
+}
+
+.date-item {
+  font-size: 14px;
+  color: #777;
+}
+
+/* QuestionBox.css */
 
 .icon-container {
   display: flex;
@@ -147,4 +146,44 @@
   color: #fff;
   background-color: #b0b0b0; /* Màu xám nhạt */
   border-radius: 50%;
+}
+
+.like-icon {
+  font-size: 14px;
+  color: #000; /* Màu mặc định */
+}
+
+.like-icon-container {
+  display: inline-block;
+  padding: 5px;
+  border-radius: 50%;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.like-icon-container.liked .like-icon {
+  color: #007bff; /* Màu xanh cho trạng thái đã like */
+}
+
+.like-icon-container:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Thay đổi nền khi hover */
+}
+
+.save-button {
+  background-color: #023e73; /* Màu xanh */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #45a049;
+}
+
+.save-button.saved {
+  background-color: #ccc; /* Màu xám khi đã lưu */
+  cursor: not-allowed;
 }

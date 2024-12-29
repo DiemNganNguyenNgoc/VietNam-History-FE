@@ -23,6 +23,7 @@ import ManageSystem from "../AdminPage/ProfileAdmin/ManageSystem";
 import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
 import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
+import SavedPage from "../pages/SavedPage/SavedPage";
 export const routes = [
   {
     path: "/",
@@ -149,7 +150,7 @@ export const routes = [
   },
 
   {
-    path: "/admin/questiondetail",
+    path: "/admin/question-detail/:questionId",
     page: QuestionDetailAdmin,
     isShowHeader: true,
   },
@@ -168,6 +169,12 @@ export const routes = [
   {
     path: "/other-list-user",
     page: OtherListUserPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/saved-list",
+    page: SavedPage,
     isShowHeader: true,
   },
 ];

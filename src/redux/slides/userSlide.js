@@ -16,10 +16,14 @@ const initialState = {
 
   followerCount: 0,
   followingCount: 0,
+  answerCount: 0,
+  quesCount: 0,
   reportCount: "",
   savedCount: "",
   reputation: "",
   access_token: "",
+  answerCount: 0,
+  quesCount:0,
   allUser: [], // Danh sách tất cả các user
   detailUser: {},
   allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại
@@ -46,6 +50,8 @@ export const userSlide = createSlice({
         password = "",
         followerCount = 0,
         followingCount = 0,
+        answerCount = 0,
+        quesCount = 0,
         reportCount = "",
         savedCount = "",
         reputation = "",
@@ -65,6 +71,8 @@ export const userSlide = createSlice({
       state.password = password;
       state.followingCount = followingCount;
       state.followerCount = followerCount;
+      state.answerCount = answerCount;
+      state.quesCount = quesCount;
       state.reportCount = reportCount;
       state.savedCount = savedCount;
       state.reputation = reputation;
@@ -86,6 +94,8 @@ export const userSlide = createSlice({
       state.password = "";
       state.followerCount = 0;
       state.followingCount = 0;
+      state.answerCount = 0;
+      state.quesCount = 0;
       state.access_token = "";
       state.reportCount = "";
       state.savedCount = "";

@@ -18,6 +18,17 @@ export const getAnswersByQuestionId = async (questionId) => {
     return res.data;
 };
 
+// Lấy câu trả lời theo ID câu hỏi
+export const getAnswersByQuestionIdAdmin = async (questionId) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/admin/get-by-question/${questionId}`);
+    return res.data;
+};
+
+export const updateAnswerStatus = async (answerId, isActive) => {
+    return await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/answer/toggle-active/${answerId}`,{ active: isActive });
+  };
+  
+
 export const getStatisticAnswer = async (userAns, year, month) => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-statistic?userAns=${userAns}&&year=${year}&&month=${month}`);
     return response.data;

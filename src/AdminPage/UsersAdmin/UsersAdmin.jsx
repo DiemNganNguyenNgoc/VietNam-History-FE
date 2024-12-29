@@ -66,11 +66,12 @@ const UsersAdmin = () => {
             <table className="data-table">
               <thead>
                 <tr>
-                <th>No</th>
-                  <th>Username</th>
-                  <th>Email</th>
+                <th className='No'>No</th>
+                  <th className='userName'>Username</th>
+                  <th className='email'>Email</th>
                   <th>Phone number</th>
-                  {/* <th>Questions</th> */}
+                  <th>Questions</th> 
+                  <th>Answers</th> 
                   <th>Reputation</th>
                   <th>Report</th>
                   <th></th>
@@ -82,16 +83,16 @@ const UsersAdmin = () => {
                 <tbody>
                 {filteredUsers.map((row, index) => (
                     <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{row.name}</td>
-                      <td>{row.email}</td>
+                      <td className='No'>{index + 1}</td>
+                      <td className='userName'>{row.name}</td>
+                      <td className='email'>{row.email}</td>
                       <td>{row.phone}</td>
-                      {/* <td>{row.questions}</td>
-                      <td>{row.answers}</td> */}
+                      <td>{row.quesCount}</td>
+                      <td>{row.answerCount}</td> 
                       <td>{row.reputation}</td>
                       <td>{row.reportCount}</td>
                       <button className='view-profile'>View</button>
-                      <button className='delete-profile'>Delete</button>
+                      <button className='ban-profile'>Ban</button>
                     </tr>
                   ))}
                 </tbody>
