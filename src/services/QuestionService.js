@@ -102,6 +102,23 @@ export const getQuestionsFromUserAnswers = async (userId) => {
   }
 };
 
+export const addVote = async (questionId, userId, isUpVote) => {
+  try {
+    const res = await axiosJWT.post(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/questions/${questionId}/vote`,
+      { questionId, userId, isUpVote }
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi khi thêm vote.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
 
 
 // export const updateAnswerCount = async (id, data) => {

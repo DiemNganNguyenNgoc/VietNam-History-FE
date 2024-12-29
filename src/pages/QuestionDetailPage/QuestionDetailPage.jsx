@@ -10,6 +10,7 @@ import * as AnswerService from "../../services/AnswerService";
 import * as UserService from "../../services/UserService";
 import * as TagService from "../../services/TagService";
 import * as QuestionService from "../../services/QuestionService";
+import * as QuestionVoteService from "../../services/QuestionVoteService";
 import * as CommentService from "../../services/CommentService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
@@ -37,6 +38,8 @@ const QuestionDetails = () => {
   // const [userCom, setIdUserCom] = useState('');
   const [comments, setComments] = useState([]); 
   const [TextCom, setTextCom] = useState('');
+  const [upVotes, setUpVotes] = useState(0); // Số lượt upvote hiện tại
+
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -60,6 +63,73 @@ const QuestionDetails = () => {
 
   const mutationComment = useMutationHook(dataCom => CommentService.addComment(dataCom));
   const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
+
+  const [voteStatus, setVoteStatus] = useState({ hasVoted: false, type: null });
+  console.log(voteStatus);
+
+  useEffect(() => {
+    // Kiểm tra trạng thái vote khi load page
+    const checkStatus = async () => {
+      try {
+        const status = await QuestionVoteService.checkVoteStatus(user?.id, questionId);
+        setVoteStatus(status.data);
+      } catch (error) {
+        console.error('Error checking vote status:', error);
+      }
+    };
+    
+    checkStatus();
+  }, [user?.id, questionId]);
+
+
+  // Hàm xử lý UpVote
+  const handleQuesUpVote = async () => {
+    try {
+      if (!voteStatus.hasVoted) {
+        // Nếu chưa vote, thực hiện upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: true, type: true });
+      } else if (voteStatus.type === true) {
+        // Nếu đã upvote, hủy upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: false, type: null });
+      } else if (voteStatus.type === false) {
+        // Nếu đã downvote, thay đổi thành upvote
+        await QuestionService.addVote(questionId, user?.id, true);
+        setVoteStatus({ hasVoted: true, type: true });
+      }
+      // Cập nhật lại số lượng vote sau khi upvote
+      const updatedQuestion = await QuestionService.getDetailsQuestion(questionId);
+      dispatch(setDetailQuestion(updatedQuestion));
+    } catch (error) {
+      console.error('Error handling upvote:', error);
+    }
+  };
+
+  // Hàm xử lý DownVote
+  const handleQuesDownVote = async () => {
+    try {
+      if (!voteStatus.hasVoted) {
+        // Nếu chưa vote, thực hiện downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: true, type: false });
+        
+      } else if (voteStatus.type === false) {
+        // Nếu đã downvote, hủy downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: false, type: null });
+      } else if (voteStatus.type === true) {
+        // Nếu đã upvote, thay đổi thành downvote
+        await QuestionService.addVote(questionId, user?.id, false);
+        setVoteStatus({ hasVoted: true, type: false });
+      }
+      const updatedQuestion = await QuestionService.getDetailsQuestion(questionId);
+      dispatch(setDetailQuestion(updatedQuestion));
+    } catch (error) {
+      console.error('Error handling downvote:', error);
+    }
+  };
+
 
   //lấy thông tin người hỏi
   useEffect(() => {
@@ -374,8 +444,7 @@ const QuestionDetails = () => {
     setTextCom("");
     fetchComments();
   }, [content, mutationComment, answers, user]);
-
-
+  
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -400,17 +469,38 @@ const QuestionDetails = () => {
 
       {/* Phần tiêu đề câu hỏi */}
       <div className="mb-4">
-        <h3>{questionDetail.data?.title || "Question Title"}</h3>
-        <p className="text-secondary">
-          <span className="me-3">{questionDetail.data?.view} views</span>
-          <span className="text-success me-3">
-            +{questionDetail.data?.upVoteCount}
-          </span>
-          <span className="text-danger">
-            -{questionDetail.data?.downVoteCount}
-          </span>
-        </p>
-      </div>
+      <h3>{questionDetail.data?.title || "Question Title"}</h3>
+      <p className="text-secondary">
+        <span className="me-3">{questionDetail.data?.view} views</span>
+        <div>
+          <button
+            className="btn me-2"
+            style={{
+              backgroundColor: voteStatus.type === true ? 'green' : voteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+            }}
+            onClick={() => handleQuesUpVote()}
+          >
+            ▲
+          </button>
+          +{questionDetail.data?.upVoteCount}
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <button
+            className="btn"
+            style={{
+              backgroundColor: voteStatus.type === false ? 'red' : voteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+              marginRight: "12px",
+            }}
+            onClick={() => handleQuesDownVote()}
+          >
+            ▼
+          </button>
+          -{questionDetail.data?.downVoteCount}
+        </div>
+      </p>
+    </div>
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
