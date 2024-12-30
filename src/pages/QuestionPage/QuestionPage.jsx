@@ -20,7 +20,7 @@ const QuestionPage = () => {
   const user = useSelector((state) => state.user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
-
+  const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
   const [likeCounts, setLikeCounts] = useState({}); // Lưu số lượt like của mỗi câu hỏi
   // console.log("user", user);
   // Lấy `allSaved` từ Redux state
@@ -112,6 +112,22 @@ const QuestionPage = () => {
     dispatch(setAllSaved(savedData));
   }, [dispatch]);
 
+  //hiện câu hỏi đã report
+  useEffect(() => {
+    // Lấy danh sách các câu hỏi đã được báo cáo từ localStorage
+    const reported =
+      JSON.parse(localStorage.getItem("reportedQuestions")) || [];
+    setReportedList(reported);
+
+    // Nếu `questions` đã được tải từ API, cập nhật trạng thái `isReported`
+    setQuestionList((prevQuestions) =>
+      prevQuestions.map((q) => ({
+        ...q,
+        isReported: reported.includes(q._id),
+      }))
+    );
+  }, []);
+
   if (isLoadingQues) {
     return <div>Loading...</div>;
   }
@@ -198,8 +214,21 @@ const QuestionPage = () => {
         question: questionId,
         user: user.id, // ID người dùng
       });
+
+      // Lấy danh sách đã báo cáo từ localStorage và cập nhật
+      const updatedReported = [...reportedList, questionId];
+      localStorage.setItem(
+        "reportedQuestions",
+        JSON.stringify(updatedReported)
+      );
+
+      setReportedList(updatedReported); // Cập nhật danh sách báo cáo trong state
+      setQuestionList((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q._id === questionId ? { ...q, isReported: true } : q
+        )
+      );
       console.log("Report submitted successfully:", response);
-      setReportedList((prev) => [...prev, questionId]);
       alert(response.message); // Thông báo sau khi báo cáo thành công hoặc lỗi
     } catch (error) {
       console.error("Error reporting question:", error);
