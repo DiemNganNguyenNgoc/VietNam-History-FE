@@ -69,25 +69,25 @@ export const routes = [
   },
 
   {
-    path: "/statistic/question",
+    path: "admin/manage/statistic/question",
     page: StatisticQuestionPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/user",
+    path: "admin/manage/statistic/user",
     page: StatisticUserPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/topic",
+    path: "admin/manage/statistic/topic",
     page: StatisticTopicPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/activity",
+    path: "admin/manage/statistic/activity",
     page: StatisticActivityPage,
     isShowHeader: true,
   },

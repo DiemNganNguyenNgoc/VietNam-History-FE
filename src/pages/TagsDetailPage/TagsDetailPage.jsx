@@ -175,6 +175,7 @@ const TagsDetailPage = () => {
                             >
                                 <QuestionBox
                                     username={user?.name || "Unknown"}
+                                    img={user?.img || ""}
                                     reputation={user?.reputation || 0}
                                     followers={user?.followerCount || 0}
                                     title={question.title}
