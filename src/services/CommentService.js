@@ -17,3 +17,11 @@ export const getCommentByQuestionId = async (questionId) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/comment/comments/${questionId}`);
     return res.data;
 };
+
+// Lấy câu trả lời theo ID người dùng
+export const getCommentByUserId = async (userId) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/comment/commentsUser/${userId}`);
+    return res.data;
+};
+
+

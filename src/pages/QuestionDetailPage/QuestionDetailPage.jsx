@@ -213,8 +213,13 @@ const QuestionDetails = () => {
   
   // Gọi hàm này thay cho `fetchAnswers`
   useEffect(() => {
-    fetchAnswersWithUserDetails();
+    fetchAnswersWithUserDetails()
+  
   }, [questionId]);
+
+  const reloadPage = () => {
+    window.location.reload();
+  };
   
 
   // Lấy danh sách bình luận
@@ -425,6 +430,8 @@ const QuestionDetails = () => {
     queryFn: getAllCom,
   });
 
+  
+
   const handleAddCommentClick = useCallback( async () => {
 
     if (!userAns) {
@@ -442,7 +449,9 @@ const QuestionDetails = () => {
 
     await mutationComment.mutateAsync(commentData);
     setTextCom("");
-    fetchComments();
+
+    reloadPage();
+   
   }, [content, mutationComment, answers, user]);
   
   return (
