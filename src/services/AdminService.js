@@ -56,14 +56,14 @@ export const signupAdmin = async (data) => {
   }
 };
 
-export const getAllAdmin = async (access_token) => {
+export const getAllAdmin = async () => {
   try {
     const res = await axios.get(
       `${process.env.REACT_APP_API_URL_BACKEND}/admin/get-all-admin`,
       {
         headers: {
           "Content-Type": "application/json",
-          token: `Bearer ${access_token}`,
+          //token: `Bearer ${access_token}`,
         },
       }
     );
