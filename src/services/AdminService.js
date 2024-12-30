@@ -109,6 +109,7 @@ export const updateAdminInfo = async (id, data, access_token) => {
 };
 
 export const getDetailsAdmin = async (id, access_token) => {
+  console.log("ACCESS", access_token)
   const res = await axios.get(
     `${process.env.REACT_APP_API_URL_BACKEND}/admin/get-detail-admin/${id}`,
     {
@@ -118,6 +119,7 @@ export const getDetailsAdmin = async (id, access_token) => {
       },
     }
   );
+  
   return res.data;
 };
 
