@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "./QuestionBox.css";
+import { Popover, Button } from "antd";
+import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
 const QuestionBox = ({
   id,
@@ -15,9 +17,11 @@ const QuestionBox = ({
   likes,
   isLiked,
   isSaved,
+  isReported,
   onLike,
   onSave,
   onUnsave,
+  onReport,
 }) => {
   return (
     <div className="question-box">
@@ -45,6 +49,17 @@ const QuestionBox = ({
 
       {/* Nội dung câu hỏi */}
       <div className="question-content">
+        <div className="title-and-tags">
+          <h3 className="question_title">{title}</h3>
+          <div className="tags-container">
+            {tags.map((tag, index) => (
+              <span key={index} className="tag-item">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
         <div className="question-details">
           <span className="detail-item">{views} views</span>
           <span className="detail-item">{answers} answers</span>
@@ -53,7 +68,7 @@ const QuestionBox = ({
             <span
               className={`like-icon-container ${isLiked ? "liked" : ""}`}
               onClick={(e) => {
-                e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
+                e.stopPropagation();
                 if (!isLiked) onLike();
               }}
               style={{
@@ -68,37 +83,38 @@ const QuestionBox = ({
               )}
             </span>
           </span>
-          {/* Nút Save/Unsave */}
-          <button
-            className={`save-button ${isSaved ? "saved" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation(); // Ngăn chặn sự kiện lan ra ngoài
-              isSaved ? onUnsave() : onSave();
-            }}
-            style={{
-              marginLeft: "10px",
-              cursor: "pointer",
-            }}
-          >
-            {isSaved ? "Saved" : "Save"}
-          </button>
         </div>
 
-        {/* Tiêu đề và tags */}
-        <div className="title-and-tags">
-          <h3 className="question_title">{title}</h3>
-          <div className="tags-container">
-            {tags.map((tag, index) => (
-              <span key={index} className="tag-item">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Ngày tạo */}
-        <div className="date-container">
+        {/* Ngày tạo và nút Save/Menu */}
+        <div className="footer-container">
           <span className="date-item">{date}</span>
+
+          <div className="action-container" style={{ marginBottom: "10px" }}>
+            <button
+              className={`save-button ${isSaved ? "saved" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                isSaved ? onUnsave() : onSave();
+              }}
+              style={{ width: "80px" }}
+            >
+              {isSaved ? "Saved" : "Save"}
+            </button>
+
+            {/* Nút Report */}
+            <button
+              className={`report-button ${isReported ? "reported" : ""}`}
+              type="text"
+              danger
+              disabled={isReported}
+              onClick={(e) => {
+                e.stopPropagation();
+                onReport();
+              }}
+            >
+              {isReported ? "Reported" : "Report"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
