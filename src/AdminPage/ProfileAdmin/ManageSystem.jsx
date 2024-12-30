@@ -48,9 +48,9 @@ function ManageSystem() {
                 onClick={() => setActiveTab("admin")}
               >
                 Admins
-                </button>
-                </li>
-                <li className="nav-item">
+              </button>
+            </li>
+            <li className="nav-item">
               <button
 
                 className={`nav-link ${activeTab === "statistic" ? "active" : ""}`}
