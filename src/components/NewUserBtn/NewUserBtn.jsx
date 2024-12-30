@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NewUserBtn = ({ onClick }) => {
+const NewAdminBtn = ({ onClick }) => {
   return (
     <button 
       onClick={onClick} 
@@ -21,9 +21,9 @@ const NewUserBtn = ({ onClick }) => {
       onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#78ACD9')}
       onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
     >
-      New User
+      New Admin
     </button>
   );
 };
 
-export default NewUserBtn;
+export default NewAdminBtn;
