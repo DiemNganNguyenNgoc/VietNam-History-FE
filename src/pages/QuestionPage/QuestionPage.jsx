@@ -23,15 +23,17 @@ const QuestionPage = () => {
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
   const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
   const [likeCounts, setLikeCounts] = useState({}); // Lưu số lượt like của mỗi câu hỏi
+  //Phan trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 10; // Số câu hỏi mỗi trang
+  const [totalQuestions, setTotalQuestions] = useState(0);
   // console.log("user", user);
   // Lấy `allSaved` từ Redux state
   const allSaved = useSelector((state) => state.saved.allSaved);
 
   const navigate = useNavigate();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const questionsPerPage = 10; // Số câu hỏi mỗi trang
-  const [totalQuestions, setTotalQuestions] = useState(0);
+ 
   const [filters, setFilters] = useState({
     no_answers: false,
     no_accepted_answer: false,
@@ -304,7 +306,7 @@ const QuestionPage = () => {
             fontWeight: "600",
           }}
         >
-          2,535,460 questions
+         {questions.length} questions
         </p>
         <br />
         <SortBtn />
