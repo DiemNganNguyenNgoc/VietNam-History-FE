@@ -7,7 +7,7 @@ const initialState = {
 };
 
 const answerSlice = createSlice({
-  name: ' answer',
+  name: "answer",
   initialState,
   reducers: {
     setAnswers(state, action) {

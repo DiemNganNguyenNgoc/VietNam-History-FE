@@ -38,11 +38,12 @@ const HeaderComponent = () => {
 
   const handleNavigateUserProfile = () => {
     if (admin?.isAdmin) {
-      navigate("/admin/profile");
+      window.location.assign("/admin/profile");
     } else {
-      navigate("/profile");
+      window.location.assign("/profile");
     }
   };
+  
 
   const content = (
     <div>
