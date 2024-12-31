@@ -66,7 +66,7 @@ const AnsVoteSubTab = () => {
               backgroundColor: "#F2F5FF", // Màu xanh nhạt giống ảnh
               borderColor: "#d0e6f5", // Màu viền nhẹ để hài hòa với nền
             }}
-            onClick={() => handleQuestionClick(vote._id)}
+            onClick={() => handleQuestionClick(vote.question._id)}
           >
             {/* Phần loại vote */}
             <div className="me-4" style={{ width: "100px", fontWeight: "bold" }}>
@@ -81,7 +81,7 @@ const AnsVoteSubTab = () => {
             <div className="flex-grow-1">
               <div className="question_title">{vote.question.title || 'Chưa có tiêu đề'}</div>
               <div className="mt-2">
-                Answer of {vote.userAns.name}
+                Answer of <span style={{ fontWeight: 'bold' }}>{vote.userAns.name}</span>
               </div>
             </div>
 
