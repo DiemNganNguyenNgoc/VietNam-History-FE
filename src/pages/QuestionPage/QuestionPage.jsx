@@ -11,10 +11,8 @@ import { setAllSaved } from "../../redux/slides/savedSlide";
 import * as QuestionService from "../../services/QuestionService";
 import * as SavedService from "../../services/SavedService";
 import * as TagService from "../../services/TagService";
-import { useDispatch, useSelector } from "react-redux";
+import * as UserService from "../../services/UserService";
 import { createSaved } from "../../services/SavedService";
-import { setAllSaved } from "../../redux/slides/savedSlide";
-import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import * as QuestionReportService from "../../services/QuestionReportService";
 
 const QuestionPage = () => {
@@ -51,7 +49,7 @@ const QuestionPage = () => {
     const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-  
+
   const {
     isLoading: isLoadingQues,
     data: questions,
@@ -60,8 +58,6 @@ const QuestionPage = () => {
     queryKey: ["questions", true], // Thêm true vào queryKey để phản ánh tham số
     queryFn: getAllQuesByActive,
   });
-
-  
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
