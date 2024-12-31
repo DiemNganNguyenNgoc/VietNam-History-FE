@@ -1,6 +1,5 @@
 import React from 'react';
 import './QuestionBoxAdmin.css';
-import { Popover } from 'antd';
 
 const QuestionBoxAdmin = ({
   img,
@@ -59,7 +58,7 @@ const QuestionBoxAdmin = ({
         </div>
 
         {/* Hiển thị thông báo nếu câu hỏi đang bị ẩn */}
-        {!isHidden && (
+        {isHidden && (
           <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px" }}>
             This question was hidden by the user.
           </div>

@@ -3,14 +3,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
 import SearchBtn from '../../components/SearchBtn/SearchBtn'
 import NewUserBtn from '../../components/NewUserBtn/NewUserBtn'
-import "../../css/UsersAdmin.css"
-import { getAllUser, updateUserStatus } from "../../services/UserService"; // API để lấy allUser
-import { setAllUser } from "../../redux/slides/userSlide";
+import '../../css/UsersAdmin.css'
+import { setAllAdmin } from "../../redux/slides/adminSlide";
 import { useNavigate } from 'react-router-dom'
-import * as message from "../../components/MessageComponent/MessageComponent";
+import { getAllAdmin } from '../../services/AdminService'
 
-
-const UsersAdmin = () => {
+const AdminAccount = () => {
+  const access_token = localStorage.getItem("access_token");
   const navigate = useNavigate();
   // const [dataUsers, setDataUser] = useState([
   //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
@@ -27,63 +26,44 @@ const UsersAdmin = () => {
   //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
   //   ]);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
+  // const admin = useSelector((state) => state.admin);
   // console.log("user", user);
 
-  const { allUser } = useSelector((state) => state.user);
-  console.log("allUser", allUser);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await getAllUser(); // Gọi API lấy toàn bộ người dùng
-      dispatch(setAllUser(response.data)); // Lưu vào Redux
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
-
+  const { allAdmin } = useSelector((state) => state.admin);
+  console.log("allUser", allAdmin);
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await getAllAdmin(); // Gọi API lấy toàn bộ người dùng
+        dispatch(setAllAdmin(response.data)); // Lưu vào Redux
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
     fetchUsers();
   }, [dispatch]);
 
   // Lọc bỏ người dùng hiện tại ra khỏi danh sách
-  const filteredUsers = allUser.filter((u) => u._id !== user.id);
-  const hadleViewProfile = (userId) => {
-    navigate(`/otheruserprofile/${userId}`)
+  const filteredUsers = allAdmin;
+  console.log("WERT", allAdmin[0])
+  const hadleViewProfile = (id) => {
+    navigate(`/admin/other-profile/${id}`)
   }
-
-  //Thay doi trang thai cau tra loi
-  const handleToggleUserStatus = async (userId, isActive) => {
-    try {
-      console.log("USER", userId)
-      console.log("STATUS", isActive)
-      const updatedUser = await updateUserStatus(userId, !isActive);
-      if (updatedUser?.status !== 'ERR') {
-        message.success(`Answer has been ${isActive ? 'deleted' : 'restored'} successfully!`);
-        console.log("STATUS1", isActive);
-        // Cập nhật danh sách câu trả lời
-        fetchUsers();
-      } else {
-        throw new Error(updatedUser?.message || "Failed to update answer status.");
-      }
-    } catch (error) {
-      console.error("Error updating answer status:", error);
-      message.error("An error occurred. Please try again.");
-    }
-  };
-
 
   return (
     <div className='container mt-4'>
-      <h1 className='title'>MANAGEMENT USER</h1>
+      <h1 className='title'>ADMIN</h1>
       <div className='search-holder' >
         <div>
           <input class="form-control" type="text" placeholder="Search by name, email, phone number..." style={{ width: '400px', height: '40px' }}></input>
         </div>
         <div>
           <SearchBtn />
+        </div>
+        <div>
+          <NewUserBtn />
         </div>
       </div>
 
@@ -96,10 +76,6 @@ const UsersAdmin = () => {
                 <th className='userName'>Username</th>
                 <th className='email'>Email</th>
                 <th>Phone number</th>
-                <th>Questions</th>
-                <th>Answers</th>
-                <th>Reputation</th>
-                <th>Report</th>
                 <th></th>
               </tr>
             </thead>
@@ -113,16 +89,8 @@ const UsersAdmin = () => {
                     <td className='userName'>{row.name}</td>
                     <td className='email'>{row.email}</td>
                     <td>{row.phone}</td>
-                    <td>{row.quesCount}</td>
-                    <td>{row.answerCount}</td>
-                    <td>{row.reputation}</td>
-                    <td>{row.reportCount}</td>
-                    <button className='view-profile' onClick={() => hadleViewProfile(row._id)} >View</button>
-                    <button
-
-                      className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
-                      onClick={() => handleToggleUserStatus(row._id, row.active)}
-                    > {row.active ? "Ban" : "Allow"}</button>
+                    <button className='view-profile' onClick={() => hadleViewProfile(row._id)}>View</button>
+                    <button className='ban-profile' >Delete</button>
                   </tr>
                 ))}
               </tbody>
@@ -134,4 +102,4 @@ const UsersAdmin = () => {
   )
 }
 
-export default UsersAdmin
+export default AdminAccount

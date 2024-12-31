@@ -56,6 +56,14 @@ export const updateQuestion = async (questionId, data) => {
   return res.data;
 };
 
+export const deleteQuestion = async (quesId) => {
+  const res = await axios.delete(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/delete-question/${quesId}`);
+  return res.data;
+};
+
+
+
 export const getQuestionsByUserId = async (userId) => {
   try {
     const res = await axiosJWT.get(
@@ -118,6 +126,12 @@ export const addVote = async (questionId, userId, isUpVote) => {
       throw { status: 500, message: "Không thể kết nối đến máy chủ." };
     }
   }
+};
+
+
+export const getStatisticQuestion = async (userQues, year, month) => {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/question/get-by-statistic?userQues=${userQues}&&year=${year}&&month=${month}`);
+  return response.data;
 };
 
 

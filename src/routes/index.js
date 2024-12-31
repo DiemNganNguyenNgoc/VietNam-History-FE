@@ -24,6 +24,7 @@ import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
 import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 import SavedPage from "../pages/SavedPage/SavedPage";
+//import OtherAdminProfilePage from "../AdminPage/OtherAdminProfilePage/OtherAdminProfilePage";
 export const routes = [
   {
     path: "/",
@@ -68,25 +69,25 @@ export const routes = [
   },
 
   {
-    path: "/statistic/question",
+    path: "admin/manage/statistic/question",
     page: StatisticQuestionPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/user",
+    path: "admin/manage/statistic/user",
     page: StatisticUserPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/topic",
+    path: "admin/manage/statistic/topic",
     page: StatisticTopicPage,
     isShowHeader: true,
   },
 
   {
-    path: "/statistic/activity",
+    path: "admin/manage/statistic/activity",
     page: StatisticActivityPage,
     isShowHeader: true,
   },
@@ -177,4 +178,10 @@ export const routes = [
     page: SavedPage,
     isShowHeader: true,
   },
+
+  // {
+  //   path:"/admin/other-profile/:id",
+  //   page: OtherAdminProfilePage,
+  //   isShowHeader: true,
+  // }
 ];

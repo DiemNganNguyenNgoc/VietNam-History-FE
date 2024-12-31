@@ -80,7 +80,7 @@ const StatisticUserPage = () => {
   return (
     <div>
       <div className="container">
-        <h1 className="title-page">Statistic User</h1>
+      <h1 className='title'>STATISTIC USERS</h1>
         {/* drop down */}
         <div className="row text-center d-flex ">
           <div className="col ">

@@ -107,7 +107,7 @@ export const updateUserInfo = async (id, data, access_token) => {
     }
   }
 };
-
+ 
 export const getAllUsersExceptSelf = async () => {
   const res = await axios.get(
     `${process.env.REACT_APP_API_URL_BACKEND}/user/get-all-except-self`,
@@ -178,4 +178,7 @@ export const updateAnswerCount = async (userId) => {
   } catch (error) {
     throw error;
   }
+};
+export const updateUserStatus = async (userId, isActive) => {
+  return await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/user/toggle-active/${userId}`,{ active: isActive });
 };

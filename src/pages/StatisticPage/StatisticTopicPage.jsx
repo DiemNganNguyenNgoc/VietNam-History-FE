@@ -1,121 +1,185 @@
 import React, { useEffect, useState } from "react";
 import "../../css/StatisticTopicPage.css";
 import PieChart from "../../components/PieChartComponent/PieChartComponent";
-import DropdownComponent from "../../components/DropdownComponent/DropdownComponent";
+import * as TagService from "../../services/TagService";
+import * as QuestionService from "../../services/QuestionService";
 
-const StatisticTopicPage = ({ totalTopic }) => {
-  const [dataTopic, setDataTopic] = useState([
-    { topicId: 111111, topicName: "Java", topicQuantity: 301 },
-    { topicId: 111112, topicName: "React", topicQuantity: 200 },
-    { topicId: 111113, topicName: "Python", topicQuantity: 150 },
-    { topicId: 111114, topicName: "C++", topicQuantity: 100 },
-    { topicId: 111115, topicName: "C#", topicQuantity: 250 },
-  ]);
-
-  const lastIndex = dataTopic.length;
-  totalTopic = Number(lastIndex);
-
-  const [dataQuantity, setDataQuantity] = useState([]); // Dữ liệu phần trăm
-  const [labels, setLabels] = useState([]); // Nhãn của biểu đồ
-  const [colors, setColors] = useState([]); // Màu sắc ngẫu nhiên
+const StatisticTopicPage = () => {
+  const [tagsWithCount, setTagsWithCount] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [year, setYear] = useState(""); // Bộ lọc theo năm
+  const [month, setMonth] = useState(""); // Bộ lọc theo tháng
+  const [filteredData, setFilteredData] = useState([]); // Dữ liệu đã lọc
+  const [availableYears, setAvailableYears] = useState([]); // Danh sách năm
 
   useEffect(() => {
-    // Tính tổng quantity của tất cả các topic
-    const totalQuantity = dataTopic.reduce(
-      (total, item) => total + item.topicQuantity,
-      0
-    );
+    // Tạo danh sách năm từ 2024 đến năm hiện tại
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: currentYear - 2023 }, (_, i) => 2024 + i);
+    setAvailableYears(years);
+  }, []);
 
-    // Tính phần trăm cho từng topic
-    const newDataQuantity = dataTopic.map((item) => {
-      return (item.topicQuantity / totalQuantity) * 100;
-    });
+  useEffect(() => {
+    const fetchTagsWithCount = async () => {
+      setIsLoading(true);
+      try {
+        const res = await TagService.getAllTag();
+        const tags = res.data;
 
-    // Lấy nhãn từ topicName
-    const newLabels = dataTopic.map((item) => item.topicName);
+        const updatedTags = await Promise.all(
+          tags.map(async (tag) => {
+            const questions = await getAllQues(tag._id);
+            return { ...tag, usedCount: questions.length };
+          })
+        );
 
-    // Sinh màu sắc ngẫu nhiên cho mỗi topic
-    const generateRandomColor = () => {
-      const letters = "0123456789ABCDEF";
-      let color = "#";
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+        setTagsWithCount(updatedTags);
+        setFilteredData(updatedTags); // Ban đầu hiển thị tất cả
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      } finally {
+        setIsLoading(false);
       }
-      return color;
     };
-    const newColors = dataTopic.map(() => generateRandomColor());
 
-    // Cập nhật state
-    setDataQuantity(newDataQuantity);
-    setLabels(newLabels);
-    setColors(newColors);
-  }, [dataTopic]);
+    fetchTagsWithCount();
+  }, []);
 
-  const totalQuantity = dataTopic.reduce(
-    (total, item) => total + item.topicQuantity,
-    0
+  // Hàm lấy danh sách câu hỏi theo tagId
+  const getAllQues = async (tagId) => {
+    const res = await QuestionService.getAllQuesByTag(tagId);
+    return res.data;
+  };
+
+  // Lọc dữ liệu theo year và month
+  useEffect(() => {
+    const filterData = () => {
+      if (!year && !month) {
+        setFilteredData(tagsWithCount); // Không lọc nếu không chọn gì
+        return;
+      }
+
+      const filtered = tagsWithCount.filter((tag) => {
+        const tagYear = new Date(tag.createdAt).getFullYear(); // Giả sử có trường createdAt
+        const tagMonth = new Date(tag.createdAt).getMonth() + 1; // Tháng tính từ 0
+
+        return (
+          (!year || tagYear === parseInt(year)) &&
+          (!month || tagMonth === parseInt(month))
+        );
+      });
+
+      setFilteredData(filtered);
+    };
+
+    filterData();
+  }, [year, month, tagsWithCount]);
+
+  // Tính tổng
+  const totalTag = filteredData.length;
+  const totalQuantity = filteredData.reduce((sum, tag) => sum + tag.usedCount, 0);
+
+  // Chuẩn bị dữ liệu cho PieChart
+  const dataQuantity = filteredData.map((tag) => tag.usedCount);
+  const labels = filteredData.map((tag) => tag.name);
+  const colors = filteredData.map(
+    () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
   );
 
   return (
     <div>
       <div className="container">
-        <h1 className="title-page">Topic</h1>
-        {/* drop down */}
-        <div className="row text-center d-flex ">
-          <div className="col ">
-            <DropdownComponent>Type</DropdownComponent>
+      <h1 className='title'>STATISTIC TAGS</h1>
+
+        {/* Dropdown lọc */}
+        <div className="row text-center d-flex">
+          <div className="col">
+            <label htmlFor="year">Select Year:</label>
+            <select
+              id="year"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="form-select"
+            >
+              <option value="">All Years</option>
+              {availableYears.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="col">
-            <DropdownComponent>Month</DropdownComponent>
-          </div>
-          <div className="col">
-            <DropdownComponent>Year</DropdownComponent>
+            <label htmlFor="month">Select Month:</label>
+            <select
+              id="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              className="form-select"
+            >
+              <option value="">All Months</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        {/* top */}
+
+        {/* Thống kê tổng */}
         <div className="total">
           <section className="section__total-question">
-            <label className="total__title">Total topic</label>
-            <h2 className="total__number">{totalTopic}</h2>
+            <label className="total__title">Total Tags</label>
+            <h2 className="total__number">{totalTag}</h2>
           </section>
           <section className="section__total-question">
-            <label className="total__title">Total quantity topic</label>
+            <label className="total__title">Total Quantity Used</label>
             <h2 className="total__number">{totalQuantity}</h2>
           </section>
         </div>
-        {/* pie chart */}
+
+        {/* Biểu đồ tròn */}
         <div className="pie-chart">
-          {/* pie chart topic */}
-          <PieChart data={dataQuantity} labels={labels} colors={colors} />
+          {filteredData.length > 0 ? (
+            <PieChart data={dataQuantity} labels={labels} colors={colors} />
+          ) : (
+            <p className="no-data">No data available</p>
+          )}
         </div>
-        {/* table */}
+
+        {/* Bảng thống kê */}
         <div className="dashboard">
-          <div className="table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Topic ID</th>
-                  <th>Topic Name</th>
-                  <th>Quantity Used</th>
-                </tr>
-              </thead>
-            </table>
-            <div className="table-body-scroll">
+          {filteredData.length > 0 ? (
+            <div className="table-container">
               <table className="data-table">
-                <tbody>
-                  {dataTopic.map((row, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{row.topicId}</td>
-                      <td>{row.topicName}</td>
-                      <td>{row.topicQuantity}</td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tag ID</th>
+                    <th>Tag Name</th>
+                    <th>Quantity Used</th>
+                  </tr>
+                </thead>
               </table>
+              <div className="table-body-scroll">
+                <table className="data-table">
+                  <tbody>
+                    {filteredData.map((row, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{row._id}</td>
+                        <td>{row.name}</td>
+                        <td>{row.usedCount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="no-data">No data available</p>
+          )}
         </div>
       </div>
     </div>

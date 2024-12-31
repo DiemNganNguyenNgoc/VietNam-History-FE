@@ -1,126 +1,242 @@
 import React, { useEffect, useState } from "react";
 import "../../css/StatisticQuestionPage.css";
 import PieChart from "../../components/PieChartComponent/PieChartComponent";
-import DropdownComponent from "../../components/DropdownComponent/DropdownComponent";
+import * as QuestionService from "../../services/QuestionService";
+import * as TagService from "../../services/TagService";
 
-const StatisticQuestionPage = (total, rating) => {
-  total = 200;
-  rating = 4.1;
-
-  const [dataQuestion, setDataQuestion] = useState([
-    { topic: "Java", quantity: 50, notAnswered: 10, rate: 4.2 },
-    { topic: "React", quantity: 50, notAnswered: 10, rate: 4.3 },
-    { topic: "Python", quantity: 50, notAnswered: 10, rate: 4.3 },
-    { topic: "C++", quantity: 50, notAnswered: 10, rate: 4.3 },
-    { topic: "C", quantity: 50, notAnswered: 10, rate: 4.3 },
-    { topic: "C#", quantity: 50, notAnswered: 10, rate: 4.3 },
-    { topic: "JavaScript", quantity: 50, notAnswered: 10, rate: 4.3 },
-  ]);
-
-  const [dataTopic, setDataTopic] = useState([]); // Dữ liệu phần trăm
-  const [labels, setLabels] = useState([]); // Nhãn của biểu đồ
-  const [colors, setColors] = useState([]); // Màu sắc ngẫu nhiên
+const StatisticQuestionPage = () => {
+  const [dataQuestion, setDataQuestion] = useState([]); // Dữ liệu tags
+  const [year, setYear] = useState(""); // Bộ lọc theo năm
+  const [month, setMonth] = useState(""); // Bộ lọc theo tháng
+  const [filteredData, setFilteredData] = useState([]); // Dữ liệu đã lọc
+  const [availableYears, setAvailableYears] = useState([]); // Danh sách năm
 
   useEffect(() => {
-    // Tính tổng quantity của tất cả các topic
-    const totalQuantity = dataQuestion.reduce(
-      (total, item) => total + item.quantity,
-      0
-    );
+    // Tạo danh sách năm từ 2024 đến năm hiện tại
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: currentYear - 2023 }, (_, i) => 2024 + i);
+    setAvailableYears(years);
+  }, []);
 
-    // Tính phần trăm cho từng topic
-    const newDataTopic = dataQuestion.map((item) => {
-      return (item.quantity / totalQuantity) * 100;
-    });
-
-    // Lấy nhãn từ topic
-    const newLabels = dataQuestion.map((item) => item.topic);
-
-    // Sinh màu sắc ngẫu nhiên cho mỗi topic
-    const generateRandomColor = () => {
-      const letters = "0123456789ABCDEF";
-      let color = "#";
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await QuestionService.getAllQues();
+        const questions = response.data; // Đây phải là danh sách câu hỏi, không phải tag
+        
+        console.log("Questions fetched:", questions); // Kiểm tra lại câu hỏi
+        
+        // Xử lý các tag và câu hỏi
+        const tags = {};
+        questions.forEach((q) => {
+          q.tags.forEach((tagId) => {
+            if (!tags[tagId]) {
+              tags[tagId] = { quantity: 0, notAnswered: 0, rate: 0, createdAt: q.createdAt };
+            }
+            tags[tagId].quantity++;
+            if (q.answerCount === 0) {
+              tags[tagId].notAnswered++;
+            }
+            if (q.rate) {
+              tags[tagId].rate += q.rate;
+            }
+          });
+        });
+        
+        const tagDetails = await Promise.all(
+          Object.keys(tags).map(async (tagId) => {
+            const tagDetail = await TagService.getDetailsTag(tagId);
+            return { id: tagId, name: tagDetail.data.name };
+          })
+        );
+        
+        const tagMap = Object.fromEntries(
+          tagDetails.map((tag) => [tag.id, tag.name])
+        );
+        
+        const data = Object.keys(tags).map((tagId) => ({
+          id: tagId,
+          name: tagMap[tagId] || tagId,
+          quantity: tags[tagId].quantity,
+          // Cập nhật lại số câu hỏi chưa trả lời từ ansCount
+          notAnswered: Math.min(tags[tagId].notAnswered, tags[tagId].quantity),
+          rate: tags[tagId].quantity
+            ? (tags[tagId].rate / tags[tagId].quantity).toFixed(1)
+            : 0,
+          createdAt: tags[tagId].createdAt,
+        }));
+        
+        setDataQuestion(data); // Gắn dữ liệu đã xử lý vào dataQuestion
+        setFilteredData(data);  // Ban đầu hiển thị tất cả câu hỏi
+      
+      } catch (error) {
+        console.error("Error fetching questions:", error);
       }
-      return color;
     };
-    const newColors = dataQuestion.map(() => generateRandomColor());
+     
+  
+    fetchData();
+  }, []);
 
-    // Cập nhật state
-    setDataTopic(newDataTopic);
-    setLabels(newLabels);
-    setColors(newColors);
-  }, [dataQuestion]);
+  useEffect(() => {
+    const filterData = async () => {
+      console.log("Filtering for year:", year, "month:", month);
+      console.log("Data before filtering:", dataQuestion);
+  
+      // Lọc câu hỏi theo tagId
+      const filtered = await Promise.all(
+        dataQuestion.map(async (item) => {
+          // Sử dụng tagId để lấy câu hỏi từ API
+          const response = await QuestionService.getAllQuesByTag(item.id);
+          const questions = response.data;
+  
+          // Lọc câu hỏi theo ngày tạo (createdAt)
+          const filteredQuestions = questions.filter((question) => {
+            const questionDate = new Date(question.createdAt); // Lấy ngày tạo của câu hỏi
+            const questionYear = questionDate.getFullYear(); // Lấy năm từ createdAt
+            const questionMonth = questionDate.getMonth() + 1; // Lấy tháng từ createdAt (lưu ý getMonth() trả về 0-11, nên cộng 1 để tương ứng với 1-12)
+  
+            // Kiểm tra nếu năm và tháng của câu hỏi khớp với bộ lọc
+            return (
+              (!year || questionYear === parseInt(year)) &&
+              (!month || questionMonth === parseInt(month))
+            );
+          });
+  
+          // Đếm số câu hỏi chưa trả lời (ansCount === 0)
+          const notAnswered = filteredQuestions.filter(
+            (question) => question.answerCount === 0
+          ).length;
+  
+          // Trả về tag này cùng với câu hỏi đã lọc và notAnswered
+          return {
+            ...item,
+            questions: filteredQuestions,
+            quantity: filteredQuestions.length,
+            notAnswered: notAnswered,
+          };
+        })
+      );
+  
+      // Lọc những tag có câu hỏi
+      const finalFilteredData = filtered.filter((item) => item.questions.length > 0);
+  
+      console.log("Filtered data:", finalFilteredData);
+      setFilteredData(finalFilteredData);
+    };
+  
+    filterData();
+  }, [year, month, dataQuestion]);
+  
+  // Tính tổng
+  const totalQuestions = filteredData.reduce((sum, item) => sum + item.quantity, 0);
+  const averageRating = (
+    filteredData.reduce((sum, item) => sum + parseFloat(item.rate), 0) / filteredData.length || 0
+  ).toFixed(1);
+
+  // Chuẩn bị dữ liệu cho PieChart
+  const dataTopic = filteredData.map((item) => item.quantity);
+  const labels = filteredData.map((item) => item.name);
+  const colors = filteredData.map(
+    () => `#${Math.floor(Math.random() * 16777215).toString(16)}`
+  );
 
   return (
     <div>
       <div className="container">
-        <h1 className="title-page">Question</h1>
-        {/* drop down */}
-        <div className="row text-center d-flex ">
-          <div className="col ">
-            <DropdownComponent>Type</DropdownComponent>
+      <h1 className='title'>STATISTIC QUESTIONS</h1>
+
+        {/* Dropdown lọc */}
+        <div className="row text-center d-flex">
+          <div className="col">
+            <label htmlFor="year">Select Year:</label>
+            <select
+              id="year"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="form-select"
+            >
+              <option value="">All Years</option>
+              {availableYears.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="col">
-            <DropdownComponent>Month</DropdownComponent>
-          </div>
-          <div className="col">
-            <DropdownComponent>Year</DropdownComponent>
+            <label htmlFor="month">Select Month:</label>
+            <select
+              id="month"
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+              className="form-select"
+            >
+              <option value="">All Months</option>
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        {/* top */}
+
+        {/* Tổng số liệu */}
         <div className="total">
           <section className="section__total-question">
-            <label className="total__title">Total question</label>
-            <h2 className="total__number">{total}</h2>
+            <label className="total__title">Total Questions</label>
+            <h2 className="total__number">{totalQuestions}</h2>
           </section>
           <section className="section__total-question">
             <label className="total__title">Average Rating</label>
-            <h2 className="total__number">{rating}</h2>
+            <h2 className="total__number">{averageRating}</h2>
           </section>
         </div>
-        {/* pie chart */}
+
+        {/* Biểu đồ tròn */}
         <div className="pie-chart">
-          {/* pie chart topic */}
-          <PieChart data={dataTopic} labels={labels} colors={colors} />
-          {/* pie chart answer */}
-          <PieChart data={dataTopic} labels={labels} colors={colors} />
-          {/* pie chart rating */}
-          <PieChart data={dataTopic} labels={labels} colors={colors} />
+          {filteredData.length > 0 ? (
+            <PieChart data={dataTopic} labels={labels} colors={colors} />
+          ) : (
+            <p className="no-data">No data available</p>
+          )}
         </div>
-        {/* table */}
+
+        {/* Bảng thống kê */}
         <div className="dashboard">
-          <div className="table-container">
-            {/* Table header (thead) */}
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Topic</th>
-                  <th>Quantity</th>
-                  <th>Not Answer</th>
-                  <th>Rate</th>
-                </tr>
-              </thead>
-            </table>
-            {/* Table body (tbody) */}
-            <div className="table-body-scroll">
+          {filteredData.length > 0 ? (
+            <div className="table-container">
               <table className="data-table">
-                <tbody>
-                  {dataQuestion.map((row, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{row.topic}</td>
-                      <td>{row.quantity}</td>
-                      <td>{row.notAnswered}</td>
-                      <td>{row.rate}</td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Tag</th>
+                    <th>Quantity</th>
+                    <th>Not Answered</th>
+                    <th>Rate</th>
+                  </tr>
+                </thead>
               </table>
+              <div className="table-body-scroll">
+                <table className="data-table">
+                  <tbody>
+                    {filteredData.map((row, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{row.name}</td>
+                        <td>{row.quantity}</td>
+                        <td>{row.notAnswered}</td>
+                        <td>{row.rate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="no-data">No data available</p>
+          )}
         </div>
       </div>
     </div>
