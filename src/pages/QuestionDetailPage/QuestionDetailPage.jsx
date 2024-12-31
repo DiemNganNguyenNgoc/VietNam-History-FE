@@ -701,7 +701,7 @@ const QuestionDetails = () => {
       alert("An error occurred while reporting the comment.");
     }
   };
-
+  const quesDate=new Date(questionDetail.data?.createdAt).toLocaleString()
   
   return (
     <div className="container my-4">
@@ -720,7 +720,7 @@ const QuestionDetails = () => {
         <div>
           <strong>{detailAsker.data?.name || "Anonymous"}</strong>
           <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
-            Asked {questionDetail.data?.createdAt || "Unknown time"}
+            Asked { quesDate|| "Unknown time"}
           </p>
         </div>
       </div>

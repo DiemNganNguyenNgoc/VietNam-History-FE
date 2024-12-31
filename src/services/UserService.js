@@ -182,3 +182,25 @@ export const updateAnswerCount = async (userId) => {
 export const updateUserStatus = async (userId, isActive) => {
   return await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/user/toggle-active/${userId}`,{ active: isActive });
 };
+
+
+export const filterUsers = async (searchParams) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/filter`, {
+      params: searchParams,
+    });
+    return response.data;  
+  } catch (error) {
+    throw error;  
+  }
+};
+
+export const filterUsersByActive = async (active) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/filter?active=${active}`);
+    return response.data;  
+  } catch (error) {
+    throw error;  
+  }
+};
+

@@ -82,7 +82,7 @@ const HeaderComponent = () => {
     <>
       <nav className="navbar" style={{ backgroundColor: "#023E73" }}>
         <div className="container">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" href="/">
             SHARING-CODE
           </a>
 
@@ -150,15 +150,7 @@ const HeaderComponent = () => {
             <div className="btn">
               <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
             </div>
-            <div className="btn">
-              <i className="bi bi-trophy-fill" style={Styles.iconHeader}></i>
-            </div>
-            <div className="btn">
-              <i
-                className="bi bi-question-circle-fill"
-                style={Styles.iconHeader}
-              ></i>
-            </div>
+
           </div>
         </div>
       </nav>

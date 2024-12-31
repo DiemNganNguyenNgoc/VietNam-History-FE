@@ -22,12 +22,6 @@ const StatisticPage = () => {
           Questions
         </button>
         <button
-          className={`nav-link ${activeTab === "activities" ? "active" : ""}`}
-          onClick={() => setActiveTab("activities")}
-        >
-          Activites
-        </button>
-        <button
           className={`nav-link ${activeTab === "users" ? "active" : ""}`}
           onClick={() => setActiveTab("users")}
         >
@@ -44,9 +38,8 @@ const StatisticPage = () => {
       {/* Nội dung Tab */}
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
-          {activeTab === "activities" && <div><StatisticActivityPage/></div>}
+          {activeTab === "users" && <div><StatisticActivityPage/></div>}
           {activeTab === "questions" && <div><StatisticQuestionPage/></div>}
-          {activeTab === "users" && <div><StatisticUserPage /></div>}
           {activeTab === "tags" && <div><StatisticTopicPage /></div>}
         </div>
       </div>

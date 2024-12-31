@@ -8,12 +8,11 @@ import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import QuestionFilter from "../../components/QuestionFilter/QuestionFilter";
 import SortBtn from "../../components/SortBtn/SortBtn";
 import { setAllSaved } from "../../redux/slides/savedSlide";
+import * as QuestionReportService from "../../services/QuestionReportService";
 import * as QuestionService from "../../services/QuestionService";
 import * as SavedService from "../../services/SavedService";
 import * as TagService from "../../services/TagService";
 import * as UserService from "../../services/UserService";
-import { createSaved } from "../../services/SavedService";
-import * as QuestionReportService from "../../services/QuestionReportService";
 
 const QuestionPage = () => {
   const dispatch = useDispatch();
@@ -49,7 +48,7 @@ const QuestionPage = () => {
     const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-
+  
   const {
     isLoading: isLoadingQues,
     data: questions,
@@ -58,6 +57,8 @@ const QuestionPage = () => {
     queryKey: ["questions", true], // Thêm true vào queryKey để phản ánh tham số
     queryFn: getAllQuesByActive,
   });
+
+  
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
@@ -339,7 +340,7 @@ const QuestionPage = () => {
                           )
                         : []
                     } // Lấy tên tag từ tags map
-                    date={question.updatedAt}
+                    date={new Date(question.updatedAt).toLocaleString()}
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}

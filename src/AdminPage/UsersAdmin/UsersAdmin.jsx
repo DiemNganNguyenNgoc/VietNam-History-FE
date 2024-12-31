@@ -1,70 +1,56 @@
-import React, { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import ButtonComponent from '../../components/ButtonComponent/ButtonComponent'
-import SearchBtn from '../../components/SearchBtn/SearchBtn'
-import NewUserBtn from '../../components/NewUserBtn/NewUserBtn'
-import "../../css/UsersAdmin.css"
-import { getAllUser, updateUserStatus } from "../../services/UserService"; // API để lấy allUser
+import React, { useState, useEffect } from 'react';
+import { filterUsersByActive, filterUsers, updateUserStatus } from "../../services/UserService"; // API
 import { setAllUser } from "../../redux/slides/userSlide";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import * as message from "../../components/MessageComponent/MessageComponent";
-
+import "../../css/UsersAdmin.css";
+import { useDispatch, useSelector } from 'react-redux';
+import { Popover, Button } from 'antd'; // Import Popover và Button từ antd
+import SearchBtn from '../../components/SearchBtn/SearchBtn';
 
 const UsersAdmin = () => {
   const navigate = useNavigate();
-  // const [dataUsers, setDataUser] = useState([
-  //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-  //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-  //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-  //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-  //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-  //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-  //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-  //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-  //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-  //     { username: 'qwerty', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 25},
-  //     { username: 'qwert', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10, reputation: 10 },
-  //     { username: 'qwertf', email: "123456@gmail.com", phonenumber: "0123456789", questions: 12, answers: 10 , reputation: 15},
-  //   ]);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  // console.log("user", user);
-
   const { allUser } = useSelector((state) => state.user);
-  console.log("allUser", allUser);
 
+  const [searchType, setSearchType] = useState('name'); // Loại tìm kiếm
+  const [searchTerm, setSearchTerm] = useState(''); // Từ khóa tìm kiếm
+  const [activeTab, setActiveTab] = useState("Allowed"); // Trạng thái tab hiện tại
+
+  // Fetch danh sách người dùng ban đầu
   const fetchUsers = async () => {
     try {
-      const response = await getAllUser(); // Gọi API lấy toàn bộ người dùng
+      const response = await filterUsersByActive(true); // Gọi API lấy danh sách người dùng
       dispatch(setAllUser(response.data)); // Lưu vào Redux
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
-const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái riêng
-
 
   useEffect(() => {
     fetchUsers();
   }, [dispatch]);
 
-  // Lọc bỏ người dùng hiện tại ra khỏi danh sách
+  // Lọc bỏ người dùng hiện tại
   const filteredUsers = allUser.filter((u) => u._id !== user.id);
-  const hadleViewProfile = (userId) => {
-    navigate(`/otheruserprofile/${userId}`)
-  }
 
-  //Thay doi trang thai cau tra loi
+  // Lọc người dùng theo trạng thái (Active / Banned)
+  const activeUsers = filteredUsers.filter((u) => u.active === true); // Người dùng đang hoạt động
+  const bannedUsers = filteredUsers.filter((u) => u.active === false); // Người dùng bị cấm
+
+  // Xem hồ sơ người dùng
+  const handleViewProfile = (userId) => {
+    navigate(`/otheruserprofile/${userId}`);
+  };
+
+  // Đổi trạng thái người dùng (Ban/Allow)
   const handleToggleUserStatus = async (userId, isActive) => {
     try {
-      console.log("USER", userId)
-      console.log("STATUS", isActive)
       const updatedUser = await updateUserStatus(userId, !isActive);
       if (updatedUser?.status !== 'ERR') {
-        message.success(`User has been ${isActive ? 'Ban' : 'Allow'} successfully!`);
-        setShowLoading(true); // Hiện loading
-        // Cập nhật danh sách câu trả lời
-        fetchUsers();
+        message.success(`User has been ${isActive ? 'banned' : 'allowed'} successfully!`);
+        fetchUsers(); // Cập nhật danh sách sau khi thay đổi trạng thái
       } else {
         throw new Error(updatedUser?.message || "Failed to update user status.");
       }
@@ -74,19 +60,68 @@ const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái ri
     }
   };
 
+  // Xử lý tìm kiếm
+  const handleSearch = async () => {
+    try {
+      const searchParams = { [searchType]: searchTerm };
+      const response = await filterUsers(searchParams);
 
-  return (
+      if (response && response.data) {
+        console.log('Filtered users:', response.data);
+        dispatch(setAllUser(response.data));
+      } else {
+        console.error('No data in response:', response);
+      }
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+  };
+
+  // Cập nhật loại tìm kiếm khi người dùng chọn trong popover
+  const handleSearchTypeChange = (type) => {
+    setSearchType(type);
+  };
+
+  // Tạo nội dung cho Popover
+  const popoverContent = (
+    <div>
+      <Button type="text" onClick={() => handleSearchTypeChange('name')}>Search by Name</Button>
+      <Button type="text" onClick={() => handleSearchTypeChange('email')}>Search by Email</Button>
+      <Button type="text" onClick={() => handleSearchTypeChange('phone')}>Search by Phone</Button>
+    </div>
+  );
+
+  // Cấu trúc phần tử Allowed (Active Users)
+  const allowed = (
     <div className='container mt-4'>
       <h1 className='title'>MANAGEMENT USER</h1>
-      <div className='search-holder' >
-        <div>
-          <input class="form-control" type="text" placeholder="Search by name, email, phone number..." style={{ width: '400px', height: '40px' }}></input>
-        </div>
-        <div>
-          <SearchBtn />
-        </div>
+      <div className='search-holder' style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+        {/* Input for search */}
+        <input
+          className="form-control"
+          type="text"
+          placeholder={`Enter ${searchType}...`}
+          style={{ width: '300px', height: '40px' }}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {/* Popover filter */}
+        <Popover
+          content={popoverContent}
+          title="Select Search Type"
+          trigger="click"
+          placement="bottomLeft"
+        >
+          <Button className="btn btn-first">
+            <i style={{fontSize:'20px'}} className="bi bi-filter"></i>
+          </Button>
+        </Popover>
+        {/* Search button */}
+        <SearchBtn onClick={handleSearch} />
       </div>
 
+      {/* Table of users */}
       <div className="dashboard" style={{ marginTop: '32px' }}>
         <div className="table-container">
           <table className="data-table">
@@ -107,7 +142,7 @@ const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái ri
           <div className="table-body-scroll">
             <table className="data-table">
               <tbody>
-                {filteredUsers.map((row, index) => (
+                {activeUsers.map((row, index) => (
                   <tr key={index}>
                     <td className='No'>{index + 1}</td>
                     <td className='userName'>{row.name}</td>
@@ -117,11 +152,15 @@ const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái ri
                     <td>{row.answerCount}</td>
                     <td>{row.reputation}</td>
                     <td>{row.reportCount}</td>
-                    <button className='view-profile' onClick={() => hadleViewProfile(row._id)} >View</button>
-                    <button
-                      className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
-                      onClick={() => handleToggleUserStatus(row._id, row.active)}
-                    > {row.active ? "Ban" : "Allow"}</button>
+                    <td>
+                      <button className='view-profile' onClick={() => handleViewProfile(row._id)}>View</button>
+                      <button
+                        className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
+                        onClick={() => handleToggleUserStatus(row._id, row.active)}
+                      >
+                        {row.active ? "Ban" : "Allow"}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -130,7 +169,118 @@ const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái ri
         </div>
       </div>
     </div>
-  )
-}
+  );
 
-export default UsersAdmin
+  // Cấu trúc phần tử Banned (Inactive Users)
+  const banned = (
+    <div className='container mt-4'>
+      <h1 className='title'>MANAGEMENT USER</h1>
+      <div className='search-holder' style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+        {/* Input for search */}
+        <input
+          className="form-control"
+          type="text"
+          placeholder={`Enter ${searchType}...`}
+          style={{ width: '300px', height: '40px' }}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {/* Popover filter */}
+        <Popover
+          content={popoverContent}
+          title="Select Search Type"
+          trigger="click"
+          placement="bottomLeft"
+        >
+          <Button className="btn btn-first">
+            <i style={{fontSize:'20px'}} className="bi bi-filter"></i>
+          </Button>
+        </Popover>
+        {/* Search button */}
+        <SearchBtn onClick={handleSearch} />
+      </div>
+
+      {/* Table of banned users */}
+      <div className="dashboard" style={{ marginTop: '32px' }}>
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th className='No'>No</th>
+                <th className='userName'>Username</th>
+                <th className='email'>Email</th>
+                <th>Phone number</th>
+                <th>Questions</th>
+                <th>Answers</th>
+                <th>Reputation</th>
+                <th>Report</th>
+                <th></th>
+              </tr>
+            </thead>
+          </table>
+          <div className="table-body-scroll">
+            <table className="data-table">
+              <tbody>
+                {bannedUsers.map((row, index) => (
+                  <tr key={index}>
+                    <td className='No'>{index + 1}</td>
+                    <td className='userName'>{row.name}</td>
+                    <td className='email'>{row.email}</td>
+                    <td>{row.phone}</td>
+                    <td>{row.quesCount}</td>
+                    <td>{row.answerCount}</td>
+                    <td>{row.reputation}</td>
+                    <td>{row.reportCount}</td>
+                    <td>
+                      <button className='view-profile' onClick={() => handleViewProfile(row._id)}>View</button>
+                      <button
+                        className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
+                        onClick={() => handleToggleUserStatus(row._id, row.active)}
+                      >
+                        {row.active ? "Ban" : "Allow"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="d-flex">
+      {/* Tabs dọc */}
+      <div
+        className="nav flex-column nav-pills me-3"
+        style={{ width: "200px" }}
+      >
+        <button
+          className={`nav-link ${activeTab === "Allowed" ? "active" : ""}`}
+          onClick={() => setActiveTab("Allowed")}
+        >
+          Allowed
+        </button>
+        <button
+          className={`nav-link ${activeTab === "Banned" ? "active" : ""}`}
+          onClick={() => setActiveTab("Banned")}
+        >
+          Banned
+        </button>
+      </div>
+
+      {/* Nội dung Tab */}
+      <div className="tab-content" style={{ flexGrow: 1 }}>
+        <div className="tab-pane fade show active">
+          {activeTab === "Allowed" && <div>{allowed}</div>}
+          {activeTab === "Banned" && <div>{banned}</div>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UsersAdmin;
