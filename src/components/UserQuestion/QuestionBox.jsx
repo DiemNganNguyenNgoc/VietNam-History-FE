@@ -78,8 +78,8 @@ const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDel
 
                 {/* Hiển thị thông báo nếu câu hỏi bị ẩn */}
                 {!isHidden && (
-          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginBottom: "10px" }}>
-            Câu hỏi này đã bị ẩn
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginBottom: "10px", fontSize:'14px' }}>
+            This question was hidden
           </div>
         )}
 

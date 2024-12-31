@@ -27,7 +27,8 @@ const initialState = {
   allUser: [], // Danh sách tất cả các user
   detailUser: {},
   allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại
-  followers: []
+  followers: [],
+        createdAt:""
 };
 
 export const userSlide = createSlice({
@@ -56,6 +57,7 @@ export const userSlide = createSlice({
         savedCount = "",
         reputation = "",
         access_token,
+        createdAt=""
       } = action.payload;
 
       state.name = name || email;
@@ -78,6 +80,7 @@ export const userSlide = createSlice({
       state.reputation = reputation;
       state.access_token = access_token;
       state.id = _id;
+            state.createdAt=createdAt
     },
     resetUser: (state) => {
       state.id = "";
@@ -100,6 +103,7 @@ export const userSlide = createSlice({
       state.reportCount = "";
       state.savedCount = "";
       state.reputation = "";
+      state.createdAt=""
     },
     setAllUser: (state, action) => {
       state.allUser = action.payload; // Lưu danh sách Question từ API

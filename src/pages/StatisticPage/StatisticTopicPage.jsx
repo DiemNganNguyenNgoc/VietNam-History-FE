@@ -7,10 +7,10 @@ import * as QuestionService from "../../services/QuestionService";
 const StatisticTopicPage = () => {
   const [tagsWithCount, setTagsWithCount] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [year, setYear] = useState(""); // Bộ lọc theo năm
-  const [month, setMonth] = useState(""); // Bộ lọc theo tháng
-  const [filteredData, setFilteredData] = useState([]); // Dữ liệu đã lọc
-  const [availableYears, setAvailableYears] = useState([]); // Danh sách năm
+  const [year, setYear] = useState(""); 
+  const [month, setMonth] = useState(""); 
+  const [filteredData, setFilteredData] = useState([]); 
+  const [availableYears, setAvailableYears] = useState([]); 
 
   useEffect(() => {
     // Tạo danh sách năm từ 2024 đến năm hiện tại
@@ -34,7 +34,7 @@ const StatisticTopicPage = () => {
         );
 
         setTagsWithCount(updatedTags);
-        setFilteredData(updatedTags); // Ban đầu hiển thị tất cả
+        setFilteredData(updatedTags); 
       } catch (error) {
         console.error("Error fetching tags:", error);
       } finally {
@@ -55,13 +55,13 @@ const StatisticTopicPage = () => {
   useEffect(() => {
     const filterData = () => {
       if (!year && !month) {
-        setFilteredData(tagsWithCount); // Không lọc nếu không chọn gì
+        setFilteredData(tagsWithCount); 
         return;
       }
 
       const filtered = tagsWithCount.filter((tag) => {
-        const tagYear = new Date(tag.createdAt).getFullYear(); // Giả sử có trường createdAt
-        const tagMonth = new Date(tag.createdAt).getMonth() + 1; // Tháng tính từ 0
+        const tagYear = new Date(tag.createdAt).getFullYear(); 
+        const tagMonth = new Date(tag.createdAt).getMonth() + 1; 
 
         return (
           (!year || tagYear === parseInt(year)) &&

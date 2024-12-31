@@ -40,6 +40,7 @@ const QuestionHolder2 = () => {
       return null;
     }
   };
+  console.log('jgvjv', questions)
 
   useEffect(() => {
     const fetchUsersAndTags = async () => {

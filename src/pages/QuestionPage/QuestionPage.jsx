@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import QuestionFilter from "../../components/QuestionFilter/QuestionFilter";
 import SortBtn from "../../components/SortBtn/SortBtn";
-import QuestionBox from "../../components/QuestionBox/QuestionBox";
-import * as QuestionService from "../../services/QuestionService";
-import * as UserService from "../../services/UserService";
-import * as SavedService from "../../services/SavedService";
-import { useQuery } from "@tanstack/react-query";
-import * as TagService from "../../services/TagService";
-import { useDispatch, useSelector } from "react-redux";
-import { createSaved } from "../../services/SavedService";
 import { setAllSaved } from "../../redux/slides/savedSlide";
-import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import * as QuestionService from "../../services/QuestionService";
+import * as SavedService from "../../services/SavedService";
+import * as TagService from "../../services/TagService";
+import * as UserService from "../../services/UserService";
 
 const QuestionPage = () => {
   const dispatch = useDispatch();
@@ -45,19 +44,21 @@ const QuestionPage = () => {
 
 
   // Lấy danh sách câu hỏi từ API
-  const getAllQues = async () => {
-    const res = await QuestionService.getAllQues();
+  const getAllQuesByActive = async () => {
+    const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-
+  
   const {
     isLoading: isLoadingQues,
     data: questions,
     error,
   } = useQuery({
-    queryKey: ["questions"],
-    queryFn: getAllQues,
+    queryKey: ["questions", true], // Thêm true vào queryKey để phản ánh tham số
+    queryFn: getAllQuesByActive,
   });
+
+  
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
@@ -284,7 +285,7 @@ const QuestionPage = () => {
                     // } // Lấy tên tag từ tags map
                     tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
 
-                    date={question.updatedAt}
+                    date={new Date(question.updatedAt).toLocaleString()}
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}

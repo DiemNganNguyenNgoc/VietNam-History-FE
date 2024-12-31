@@ -29,40 +29,40 @@ function StatisticActivityPage() {
       const response = await UserService.getAllUser();
       const users = response.data;
       console.log("Fetched Users:", users);
-    
+
       if (Array.isArray(users)) {
         const filteredData = await Promise.all(
           users.map(async (user) => {
             console.log(`Fetching data for user: ${user._id}, year: ${year}, month: ${month}`);
-            
+
             // Kiểm tra và đảm bảo rằng user._id, year, và month có giá trị hợp lệ
             if (!user._id || !year || !month) {
               console.error("Missing required parameters:", user._id, year, month);
-              return null; // Không tiếp tục nếu thiếu tham số
+              return null;
             }
-    
+
             // Gọi API để lấy câu hỏi đã được đếm và lọc từ QuestionService
             const questions = await QuestionService.getStatisticQuestion(
-              user._id, 
+              user._id,
               year,
               month
             );
             console.log(`Questions for User ${user._id}:`, questions);
-    
+
             // Gọi API để lấy câu trả lời đã được đếm từ AnswerService
             const answers = await AnswerService.getStatisticAnswer(user._id, year, month);
             console.log(`Answers for User ${user._id}:`, answers);
-    
+
             return {
-              uid: user._id, // Sử dụng user._id nếu cần
+              uid: user._id,
               userName: user.name,
-              post: questions.data.length, // Đã được đếm sẵn từ API
-              answer: answers.data.length, // Đã được đếm sẵn từ API
-              vote: 0, // Nếu có dữ liệu về vote từ API, hãy thay đổi ở đây
+              post: questions.data.length,
+              answer: answers.data.length,
+              vote: 0,
             };
           })
         );
-    
+
         // Lọc các dữ liệu hợp lệ và set state
         setDataActivity(filteredData.filter(data => data !== null));
       } else {
@@ -72,7 +72,7 @@ function StatisticActivityPage() {
       console.error("Error fetching data: ", error);
     }
   };
-  
+
 
   useEffect(() => {
     filterData(); // Gọi khi year hoặc month thay đổi
@@ -81,7 +81,7 @@ function StatisticActivityPage() {
   return (
     <div>
       <div className="container">
-      <h1 className='title'>STATISTIC ACTIVITIES</h1>
+        <h1 className='title'>STATISTIC ACTIVITIES</h1>
 
         {/* Dropdown lọc */}
         <div className="row text-center d-flex">
@@ -141,12 +141,12 @@ function StatisticActivityPage() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th >UID</th>
-                  <th>User Name</th>
-                  <th>Post</th>
-                  <th>Answer</th>
-                  <th>Vote</th>
+                  <th style={{ width: '10%' }}>No</th>
+                  <th style={{ width: '30%' }}>UID</th>
+                  <th style={{ width: '30%' }}>User Name</th>
+                  <th style={{ width: '10%' }}>Post</th>
+                  <th style={{ width: '10%' }}>Answer</th>
+                  <th style={{ width: '10%' }}>Vote</th>
                 </tr>
               </thead>
               <tbody>

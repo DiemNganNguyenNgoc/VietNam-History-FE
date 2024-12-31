@@ -9,6 +9,13 @@ import { useSelector } from "react-redux";
 function ProfilePage() {
   const user = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("profile");
+  const memberAt = new Date(user.createdAt).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  
+  console.log('vjvj', user)
 
   return (
     <div className="container mt-4">
@@ -35,7 +42,7 @@ function ProfilePage() {
           <div className="row">
             <div className="col">
           <i class="bi bi-calendar"></i>
-          <p>Member for 10 days</p>
+          <p>Be a member at {memberAt}</p>
           </div>
           <div className="col">
           <i class="bi bi-clock-history"></i>
