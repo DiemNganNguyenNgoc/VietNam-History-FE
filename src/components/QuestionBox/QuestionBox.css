@@ -168,8 +168,31 @@
   background-color: rgba(0, 0, 0, 0.1); /* Thay đổi nền khi hover */
 }
 
+/* Container cho ngày tạo và các nút hành động */
+.footer-container {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Ngày tạo */
+.date-item {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Container cho nút Save và menu ba chấm */
+.action-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Nút Save */
 .save-button {
-  background-color: #023e73; /* Màu xanh */
+  background-color: #023e73;
   color: white;
   border: none;
   padding: 5px 10px;
@@ -179,11 +202,47 @@
   transition: background-color 0.3s ease;
 }
 
-.save-button:hover {
-  background-color: #45a049;
+.save-button.saved {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
-.save-button.saved {
-  background-color: #ccc; /* Màu xám khi đã lưu */
+/* Menu ba chấm */
+.menu-container {
+  position: relative;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Nút Report */
+.report-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.report-button.reported {
+  color: gray;
   cursor: not-allowed;
 }

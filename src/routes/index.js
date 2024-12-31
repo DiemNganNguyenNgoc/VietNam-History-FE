@@ -24,6 +24,7 @@ import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
 import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 import SavedPage from "../pages/SavedPage/SavedPage";
+
 export const routes = [
   {
     path: "/",
@@ -177,4 +178,6 @@ export const routes = [
     page: SavedPage,
     isShowHeader: true,
   },
+
+
 ];

@@ -11,12 +11,18 @@ import { setAllSaved } from "../../redux/slides/savedSlide";
 import * as QuestionService from "../../services/QuestionService";
 import * as SavedService from "../../services/SavedService";
 import * as TagService from "../../services/TagService";
-import * as UserService from "../../services/UserService";
+import { useDispatch, useSelector } from "react-redux";
+import { createSaved } from "../../services/SavedService";
+import { setAllSaved } from "../../redux/slides/savedSlide";
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import * as QuestionReportService from "../../services/QuestionReportService";
 
 const QuestionPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
+  const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
+  const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
   const [likeCounts, setLikeCounts] = useState({}); // Lưu số lượt like của mỗi câu hỏi
   // console.log("user", user);
   // Lấy `allSaved` từ Redux state
@@ -39,9 +45,6 @@ const QuestionPage = () => {
   //const [userInfo, setUserInfo] = useState({});
   const [users, setUsers] = useState({});
   const [tags, setTags] = useState({});
-
-
-
 
   // Lấy danh sách câu hỏi từ API
   const getAllQuesByActive = async () => {
@@ -113,6 +116,21 @@ const QuestionPage = () => {
     dispatch(setAllSaved(savedData));
   }, [dispatch]);
 
+  //hiện câu hỏi đã report
+  useEffect(() => {
+    // Lấy danh sách các câu hỏi đã được báo cáo từ localStorage
+    const reported =
+      JSON.parse(localStorage.getItem("reportedQuestions")) || [];
+    setReportedList(reported);
+
+    // Nếu `questions` đã được tải từ API, cập nhật trạng thái `isReported`
+    setQuestionList((prevQuestions) =>
+      prevQuestions.map((q) => ({
+        ...q,
+        isReported: reported.includes(q._id),
+      }))
+    );
+  }, []);
 
   if (isLoadingQues) {
     return <div>Loading...</div>;
@@ -178,6 +196,47 @@ const QuestionPage = () => {
       localStorage.setItem("allSaved", JSON.stringify(updatedSavedList));
     } catch (error) {
       console.error("Error unsaving question:", error);
+    }
+  };
+
+  const handleReport = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User must be logged in to report questions.");
+        return;
+      }
+
+      const isConfirmed = window.confirm(
+        "Are you sure you want to report this question?"
+      );
+
+      if (!isConfirmed) {
+        return; // Nếu người dùng nhấn "Cancel", thoát khỏi hàm
+      }
+
+      const response = await QuestionReportService.createQuestionReport({
+        question: questionId,
+        user: user.id, // ID người dùng
+      });
+
+      // Lấy danh sách đã báo cáo từ localStorage và cập nhật
+      const updatedReported = [...reportedList, questionId];
+      localStorage.setItem(
+        "reportedQuestions",
+        JSON.stringify(updatedReported)
+      );
+
+      setReportedList(updatedReported); // Cập nhật danh sách báo cáo trong state
+      setQuestionList((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q._id === questionId ? { ...q, isReported: true } : q
+        )
+      );
+      console.log("Report submitted successfully:", response);
+      alert(response.message); // Thông báo sau khi báo cáo thành công hoặc lỗi
+    } catch (error) {
+      console.error("Error reporting question:", error);
+      alert("An error occurred while reporting the question.");
     }
   };
 
@@ -250,13 +309,11 @@ const QuestionPage = () => {
         </div>
         {/* Render các câu hỏi */}
         <div style={{ marginTop: "20px" }}>
-        {isLoadingQues ? (
-          <LoadingComponent isLoading={isLoadingQues} />
-        ) :
-          Array.isArray(questions) && questions.length > 0 ? (
+          {isLoadingQues ? (
+            <LoadingComponent isLoading={isLoadingQues} />
+          ) : Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
-
-              // console.log("question", question);
+              console.log("question", question);
 
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
@@ -265,17 +322,13 @@ const QuestionPage = () => {
                   onClick={() => handleQuestionClick(question._id)}
                 >
                   <QuestionBox
-
                     id={question._id}
                     userQues={question.userQues}
-
                     img={user?.img || ""}
-
                     username={user?.name || "Unknown"}
                     reputation={user?.reputation || 0}
                     followers={user?.followerCount || 0}
                     title={question.title}
-
                     // tags={
                     //   question.tags
                     //     ? question.tags.map(
@@ -283,17 +336,22 @@ const QuestionPage = () => {
                     //     )
                     //     : []
                     // } // Lấy tên tag từ tags map
-                    tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
-
-                    date={new Date(question.updatedAt).toLocaleString()}
+                    tags={
+                      question.tags
+                        ? question.tags.map(
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
+                        : []
+                    } // Lấy tên tag từ tags map
+                    date={question.updatedAt}
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}
-
                     isLiked={savedList.includes(question._id)}
                     isSaved={allSaved.some(
                       (saved) => saved.question === question._id
                     )}
+                    isReported={reportedList.includes(question._id)}
                     // onLike={(e) =>
                     //   handleSaved(e, question._id, question.userQues)
                     // }
@@ -304,7 +362,7 @@ const QuestionPage = () => {
                       );
                       if (savedItem) handleUnsave(savedItem._id); // Truyền `_id` của bài đã lưu
                     }}
-
+                    onReport={() => handleReport(question._id)}
                   />
                 </div>
               );
