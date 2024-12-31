@@ -113,7 +113,7 @@ export const getQuestionsFromUserAnswers = async (userId) => {
 export const addVote = async (questionId, userId, isUpVote) => {
   try {
     const res = await axiosJWT.post(
-      `${process.env.REACT_APP_API_URL_BACKEND}/question/questions/${questionId}/vote`,
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/${questionId}/vote`,
       { questionId, userId, isUpVote }
     );
     return res.data;
