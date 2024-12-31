@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
+import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import QuestionFilter from "../../components/QuestionFilter/QuestionFilter";
 import SortBtn from "../../components/SortBtn/SortBtn";
-import QuestionBox from "../../components/QuestionBox/QuestionBox";
+import { setAllSaved } from "../../redux/slides/savedSlide";
 import * as QuestionService from "../../services/QuestionService";
-import * as UserService from "../../services/UserService";
 import * as SavedService from "../../services/SavedService";
-import { useQuery } from "@tanstack/react-query";
 import * as TagService from "../../services/TagService";
 import { useDispatch, useSelector } from "react-redux";
 import { createSaved } from "../../services/SavedService";
@@ -45,19 +47,21 @@ const QuestionPage = () => {
   const [tags, setTags] = useState({});
 
   // Lấy danh sách câu hỏi từ API
-  const getAllQues = async () => {
-    const res = await QuestionService.getAllQues();
+  const getAllQuesByActive = async () => {
+    const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-
+  
   const {
     isLoading: isLoadingQues,
     data: questions,
     error,
   } = useQuery({
-    queryKey: ["questions"],
-    queryFn: getAllQues,
+    queryKey: ["questions", true], // Thêm true vào queryKey để phản ánh tham số
+    queryFn: getAllQuesByActive,
   });
+
+  
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {

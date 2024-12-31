@@ -134,6 +134,11 @@ export const getStatisticQuestion = async (userQues, year, month) => {
   return response.data;
 };
 
+export const getAllQuestionByActive = async (active) => {
+  const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?active=${active}`);
+  return response.data;
+};
+
 
 // export const updateAnswerCount = async (id, data) => {
 //   try {

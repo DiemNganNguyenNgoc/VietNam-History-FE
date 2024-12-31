@@ -59,7 +59,7 @@ const QuestionBoxAdmin = ({
 
         {/* Hiển thị thông báo nếu câu hỏi đang bị ẩn */}
         {isHidden && (
-          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px" }}>
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px", fontSize:'14px' }}>
             This question was hidden by the user.
           </div>
         )}

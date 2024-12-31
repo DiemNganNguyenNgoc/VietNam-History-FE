@@ -19,6 +19,7 @@ const QuestionHolder = () => {
     setError(null);
     try {
       const response = await QuestionService.getQuestionsByUserId(user?.id);
+      console.log('bbbj', response)
       if (response.status === 'OK') {
         setQuestions(response.data);
       } else {
@@ -58,6 +59,8 @@ const QuestionHolder = () => {
       }
       setTags(tagMap);
     };
+
+
 
     if (questions.length > 0) {
       fetchUsersAndTags();
@@ -120,7 +123,7 @@ const QuestionHolder = () => {
             key={question._id}
             title={question.title}
             tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || "Unknown Tag") : []}
-            date={new Date(question.createdAt).toLocaleString()}
+            date={new Date(question.updatedAt).toLocaleString()}
             views={question.view}
             answers={question.answerCount}
             likes={question.upVoteCount}

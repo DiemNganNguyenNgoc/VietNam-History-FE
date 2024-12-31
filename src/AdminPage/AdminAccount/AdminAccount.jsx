@@ -6,7 +6,7 @@ import NewUserBtn from '../../components/NewUserBtn/NewUserBtn'
 import '../../css/UsersAdmin.css'
 import { setAllAdmin } from "../../redux/slides/adminSlide";
 import { useNavigate } from 'react-router-dom'
-import { getAllAdmin } from '../../services/AdminService'
+import { getAllAdmin, deleteAdmin } from '../../services/AdminService'
 
 const AdminAccount = () => {
   const access_token = localStorage.getItem("access_token");
@@ -28,10 +28,9 @@ const AdminAccount = () => {
   const dispatch = useDispatch();
   // const admin = useSelector((state) => state.admin);
   // console.log("user", user);
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.admin);
   const { allAdmin } = useSelector((state) => state.admin);
   console.log("allUser", allAdmin);
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -41,7 +40,7 @@ const AdminAccount = () => {
         console.error("Error fetching users:", error);
       }
     };
-
+  
     fetchUsers();
   }, [dispatch]);
 
@@ -51,9 +50,29 @@ const AdminAccount = () => {
     console.log("ADMIN",admin); // Thực hiện hành động với từng phần tử
 });
 
-  const hadleViewProfile = (id) => {
-    navigate(`/admin/other-profile/${id}`)
+  const hadleNewAdmin = () => {
+    navigate(`/admin/add-admin`)
   }
+
+ const handleOnDelete = async (id) => {
+    // event.stopPropagation(); // Ngừng sự kiện lan truyền
+ 
+     const isConfirmed = window.confirm("Are you sure you want to delete this admin account?");
+     if (isConfirmed) {
+       try {
+         await deleteAdmin(id);
+         const response = await getAllAdmin(); // Fetch updated list
+         dispatch(setAllAdmin(response.data)); // Update Redux state with new data
+         alert("Admin account deleted successfully!");
+        //  navigate(-1);
+     
+       } catch (error) {
+         console.error("Error deleting admin account: ", error);
+         alert("Error deleting admin account.");
+       }
+     }
+     
+   };
   
 
   return (
@@ -67,7 +86,7 @@ const AdminAccount = () => {
           <SearchBtn />
         </div>
         <div>
-          <NewUserBtn />
+          <NewUserBtn onClick={hadleNewAdmin} />
         </div>
       </div>
 
@@ -93,9 +112,8 @@ const AdminAccount = () => {
                     <td >{row.name}</td>
                     <td className='email'>{row.email}</td>
                     <td>{row.phone}</td>
-                    <button className='view-profile' onClick={() => hadleViewProfile(row._id)}>View</button>
                     <button
-                      className="ban-profile">Delete</button>
+                      className="ban-profile" onClick={() => handleOnDelete(row._id)}>Delete</button>
                   </tr>
                 ))}
               </tbody>
