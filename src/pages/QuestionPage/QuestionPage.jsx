@@ -14,6 +14,7 @@ import * as TagService from "../../services/TagService";
 import * as UserService from "../../services/UserService";
 import { createSaved } from "../../services/SavedService";
 import * as QuestionReportService from "../../services/QuestionReportService";
+import Pagination from "../../components/Pagination/Pagination";
 
 const QuestionPage = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,9 @@ const QuestionPage = () => {
 
   const navigate = useNavigate();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 10; // Số câu hỏi mỗi trang
+  const [totalQuestions, setTotalQuestions] = useState(0);
   const [filters, setFilters] = useState({
     no_answers: false,
     no_accepted_answer: false,
@@ -44,20 +48,22 @@ const QuestionPage = () => {
   const [users, setUsers] = useState({});
   const [tags, setTags] = useState({});
 
-  // Lấy danh sách câu hỏi từ API
-  const getAllQuesByActive = async () => {
-    const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
+  // Lấy danh sách câu hỏi từ API, bao gồm các tham số phân trang
+  const getAllQuesByActive = async (page, limit) => {
+    const res = await QuestionService.getAllQuestionByActive(true, page, limit);
+    setTotalQuestions(res.total); // Cập nhật tổng số câu hỏi
     return res.data;
   };
-
   const {
     isLoading: isLoadingQues,
     data: questions,
     error,
   } = useQuery({
-    queryKey: ["questions", true], // Thêm true vào queryKey để phản ánh tham số
-    queryFn: getAllQuesByActive,
+    queryKey: ["questions", currentPage], // Thêm currentPage vào queryKey để phản ánh tham số phân trang
+    queryFn: () => getAllQuesByActive(currentPage, questionsPerPage),
   });
+
+
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
@@ -240,6 +246,19 @@ const QuestionPage = () => {
     navigate("/saved-list");
   };
 
+  // Hàm để thay đổi trang
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  if (isLoadingQues) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading questions: {error.message}</div>;
+  }
+
   return (
     <div className="container">
       <div
@@ -310,6 +329,7 @@ const QuestionPage = () => {
           ) : Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
               console.log("question", question);
+              console.log("Questions length:", Array.isArray(questions) ? questions.length : "Not an array");
 
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
@@ -335,8 +355,8 @@ const QuestionPage = () => {
                     tags={
                       question.tags
                         ? question.tags.map(
-                            (tagId) => tags[tagId]?.name || tagId
-                          )
+                          (tagId) => tags[tagId]?.name || tagId
+                        )
                         : []
                     } // Lấy tên tag từ tags map
                     date={question.updatedAt}
@@ -367,6 +387,12 @@ const QuestionPage = () => {
             <LoadingComponent isLoading={isLoadingQues} />
           )}
         </div>
+        {/* Pagination component */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(totalQuestions / questionsPerPage)}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );
