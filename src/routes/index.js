@@ -24,7 +24,7 @@ import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdateQuestionPage";
 import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 import SavedPage from "../pages/SavedPage/SavedPage";
-//import OtherAdminProfilePage from "../AdminPage/OtherAdminProfilePage/OtherAdminProfilePage";
+import OtherAdminProfilePage from "../AdminPage/OtherAdminProfilePage/OtherAdminProfile";
 export const routes = [
   {
     path: "/",
@@ -179,9 +179,9 @@ export const routes = [
     isShowHeader: true,
   },
 
-  // {
-  //   path:"/admin/other-profile/:id",
-  //   page: OtherAdminProfilePage,
-  //   isShowHeader: true,
-  // }
+  {
+    path:"/admin/other-profile/:id",
+    page: OtherAdminProfilePage,
+    isShowHeader: true,
+  }
 ];

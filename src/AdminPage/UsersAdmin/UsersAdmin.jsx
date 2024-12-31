@@ -41,7 +41,7 @@ const UsersAdmin = () => {
       console.error("Error fetching users:", error);
     }
   };
-
+const [showLoading, setShowLoading] = useState(false); // Thêm trạng thái riêng
 
 
   useEffect(() => {
@@ -61,15 +61,15 @@ const UsersAdmin = () => {
       console.log("STATUS", isActive)
       const updatedUser = await updateUserStatus(userId, !isActive);
       if (updatedUser?.status !== 'ERR') {
-        message.success(`Answer has been ${isActive ? 'deleted' : 'restored'} successfully!`);
-        console.log("STATUS1", isActive);
+        message.success(`User has been ${isActive ? 'Ban' : 'Allow'} successfully!`);
+        setShowLoading(true); // Hiện loading
         // Cập nhật danh sách câu trả lời
         fetchUsers();
       } else {
-        throw new Error(updatedUser?.message || "Failed to update answer status.");
+        throw new Error(updatedUser?.message || "Failed to update user status.");
       }
     } catch (error) {
-      console.error("Error updating answer status:", error);
+      console.error("Error updating user status:", error);
       message.error("An error occurred. Please try again.");
     }
   };
@@ -119,7 +119,6 @@ const UsersAdmin = () => {
                     <td>{row.reportCount}</td>
                     <button className='view-profile' onClick={() => hadleViewProfile(row._id)} >View</button>
                     <button
-
                       className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
                       onClick={() => handleToggleUserStatus(row._id, row.active)}
                     > {row.active ? "Ban" : "Allow"}</button>

@@ -28,7 +28,7 @@ const AdminAccount = () => {
   const dispatch = useDispatch();
   // const admin = useSelector((state) => state.admin);
   // console.log("user", user);
-
+  const user = useSelector((state) => state.user);
   const { allAdmin } = useSelector((state) => state.admin);
   console.log("allUser", allAdmin);
 
@@ -46,11 +46,15 @@ const AdminAccount = () => {
   }, [dispatch]);
 
   // Lọc bỏ người dùng hiện tại ra khỏi danh sách
-  const filteredUsers = allAdmin;
-  console.log("WERT", allAdmin[0])
+  const filteredUsers = allAdmin.filter((u) => u._id !== user.id);
+  allAdmin.forEach(admin => {
+    console.log("ADMIN",admin); // Thực hiện hành động với từng phần tử
+});
+
   const hadleViewProfile = (id) => {
     navigate(`/admin/other-profile/${id}`)
   }
+  
 
   return (
     <div className='container mt-4'>
@@ -72,8 +76,8 @@ const AdminAccount = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th className='No'>No</th>
-                <th className='userName'>Username</th>
+                <th >No</th>
+                <th >Username</th>
                 <th className='email'>Email</th>
                 <th>Phone number</th>
                 <th></th>
@@ -85,12 +89,13 @@ const AdminAccount = () => {
               <tbody>
                 {filteredUsers.map((row, index) => (
                   <tr key={index}>
-                    <td className='No'>{index + 1}</td>
-                    <td className='userName'>{row.name}</td>
+                    <td >{index + 1}</td>
+                    <td >{row.name}</td>
                     <td className='email'>{row.email}</td>
                     <td>{row.phone}</td>
                     <button className='view-profile' onClick={() => hadleViewProfile(row._id)}>View</button>
-                    <button className='ban-profile' >Delete</button>
+                    <button
+                      className="ban-profile">Delete</button>
                   </tr>
                 ))}
               </tbody>
