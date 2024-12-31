@@ -37,3 +37,26 @@ export const checkVoteStatus = async (userId, answerId) => {
     }
   }
 };
+
+export const getVotesAndAnswersFromUser = async (userId) => {
+  try {
+    // Gọi API để lấy thông tin vote và câu trả lời từ userId
+    const res = await axiosJWT.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/answer-vote/votes/answers/${userId}`
+    );
+    return res.data; // Trả về dữ liệu từ API
+  } catch (error) {
+    if (error.response) {
+      // Trả về lỗi từ phản hồi của server
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      // Trả về lỗi khi không kết nối được với máy chủ
+      throw {
+        status: 500,
+        message: "Không thể kết nối đến máy chủ.",
+      };
+    }
+  }
+};
