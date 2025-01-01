@@ -168,3 +168,14 @@ export const deleteAdmin = async (id) => {
     }
   }
 };
+
+export const filterAdmin = async (searchParams) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/admin/filter`, {
+      params: searchParams,
+    });
+    return response.data;  
+  } catch (error) {
+    throw error;  
+  }
+};

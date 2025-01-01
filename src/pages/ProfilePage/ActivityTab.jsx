@@ -8,7 +8,7 @@ import QuestionSubTab from "./QuestionSubTab";
 import AnswerSubTab from "./AnswerSubTab";
 import TagSubTab from "./TagSubTab";
 import SaveSubTab from "./SaveSubTab";
-import VoteSubTab from "./VoteSubTab";
+import VoteSubTab from "./VoteSubTab/VoteSubTab";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
@@ -80,13 +80,10 @@ const ActivityTab = () => {
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
 
-          {activeTab === "questions" && <div>Questions Content</div>}
-          {activeTab === "answers" && <div>Answers Content</div>}
+          
           {activeTab === "responses" && <div><ResponsesSubTab/></div>}
-          {activeTab === "tabs" && <div>Tabs Content</div>}
           {activeTab === "questions" && <QuestionSubTab />}
           {activeTab === "answers" && <AnswerSubTab />}
-          {activeTab === "responses" && <div>Responses Content</div>}
           {activeTab === "tags" && <TagSubTab />}
           {activeTab === "saved" && <SaveSubTab/>}
           {activeTab === "followers" && <FollowerSubTab />}

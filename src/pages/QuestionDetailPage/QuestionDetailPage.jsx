@@ -11,13 +11,14 @@ import * as UserService from "../../services/UserService";
 import * as TagService from "../../services/TagService";
 import * as QuestionService from "../../services/QuestionService";
 import * as QuestionVoteService from "../../services/QuestionVoteService";
+import * as AnswerVoteService from "../../services/AnswerVoteService";
 import * as CommentService from "../../services/CommentService";
 import * as CommentReportService from "../../services/CommentReportService";
 import * as AnswerReportService from "../../services/AnswerReportService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { addAnswer } from "../../redux/slides/AnswerSlice"; // Import action
+import { setDetailAnswer, addAnswer } from '../../redux/slides/AnswerSlice'; // Import action
 import {
   setDetailAsker,
   setDetailQuestion,
@@ -53,7 +54,6 @@ const QuestionDetails = () => {
 
   // Lấy dữ liệu chi tiết của câu hỏi từ Redux store
   const questionDetail = useSelector((state) => state.question.detailQuestion);
-  // console.log("Question Detail:", questionDetail);
 
   const detailAsker = useSelector((state) => state.question.detailAsker);
   // console.log("detailAsker", detailAsker);
@@ -69,24 +69,22 @@ const QuestionDetails = () => {
   );
   const { dataCom, isLoadingCom, isSuccessCom, isErrorCom } = mutationComment;
 
-  const [voteStatus, setVoteStatus] = useState({ hasVoted: false, type: null });
-  // console.log(voteStatus);
+  const [quesVoteStatus, setQuesVoteStatus] = useState({ hasVoted: false, type: null });
+  const [ansVoteStatus, setAnsVoteStatus] = useState({ hasVoted: false, type: null });
+  const [votes, setVotes] = useState({});
 
   useEffect(() => {
     // Kiểm tra trạng thái vote khi load page
-    const checkStatus = async () => {
+    const checkQuesStatus = async () => {
       try {
-        const status = await QuestionVoteService.checkVoteStatus(
-          user?.id,
-          questionId
-        );
-        setVoteStatus(status.data);
+        const status = await QuestionVoteService.checkVoteStatus(user?.id, questionId);
+        setQuesVoteStatus(status.data);
       } catch (error) {
         console.error("Error checking vote status:", error);
       }
     };
 
-    checkStatus();
+    checkQuesStatus();
   }, [user?.id, questionId]);
 
   //load comment bị report
@@ -110,21 +108,59 @@ const QuestionDetails = () => {
     );
   }, []);
 
+  useEffect(() => {
+    const checkAnswerVoteStatus = async () => {
+      try {
+        // Lấy danh sách câu trả lời và kiểm tra trạng thái vote của mỗi câu trả lời
+        const voteStatusPromises = answers.map(async (answer) => {
+          try {
+            // Kiểm tra trạng thái vote của câu trả lời
+            const status = await AnswerVoteService.checkVoteStatus(user?.id, answer._id);
+            return { answerId: answer._id, voteStatus: status.data };
+            
+             // Trả về trạng thái vote
+          } catch (error) {
+            console.error('Error checking vote status for answer:', error);
+            return { answerId: answer._id, voteStatus: null }; // Trả về null nếu có lỗi
+          }
+        });
+
+        // Chờ tất cả các promise hoàn thành
+        const voteStatuses = await Promise.all(voteStatusPromises);
+
+        // Cập nhật trạng thái vote của các câu trả lời
+        const voteStatusMap = voteStatuses.reduce((acc, { answerId, voteStatus }) => {
+          acc[answerId] = voteStatus; // Lưu trạng thái vote của từng câu trả lời
+          return acc;
+        }, {});
+
+        setAnsVoteStatus(voteStatusMap); // Cập nhật trạng thái vote vào state
+      } catch (error) {
+        console.error('Error checking vote statuses:', error);
+      }
+    };
+
+    if (answers.length > 0 && userAns) {
+      checkAnswerVoteStatus(); // Gọi hàm kiểm tra trạng thái vote nếu có câu trả lời và user đã đăng nhập
+    }
+  }, [answers]); // Chạy lại effect khi answers hoặc user thay đổi
+
+
   // Hàm xử lý UpVote
   const handleQuesUpVote = async () => {
     try {
-      if (!voteStatus.hasVoted) {
+      if (!quesVoteStatus.hasVoted) {
         // Nếu chưa vote, thực hiện upvote
         await QuestionService.addVote(questionId, user?.id, true);
-        setVoteStatus({ hasVoted: true, type: true });
-      } else if (voteStatus.type === true) {
+        setQuesVoteStatus({ hasVoted: true, type: true });
+      } else if (quesVoteStatus.type === true) {
         // Nếu đã upvote, hủy upvote
         await QuestionService.addVote(questionId, user?.id, true);
-        setVoteStatus({ hasVoted: false, type: null });
-      } else if (voteStatus.type === false) {
+        setQuesVoteStatus({ hasVoted: false, type: null });
+      } else if (quesVoteStatus.type === false) {
         // Nếu đã downvote, thay đổi thành upvote
         await QuestionService.addVote(questionId, user?.id, true);
-        setVoteStatus({ hasVoted: true, type: true });
+        setQuesVoteStatus({ hasVoted: true, type: true });
       }
       // Cập nhật lại số lượng vote sau khi upvote
       const updatedQuestion = await QuestionService.getDetailsQuestion(
@@ -139,18 +175,19 @@ const QuestionDetails = () => {
   // Hàm xử lý DownVote
   const handleQuesDownVote = async () => {
     try {
-      if (!voteStatus.hasVoted) {
+      if (!quesVoteStatus.hasVoted) {
         // Nếu chưa vote, thực hiện downvote
         await QuestionService.addVote(questionId, user?.id, false);
-        setVoteStatus({ hasVoted: true, type: false });
-      } else if (voteStatus.type === false) {
+        setQuesVoteStatus({ hasVoted: true, type: false });
+        
+      } else if (quesVoteStatus.type === false) {
         // Nếu đã downvote, hủy downvote
         await QuestionService.addVote(questionId, user?.id, false);
-        setVoteStatus({ hasVoted: false, type: null });
-      } else if (voteStatus.type === true) {
+        setQuesVoteStatus({ hasVoted: false, type: null });
+      } else if (quesVoteStatus.type === true) {
         // Nếu đã upvote, thay đổi thành downvote
         await QuestionService.addVote(questionId, user?.id, false);
-        setVoteStatus({ hasVoted: true, type: false });
+        setQuesVoteStatus({ hasVoted: true, type: false });
       }
       const updatedQuestion = await QuestionService.getDetailsQuestion(
         questionId
@@ -160,6 +197,101 @@ const QuestionDetails = () => {
       console.error("Error handling downvote:", error);
     }
   };
+
+  const handleAnsUpVote = async (answerId) => {
+    try {
+      const currentVoteStatus = ansVoteStatus[answerId];
+      let newUpVoteCount = answers.find((answer) => answer._id === answerId).upVoteCount;
+      let newDownVoteCount = answers.find((answer) => answer._id === answerId).downVoteCount;
+      if (currentVoteStatus?.type === true) {
+        // Nếu đã upvote, hủy bỏ upvote
+        await AnswerService.addVote(answerId, user?.id, true);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: false, type: null },
+        }));
+        newUpVoteCount -= 1;
+      } else if (currentVoteStatus?.type === false) {
+        // Nếu đã downvote, chuyển thành upvote
+        await AnswerService.addVote(answerId, user?.id, true);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: true, type: true },
+        }));
+        newUpVoteCount += 1;
+        newDownVoteCount -= 1;
+      } else {
+        // Nếu chưa vote, thực hiện upvote
+        await AnswerService.addVote(answerId, user?.id, true);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: true, type: true },
+        }));
+        newUpVoteCount += 1;
+      }
+  
+      // Cập nhật lại số lượng vote sau khi thực hiện action
+      setAnswers((prevAnswers) =>
+        prevAnswers.map((answer) =>
+          answer._id === answerId
+            ? { ...answer, upVoteCount: newUpVoteCount, downVoteCount: newDownVoteCount }
+            : answer
+        )
+      );
+    } catch (error) {
+      console.error('Error handling upvote for answer:', error);
+    }
+  };
+  
+  
+  
+
+  // Hàm xử lý DownVote
+  const handleAnsDownVote = async (answerId) => {
+    try {
+      const currentVoteStatus = ansVoteStatus[answerId];
+      let newUpVoteCount = answers.find((answer) => answer._id === answerId).upVoteCount;
+      let newDownVoteCount = answers.find((answer) => answer._id === answerId).downVoteCount;
+      if (currentVoteStatus?.type === false) {
+        // Nếu đã downvote, hủy bỏ downvote
+        await AnswerService.addVote(answerId, user?.id, false);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: false, type: null },
+        }));
+        newDownVoteCount -= 1;
+      } else if (currentVoteStatus?.type === true) {
+        // Nếu đã upvote, chuyển thành downvote
+        await AnswerService.addVote(answerId, user?.id, false);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: true, type: false },
+        }));
+        newUpVoteCount -= 1; // Giảm số lượng upvote
+        newDownVoteCount += 1;
+      } else {
+        // Nếu chưa vote, thực hiện downvote
+        await AnswerService.addVote(answerId, user?.id, false);
+        setAnsVoteStatus((prevState) => ({
+          ...prevState,
+          [answerId]: { hasVoted: true, type: false },
+        }));
+        newDownVoteCount += 1;
+      }
+  
+      // Cập nhật lại số lượng vote sau khi thực hiện action
+      setAnswers((prevAnswers) =>
+        prevAnswers.map((answer) =>
+          answer._id === answerId
+            ? { ...answer, upVoteCount: newUpVoteCount, downVoteCount: newDownVoteCount }
+            : answer
+        )
+      );
+    } catch (error) {
+      console.error('Error handling downvote for answer:', error);
+    }
+  }  
+  
 
   //lấy thông tin người hỏi
   useEffect(() => {
@@ -578,7 +710,8 @@ const QuestionDetails = () => {
       alert("An error occurred while reporting the comment.");
     }
   };
-
+  const quesDate=new Date(questionDetail.data?.createdAt).toLocaleString()
+  
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -596,55 +729,45 @@ const QuestionDetails = () => {
         <div>
           <strong>{detailAsker.data?.name || "Anonymous"}</strong>
           <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
-            Asked {questionDetail.data?.createdAt || "Unknown time"}
+            Asked { quesDate|| "Unknown time"}
           </p>
         </div>
       </div>
 
       {/* Phần tiêu đề câu hỏi */}
       <div className="mb-4">
-        <h3>{questionDetail.data?.title || "Question Title"}</h3>
-        <p className="text-secondary">
-          <span className="me-3">{questionDetail.data?.view} views</span>
-          <div>
-            <button
-              className="btn me-2"
-              style={{
-                backgroundColor:
-                  voteStatus.type === true
-                    ? "green"
-                    : voteStatus.hasVoted === false
-                    ? "gray"
-                    : "gray",
-                color: "white",
-              }}
-              onClick={() => handleQuesUpVote()}
-            >
-              ▲
-            </button>
-            +{questionDetail.data?.upVoteCount}
-          </div>
-          <div style={{ marginTop: "10px" }}>
-            <button
-              className="btn"
-              style={{
-                backgroundColor:
-                  voteStatus.type === false
-                    ? "red"
-                    : voteStatus.hasVoted === false
-                    ? "gray"
-                    : "gray",
-                color: "white",
-                marginRight: "12px",
-              }}
-              onClick={() => handleQuesDownVote()}
-            >
-              ▼
-            </button>
-            -{questionDetail.data?.downVoteCount}
-          </div>
-        </p>
-      </div>
+      <h3>{questionDetail.data?.title || "Question Title"}</h3>
+      <p className="text-secondary">
+        <span className="me-3">{questionDetail.data?.view} views</span>
+        <div>
+          <button
+            className="btn me-2"
+            style={{
+              backgroundColor: quesVoteStatus.type === true ? 'green' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+            }}
+            onClick={() => handleQuesUpVote()}
+          >
+            ▲
+          </button>
+          +{questionDetail.data?.upVoteCount}
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <button
+            className="btn"
+            style={{
+              backgroundColor: quesVoteStatus.type === false ? 'red' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
+              color: 'white',
+              marginRight: "12px",
+            }}
+            onClick={() => handleQuesDownVote()}
+          >
+            ▼
+          </button>
+          -{questionDetail.data?.downVoteCount}
+        </div>
+      </p>
+    </div>
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
@@ -715,59 +838,86 @@ const QuestionDetails = () => {
 
       {/* Danh sách câu trả lời */}
       <div>
-        <h5 className="mb-3">{answers.length} Answers</h5>
-        {Array.isArray(answers) && answers.length > 0 ? (
-          answers.map((answer, index) => (
-            <div key={index} className="p-3 border rounded mb-3">
-              <div
-                className="d-flex align-items-center mb-2"
-                style={{ justifyContent: "space-between" }}
-              >
-                <div>
-                  <div className="d-flex align-items-center gap-3">
-                    <img
-                      src="https://via.placeholder.com/40"
-                      alt="Answerer Avatar"
-                      className="rounded-circle me-2"
-                      width="40"
-                      height="40"
-                    />
+  <h5 className="mb-3">{answers.length} Answer{answers.length > 1 ? 's' : ''}</h5>
+  {Array.isArray(answers) && answers.length > 0 ? (
+    answers.map((answer, index) => (
+      <div key={index} className="d-flex align-items-start p-3 border rounded mb-3">
+        {/* Phần bỏ phiếu nằm bên trái, cùng dòng với nội dung */}
+        <div className="vote-buttons me-3 d-flex flex-column align-items-center">
+          <div>
+            <button
+              className="btn me-2"
+              style={{
+                backgroundColor: ansVoteStatus[answer._id]?.type === true ? 'green' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
+                color: 'white',
+              }}
+              onClick={() => handleAnsUpVote(answer._id)}
+            >
+              ▲
+            </button>
+            +{answer.upVoteCount}
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            <button
+              className="btn"
+              style={{
+                backgroundColor: ansVoteStatus[answer._id]?.type === false ? 'red' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
+                color: 'white',
+                marginRight: "12px",
+              }}
+              onClick={() => handleAnsDownVote(answer._id)}
+            >
+              ▼
+            </button>
+            -{answer.downVoteCount}
+          </div>
+        </div>
 
-                    <strong>{answer.userName || "Loading..."}</strong>
-                  </div>
-                  <div>
-                    <p
-                      className="text-muted mb-0"
-                      style={{ fontSize: "0.9em" }}
-                    >
-                      Answered {new Date(answer.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-                {/* Nút Report */}
-                <button
-                  className={`report-button ${
-                    answer.isReported ? "reported" : ""
-                  }`}
-                  disabled={answer.isReported} // Vô hiệu hóa nút nếu đã report
-                  onClick={() => handleAnswerReport(answer._id)} // Gọi hàm report
-                >
-                  {answer.isReported ? "Reported" : "Report"}
-                </button>
+        {/* Phần hiển thị câu trả lời nằm bên phải */}
+        <div className="answer-content flex-grow-1">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            {/* Thông tin người trả lời */}
+            <div className="d-flex align-items-center">
+              <img
+                src="https://via.placeholder.com/40"
+                alt="Answerer Avatar"
+                className="rounded-circle me-2"
+                width="40"
+                height="40"
+              />
+              <div>
+                <strong>{answer.userName || "Loading..."}</strong>
+                <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
+                  Answered {new Date(answer.createdAt).toLocaleString()}
+                </p>
               </div>
-              <p>{parse(answer.content)}</p>
-              {answer.images?.map((img, index) => (
-                <img
-                  src={img || "https://via.placeholder.com/150"}
-                  alt={`Answer Image ${index}`}
-                  //className="img-fluid rounded my-2"
-                />
-              ))}
             </div>
-          ))
-        ) : (
-          <p>No answers available.</p>
-        )}
+            {/* Nút Report */}
+            <button
+              className={`report-button ${answer.isReported ? "reported" : ""}`}
+              disabled={answer.isReported} // Vô hiệu hóa nút nếu đã report
+              onClick={() => handleAnswerReport(answer._id)} // Gọi hàm report
+            >
+              {answer.isReported ? "Reported" : "Report"}
+            </button>
+          </div>
+
+          <p>{parse(answer.content)}</p>
+          {answer.images?.map((img, index) => (
+            <img
+              key={index}
+              src={img || "https://via.placeholder.com/150"}
+              alt={`Answer Image ${index}`}
+              className="img-fluid rounded my-2"
+            />
+          ))}
+        </div>
+      </div>
+    ))
+  ) : (
+    <p>No answers available.</p>
+  )}
+
         {/* Thêm các câu trả lời khác */}
         <AnswerEditor
           content={content}

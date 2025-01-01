@@ -91,7 +91,7 @@ function TagAdmin() {
           type="text"
           className="form-control d-inline-block me-2"
           placeholder="Search by tag name..."
-          style={{ width: "300px" }}
+          style={{ width: "300px", marginBottom:'30px' }}
         />
       </div>
 

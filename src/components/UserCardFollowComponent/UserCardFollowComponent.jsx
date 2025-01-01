@@ -11,13 +11,15 @@ const UserCardFollowComponent = ({
   img,
   address,
   followerCount,
-  isInitiallyFollowed,
+  isFollowed,
+  onFollow,
 }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const [userState, setUserState] = useState({ isFollowed });
+
   // const access_token = useSelector((state) => state.user.access_token);
-  const [isFollowed, setIsFollowed] = useState(isInitiallyFollowed);
-  const [follower, setFollower] = useState(followerCount);
+  // const [isFollowed, setIsFollowed] = useState(isInitiallyFollowed);
+  // const [follower, setFollower] = useState(followerCount);
   // console.log("access_token", access_token);
   // console.log("followerCount", followerCount);
 
@@ -26,23 +28,9 @@ const UserCardFollowComponent = ({
     navigate(`/otheruserprofile/${id}`);
   };
 
-  const handleFollowClick = async (e) => {
-    e.stopPropagation(); // Ngăn chặn click vào card khi nhấn nút
-    try {
-      const access_token = localStorage.getItem("access_token");
-      // console.log("access_token", access_token);
-      // const cleanedToken = access_token.replace(/^"|"$/g, "");
-      console.log("cleanedToken", access_token);
-
-      const result = await UserService.addFollower(id, access_token);
-      dispatch(addFollow(result)); // Cập nhật Redux store
-      alert("Followed successfully!");
-      // Cập nhật trạng thái nút và followerCount
-      setIsFollowed(!isFollowed);
-      setFollower((prevCount) => (isFollowed ? prevCount - 1 : prevCount + 1));
-    } catch (error) {
-      console.error("Error following user:", error);
-    }
+  const handleFollowClick = (e) => {
+    e.stopPropagation(); // Ngăn chặn click vào card
+    onFollow(id, isFollowed, followerCount); // Gọi hàm xử lý follow từ parent
   };
 
   return (
@@ -64,7 +52,9 @@ const UserCardFollowComponent = ({
               alt={`${name}'s avatar`}
               className="img-fluid rounded-circle p-2"
               style={{
-                maxHeight: "100px",
+                height: "100px",
+                width: "100px",
+                borderRadius: "50%",
                 objectFit: "cover",
               }}
             />
@@ -76,7 +66,7 @@ const UserCardFollowComponent = ({
                 {address || "Address not available"}
               </p>
               <p className="card-text">
-                <small className="text-muted">{follower} Followers</small>
+                <small className="text-muted">{followerCount} Followers</small>
               </p>
               <button
                 onClick={handleFollowClick}

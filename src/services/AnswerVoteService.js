@@ -1,12 +1,12 @@
 import axios from "axios";
 export const axiosJWT = axios.create();
 
-export const checkVoteStatus = async (userId, questionId) => {
+export const checkVoteStatus = async (userId, answerId) => {
   try {
     // Gọi API để kiểm tra trạng thái vote của người dùng
     const response = await axios.get(
-      `${process.env.REACT_APP_API_URL_BACKEND}/question-vote/vote-status/${userId}/${questionId}`,
-      { params: { userId, questionId } }
+      `${process.env.REACT_APP_API_URL_BACKEND}/answer-vote/vote-status/${userId}/${answerId}`,
+      { params: { userId, answerId } }
     );
 
     // Nếu không có vote thì trả về false
@@ -38,11 +38,11 @@ export const checkVoteStatus = async (userId, questionId) => {
   }
 };
 
-export const getVotesAndQuestionsFromUser = async (userId) => {
+export const getVotesAndAnswersFromUser = async (userId) => {
   try {
-    // Gọi API để lấy thông tin vote và câu hỏi từ userId
+    // Gọi API để lấy thông tin vote và câu trả lời từ userId
     const res = await axiosJWT.get(
-      `${process.env.REACT_APP_API_URL_BACKEND}/question-vote/votes/questions/${userId}`
+      `${process.env.REACT_APP_API_URL_BACKEND}/answer-vote/votes/answers/${userId}`
     );
     return res.data; // Trả về dữ liệu từ API
   } catch (error) {

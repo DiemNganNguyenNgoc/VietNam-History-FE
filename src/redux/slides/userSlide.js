@@ -23,12 +23,13 @@ const initialState = {
   reputation: "",
   access_token: "",
   answerCount: 0,
-  quesCount:0,
+  quesCount: 0,
   allUser: [], // Danh sách tất cả các user
   detailUser: {},
   allUsersExceptSelf: [], // Danh sách tất cả user trừ user hiện tại
   followers: [],
-        createdAt:""
+  following: [],
+  createdAt: "",
 };
 
 export const userSlide = createSlice({
@@ -57,7 +58,7 @@ export const userSlide = createSlice({
         savedCount = "",
         reputation = "",
         access_token,
-        createdAt=""
+        createdAt = "",
       } = action.payload;
 
       state.name = name || email;
@@ -80,7 +81,7 @@ export const userSlide = createSlice({
       state.reputation = reputation;
       state.access_token = access_token;
       state.id = _id;
-            state.createdAt=createdAt
+      state.createdAt = createdAt;
     },
     resetUser: (state) => {
       state.id = "";
@@ -103,7 +104,7 @@ export const userSlide = createSlice({
       state.reportCount = "";
       state.savedCount = "";
       state.reputation = "";
-      state.createdAt=""
+      state.createdAt = "";
     },
     setAllUser: (state, action) => {
       state.allUser = action.payload; // Lưu danh sách Question từ API
@@ -117,6 +118,27 @@ export const userSlide = createSlice({
     addFollow: (state, action) => {
       state.followers.push(action.payload); // Thêm người theo dõi vào danh sách
     },
+    setFollowStatus: (state, action) => {
+      const { userId, isFollowed, followerCount } = action.payload;
+
+      // Cập nhật danh sách user
+      state.allUser = state.allUser.map((user) =>
+        user._id === userId ? { ...user, followerCount } : user
+      );
+
+      // Đảm bảo `following` luôn là mảng
+      state.following = Array.isArray(state.following) ? state.following : [];
+
+      // Cập nhật danh sách following
+      state.following = isFollowed
+        ? [...state.following, userId]
+        : state.following.filter((id) => id !== userId);
+    },
+
+    // Thêm action để cập nhật danh sách following
+    setFollowing: (state, action) => {
+      state.following = action.payload; // Lưu danh sách user đang follow
+    },
   },
 });
 
@@ -126,7 +148,9 @@ export const {
   setDetailUser,
   setAllUser,
   setAllUsersExceptSelf,
-  addFollow
+  addFollow,
+  setFollowStatus,
+  setFollowing,
 } = userSlide.actions;
 
 export default userSlide.reducer;

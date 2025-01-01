@@ -87,7 +87,8 @@ export const updateAnswerCount = async (questionId, newAnswerCount) => {
   console.log("ID", questionId);
 
 
-  const response = await axios.put( `${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {answerCount: newAnswerCount,
+  const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/question/update-answer-count/${questionId}`, {
+    answerCount: newAnswerCount,
   });
   return response.data;
 };
@@ -113,7 +114,7 @@ export const getQuestionsFromUserAnswers = async (userId) => {
 export const addVote = async (questionId, userId, isUpVote) => {
   try {
     const res = await axiosJWT.post(
-      `${process.env.REACT_APP_API_URL_BACKEND}/question/questions/${questionId}/vote`,
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/${questionId}/vote`,
       { questionId, userId, isUpVote }
     );
     return res.data;
@@ -134,11 +135,24 @@ export const getStatisticQuestion = async (userQues, year, month) => {
   return response.data;
 };
 
-export const getAllQuestionByActive = async (active) => {
-  const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?active=${active}`);
+// export const getAllQuestionByActive = async (active) => {
+//   const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question?active=${active}`);
+//   return response.data;
+// };
+
+export const getAllQuestionByActive = async (active, page = 1, limit = 10) => {
+  const response = await axios.get(
+    `${process.env.REACT_APP_API_URL_BACKEND}/question/get-all-question`, {
+    params: {
+      active,
+      page,
+      limit,
+    },
+  }
+  );
+  console.log("RES", response.data)
   return response.data;
 };
-
 
 // export const updateAnswerCount = async (id, data) => {
 //   try {

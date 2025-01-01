@@ -1,4 +1,5 @@
 import axios from "axios";
+export const axiosJWT = axios.create();
 
 // Thêm câu trả lời
 export const addAns = async (data) => {
@@ -9,6 +10,11 @@ export const addAns = async (data) => {
 // Lấy tất cả câu trả lời theo ID câu hỏi
 export const getAllAns = async (id) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-all/${id}`);
+    return res.data;
+};
+
+export const getDetailsAnswer = async (id) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-detail-answer/${id}`);
     return res.data;
 };
 
@@ -33,3 +39,22 @@ export const getStatisticAnswer = async (userAns, year, month) => {
     const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-statistic?userAns=${userAns}&&year=${year}&&month=${month}`);
     return response.data;
   };
+
+export const addVote = async (answerId, userId, isUpVote) => {
+  try {
+    const res = await axiosJWT.post(
+      `${process.env.REACT_APP_API_URL_BACKEND}/answer/${answerId}/vote`,
+      { answerId, userId, isUpVote }
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi khi thêm vote.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
+  
