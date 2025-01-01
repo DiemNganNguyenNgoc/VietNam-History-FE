@@ -17,9 +17,10 @@ import { createSaved } from "../../services/SavedService";
 import Pagination from "../../components/Pagination/Pagination";
 
 const QuestionPage = () => {
-  const location = useLocation()
+  const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  console.log("user1", user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
   const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
@@ -34,7 +35,6 @@ const QuestionPage = () => {
 
   const navigate = useNavigate();
 
- 
   const [filters, setFilters] = useState({
     no_answers: false,
     no_accepted_answer: false,
@@ -65,8 +65,6 @@ const QuestionPage = () => {
     queryKey: ["questions", currentPage], // Thêm currentPage vào queryKey để phản ánh tham số phân trang
     queryFn: () => getAllQuesByActive(currentPage, questionsPerPage),
   });
-
-
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
@@ -155,12 +153,15 @@ const QuestionPage = () => {
 
   const handleAskQuestionClick = () => {
     if (!user?.id) {
-      alert ('Please log in to ask question!')
-      navigate('/login', { state: location?.pathname })
+      alert("Please log in to ask question!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a question at this time."
+      );
     } else {
       navigate("/askquestion");
     }
-    
   };
 
    const handleQuestionClick = async (questionId) => {
@@ -323,7 +324,7 @@ const QuestionPage = () => {
             fontWeight: "600",
           }}
         >
-         {questions.length} questions
+          {questions.length} questions
         </p>
         <br />
         <SortBtn />
@@ -348,7 +349,10 @@ const QuestionPage = () => {
           ) : Array.isArray(questions) && questions.length > 0 ? (
             questions.map((question) => {
               console.log("question", question);
-              console.log("Questions length:", Array.isArray(questions) ? questions.length : "Not an array");
+              console.log(
+                "Questions length:",
+                Array.isArray(questions) ? questions.length : "Not an array"
+              );
 
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
@@ -374,8 +378,8 @@ const QuestionPage = () => {
                     tags={
                       question.tags
                         ? question.tags.map(
-                          (tagId) => tags[tagId]?.name || tagId
-                        )
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
                         : []
                     } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}

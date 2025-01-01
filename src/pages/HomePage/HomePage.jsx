@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import slider1 from '../../assets/image/slider1.webp';
-import slider2 from '../../assets/image/slider2.webp';
-import slider3 from '../../assets/image/slider3.webp';
+import slider1 from "../../assets/image/slider1.webp";
+import slider2 from "../../assets/image/slider2.webp";
+import slider3 from "../../assets/image/slider3.webp";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
-import SliderComponent from '../../components/SliderComponent/SliderComponent';
+import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import SortBtnHome from '../../components/SortBtnHome/SortBtnHome';
+import SortBtnHome from "../../components/SortBtnHome/SortBtnHome";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
@@ -15,12 +15,11 @@ import * as TagService from "../../services/TagService";
 import { useSelector } from "react-redux";
 
 function HomePage() {
-
-/////////------xét login---------///////////////
-const location = useLocation()
+  /////////------xét login---------///////////////
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("interesting");
-  const user=useSelector((state)=>state.user)
+  const user = useSelector((state) => state.user);
 
   const navigate = useNavigate();
 
@@ -33,7 +32,7 @@ const location = useLocation()
     const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-  
+
   const {
     isLoading: isLoadingQues,
     data: questions,
@@ -100,12 +99,15 @@ const location = useLocation()
 
   const handleAskQuestionClick = () => {
     if (!user?.id) {
-      alert ('Please log in to ask question!')
-      navigate('/login', { state: location?.pathname })
+      alert("Please log in to ask question!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a question at this time."
+      );
     } else {
       navigate("/askquestion");
     }
-    
   };
 
   const handleQuestionClick = async (questionId) => {
@@ -123,19 +125,20 @@ const location = useLocation()
   };
   
   return (
-    <div className="container mt-4" >
+    <div className="container mt-4">
       <div>
         <SliderComponent arrImg={[slider1, slider2, slider3]} />
       </div>
       <br></br>
       <div className="row">
         <div className="col">
-          <span className='title'>TOP QUESTION MAY INTEREST YOU</span>
+          <span className="title">TOP QUESTION MAY INTEREST YOU</span>
         </div>
-        <div className="col-2" style={{ marginTop: '10px' }}>
+        <div className="col-2" style={{ marginTop: "10px" }}>
           <ButtonComponent
             textButton="Ask question"
-            onClick={handleAskQuestionClick} />
+            onClick={handleAskQuestionClick}
+          />
         </div>
       </div>
       <SortBtnHome></SortBtnHome>
@@ -155,7 +158,13 @@ const location = useLocation()
                     reputation={user?.reputation || 0}
                     followers={user?.followerCount || 0}
                     title={question.title}
-                    tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
+                    tags={
+                      question.tags
+                        ? question.tags.map(
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
+                        : []
+                    } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}
                     views={question.view}
                     answers={question.answerCount}
@@ -165,13 +174,12 @@ const location = useLocation()
               );
             })
           ) : (
-            <LoadingComponent isLoading={isLoadingQues}/>
+            <LoadingComponent isLoading={isLoadingQues} />
           )}
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
