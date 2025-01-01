@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as AdminService from "../../services/AdminService";
 import * as UserService from "../../services/UserService";
 import { useMutationHook } from "../../hooks/useMutationHook";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
@@ -14,6 +14,9 @@ import { updateUser } from "../../redux/slides/userSlide";
 import { updateAdmin } from "../../redux/slides/adminSlide";
 
 const LogInPage = () => {
+  ////////////---------xét login----------////////////
+  const location = useLocation()
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -69,19 +72,20 @@ const LogInPage = () => {
 
   const handleGetDetailsUser = async (id, token) => {
     try {
-    const res = await UserService.getDetailsUser(id, token);
-    const followingUsers = res?.data?.following || [];
-    localStorage.setItem("followingUsers", JSON.stringify(followingUsers)); // Lưu danh sách vào localStorage
+      const res = await UserService.getDetailsUser(id, token);
+      const followingUsers = res?.data?.following || [];
+      localStorage.setItem("followingUsers", JSON.stringify(followingUsers)); // Lưu danh sách vào localStorage
 
-    dispatch(
-      updateUser({
-        ...res?.data,
-        access_token: token,
-      })
-    );
-  } catch (error) {
-    console.error("Error fetching user details:", error);
-  }  };
+      dispatch(
+        updateUser({
+          ...res?.data,
+          access_token: token,
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
 
   const handleGetDetailsAdmin = async (id, token) => {
     const res = await AdminService.getDetailsAdmin(id, token);
@@ -111,14 +115,19 @@ const LogInPage = () => {
       },
       {
         onSuccess: (data) => {
-          setErrorMessage(""); // Xóa lỗi nếu thành công
+          setErrorMessage("");
           setTimeout(() => {
-            setShowLoading(false); // Ẩn loading sau 0.5s
-            navigate("/"); // Điều hướng nếu thành công
+            setShowLoading(false);
+
+            if (location?.state) {
+              navigate(location?.state)
+            }
+            else {
+              navigate('/')
+            }
           }, 500);
         },
         onError: (error) => {
-          // console.error("Login failed: ", error);
           // Trích xuất thông báo lỗi chi tiết
           const errorMessage =
             error.message?.message || error.message || "Đăng nhập thất bại.";

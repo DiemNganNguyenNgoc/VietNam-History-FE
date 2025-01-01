@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import slider1 from '../../assets/image/slider1.webp';
 import slider2 from '../../assets/image/slider2.webp';
 import slider3 from '../../assets/image/slider3.webp';
@@ -12,9 +12,15 @@ import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
 import { useQuery } from "@tanstack/react-query";
 import * as TagService from "../../services/TagService";
+import { useSelector } from "react-redux";
 
 function HomePage() {
+
+/////////------xét login---------///////////////
+const location = useLocation()
+
   const [activeTab, setActiveTab] = useState("interesting");
+  const user=useSelector((state)=>state.user)
 
   const navigate = useNavigate();
 
@@ -93,7 +99,13 @@ function HomePage() {
   }
 
   const handleAskQuestionClick = () => {
-    navigate("/askquestion");
+    if (!user?.id) {
+      alert ('Please log in to ask question!')
+      navigate('/login', { state: location?.pathname })
+    } else {
+      navigate("/askquestion");
+    }
+    
   };
 
   const handleQuestionClick = (questionId) => {

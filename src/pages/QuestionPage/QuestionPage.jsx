@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
@@ -17,6 +17,7 @@ import { createSaved } from "../../services/SavedService";
 import Pagination from "../../components/Pagination/Pagination";
 
 const QuestionPage = () => {
+  const location = useLocation()
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
@@ -153,7 +154,13 @@ const QuestionPage = () => {
   };
 
   const handleAskQuestionClick = () => {
-    navigate("/askquestion");
+    if (!user?.id) {
+      alert ('Please log in to ask question!')
+      navigate('/login', { state: location?.pathname })
+    } else {
+      navigate("/askquestion");
+    }
+    
   };
 
   const handleQuestionClick = (questionId) => {
