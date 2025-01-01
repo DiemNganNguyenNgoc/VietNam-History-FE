@@ -117,8 +117,8 @@ const QuestionDetails = () => {
             // Kiểm tra trạng thái vote của câu trả lời
             const status = await AnswerVoteService.checkVoteStatus(user?.id, answer._id);
             return { answerId: answer._id, voteStatus: status.data };
-            
-             // Trả về trạng thái vote
+
+            // Trả về trạng thái vote
           } catch (error) {
             console.error('Error checking vote status for answer:', error);
             return { answerId: answer._id, voteStatus: null }; // Trả về null nếu có lỗi
@@ -179,7 +179,7 @@ const QuestionDetails = () => {
         // Nếu chưa vote, thực hiện downvote
         await QuestionService.addVote(questionId, user?.id, false);
         setQuesVoteStatus({ hasVoted: true, type: false });
-        
+
       } else if (quesVoteStatus.type === false) {
         // Nếu đã downvote, hủy downvote
         await QuestionService.addVote(questionId, user?.id, false);
@@ -229,7 +229,7 @@ const QuestionDetails = () => {
         }));
         newUpVoteCount += 1;
       }
-  
+
       // Cập nhật lại số lượng vote sau khi thực hiện action
       setAnswers((prevAnswers) =>
         prevAnswers.map((answer) =>
@@ -242,9 +242,9 @@ const QuestionDetails = () => {
       console.error('Error handling upvote for answer:', error);
     }
   };
-  
-  
-  
+
+
+
 
   // Hàm xử lý DownVote
   const handleAnsDownVote = async (answerId) => {
@@ -278,7 +278,7 @@ const QuestionDetails = () => {
         }));
         newDownVoteCount += 1;
       }
-  
+
       // Cập nhật lại số lượng vote sau khi thực hiện action
       setAnswers((prevAnswers) =>
         prevAnswers.map((answer) =>
@@ -290,8 +290,8 @@ const QuestionDetails = () => {
     } catch (error) {
       console.error('Error handling downvote for answer:', error);
     }
-  }  
-  
+  }
+
 
   //lấy thông tin người hỏi
   useEffect(() => {
@@ -417,6 +417,8 @@ const QuestionDetails = () => {
   const handleTextCom = (value) => {
     setTextCom(value);
   };
+
+  console.log('vvjjbh', questionDetail)
 
   // useEffect(() => {
   //   if (question?.id) {
@@ -701,8 +703,8 @@ const QuestionDetails = () => {
       alert("An error occurred while reporting the comment.");
     }
   };
-  const quesDate=new Date(questionDetail.data?.createdAt).toLocaleString()
-  
+  const quesDate = new Date(questionDetail.data?.createdAt).toLocaleString()
+
   return (
     <div className="container my-4">
       {/* Phần người đăng */}
@@ -720,49 +722,51 @@ const QuestionDetails = () => {
         <div>
           <strong>{detailAsker.data?.name || "Anonymous"}</strong>
           <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
-            Asked { quesDate|| "Unknown time"}
+            Asked {quesDate || "Unknown time"}
           </p>
         </div>
       </div>
 
       {/* Phần tiêu đề câu hỏi */}
       <div className="mb-4">
-      <h3>{questionDetail.data?.title || "Question Title"}</h3>
-      <p className="text-secondary">
-        <span className="me-3">{questionDetail.data?.view} views</span>
-        <div>
-          <button
-            className="btn me-2"
-            style={{
-              backgroundColor: quesVoteStatus.type === true ? 'green' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
-              color: 'white',
-            }}
-            onClick={() => handleQuesUpVote()}
-          >
-            ▲
-          </button>
-          +{questionDetail.data?.upVoteCount}
-        </div>
-        <div style={{ marginTop: "10px" }}>
-          <button
-            className="btn"
-            style={{
-              backgroundColor: quesVoteStatus.type === false ? 'red' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
-              color: 'white',
-              marginRight: "12px",
-            }}
-            onClick={() => handleQuesDownVote()}
-          >
-            ▼
-          </button>
-          -{questionDetail.data?.downVoteCount}
-        </div>
-      </p>
-    </div>
+        <h3>{questionDetail.data?.title || "Question Title"}</h3>
+        <p className="text-secondary">
+          <span className="me-3">{questionDetail.data?.view} views</span>
+          <div>
+            <button
+              className="btn me-2"
+              style={{
+                backgroundColor: quesVoteStatus.type === true ? 'green' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
+                color: 'white',
+              }}
+              onClick={() => handleQuesUpVote()}
+            >
+              ▲
+            </button>
+            +{questionDetail.data?.upVoteCount}
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            <button
+              className="btn"
+              style={{
+                backgroundColor: quesVoteStatus.type === false ? 'red' : quesVoteStatus.hasVoted === false ? 'gray' : 'gray',
+                color: 'white',
+                marginRight: "12px",
+              }}
+              onClick={() => handleQuesDownVote()}
+            >
+              ▼
+            </button>
+            -{questionDetail.data?.downVoteCount}
+          </div>
+        </p>
+      </div>
+
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
-        <p>{questionDetail.data?.content || "No content provided"}</p>
+        <p className="mt-3" style={{ fontSize: '20px' }}>Content:</p>
+        <p dangerouslySetInnerHTML={{ __html: questionDetail.data?.content || "No content provided" }}></p>
         <div className="bg-dark text-white p-3 rounded">
           {questionDetail.data?.images?.map((img, index) => (
             <img
@@ -773,11 +777,11 @@ const QuestionDetails = () => {
             />
           ))}
         </div>
-        <p className="mt-3">Output:</p>
+
+        <p className="mt-3" style={{ fontSize: '20px' }}>Expected Result:</p>
         <div className="bg-light border rounded p-2">
-          <code>9 8 7 6 5 4 3 2 1 0</code>
+          <p dangerouslySetInnerHTML={{ __html: questionDetail.data?.note || "" }}></p>
         </div>
-        <p className="mt-3">{questionDetail.data?.note || ""}</p>
 
         {/* Tags chủ đề */}
         <div className="mt-4">
@@ -791,6 +795,7 @@ const QuestionDetails = () => {
           ))}
         </div>
       </div>
+
 
       {/* Phần bình luận */}
       <div className="mb-4">
@@ -829,85 +834,85 @@ const QuestionDetails = () => {
 
       {/* Danh sách câu trả lời */}
       <div>
-  <h5 className="mb-3">{answers.length} Answer{answers.length > 1 ? 's' : ''}</h5>
-  {Array.isArray(answers) && answers.length > 0 ? (
-    answers.map((answer, index) => (
-      <div key={index} className="d-flex align-items-start p-3 border rounded mb-3">
-        {/* Phần bỏ phiếu nằm bên trái, cùng dòng với nội dung */}
-        <div className="vote-buttons me-3 d-flex flex-column align-items-center">
-          <div>
-            <button
-              className="btn me-2"
-              style={{
-                backgroundColor: ansVoteStatus[answer._id]?.type === true ? 'green' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
-                color: 'white',
-              }}
-              onClick={() => handleAnsUpVote(answer._id)}
-            >
-              ▲
-            </button>
-            +{answer.upVoteCount}
-          </div>
-          <div style={{ marginTop: "10px" }}>
-            <button
-              className="btn"
-              style={{
-                backgroundColor: ansVoteStatus[answer._id]?.type === false ? 'red' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
-                color: 'white',
-                marginRight: "12px",
-              }}
-              onClick={() => handleAnsDownVote(answer._id)}
-            >
-              ▼
-            </button>
-            -{answer.downVoteCount}
-          </div>
-        </div>
+        <h5 className="mb-3">{answers.length} Answer{answers.length > 1 ? 's' : ''}</h5>
+        {Array.isArray(answers) && answers.length > 0 ? (
+          answers.map((answer, index) => (
+            <div key={index} className="d-flex align-items-start p-3 border rounded mb-3">
+              {/* Phần bỏ phiếu nằm bên trái, cùng dòng với nội dung */}
+              <div className="vote-buttons me-3 d-flex flex-column align-items-center">
+                <div>
+                  <button
+                    className="btn me-2"
+                    style={{
+                      backgroundColor: ansVoteStatus[answer._id]?.type === true ? 'green' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
+                      color: 'white',
+                    }}
+                    onClick={() => handleAnsUpVote(answer._id)}
+                  >
+                    ▲
+                  </button>
+                  +{answer.upVoteCount}
+                </div>
+                <div style={{ marginTop: "10px" }}>
+                  <button
+                    className="btn"
+                    style={{
+                      backgroundColor: ansVoteStatus[answer._id]?.type === false ? 'red' : ansVoteStatus[answer._id]?.hasVoted === false ? 'gray' : 'gray',
+                      color: 'white',
+                      marginRight: "12px",
+                    }}
+                    onClick={() => handleAnsDownVote(answer._id)}
+                  >
+                    ▼
+                  </button>
+                  -{answer.downVoteCount}
+                </div>
+              </div>
 
-        {/* Phần hiển thị câu trả lời nằm bên phải */}
-        <div className="answer-content flex-grow-1">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            {/* Thông tin người trả lời */}
-            <div className="d-flex align-items-center">
-              <img
-                src="https://via.placeholder.com/40"
-                alt="Answerer Avatar"
-                className="rounded-circle me-2"
-                width="40"
-                height="40"
-              />
-              <div>
-                <strong>{answer.userName || "Loading..."}</strong>
-                <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
-                  Answered {new Date(answer.createdAt).toLocaleString()}
-                </p>
+              {/* Phần hiển thị câu trả lời nằm bên phải */}
+              <div className="answer-content flex-grow-1">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  {/* Thông tin người trả lời */}
+                  <div className="d-flex align-items-center">
+                    <img
+                      src="https://via.placeholder.com/40"
+                      alt="Answerer Avatar"
+                      className="rounded-circle me-2"
+                      width="40"
+                      height="40"
+                    />
+                    <div>
+                      <strong>{answer.userName || "Loading..."}</strong>
+                      <p className="text-muted mb-0" style={{ fontSize: "0.9em" }}>
+                        Answered {new Date(answer.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Nút Report */}
+                  <button
+                    className={`report-button ${answer.isReported ? "reported" : ""}`}
+                    disabled={answer.isReported} // Vô hiệu hóa nút nếu đã report
+                    onClick={() => handleAnswerReport(answer._id)} // Gọi hàm report
+                  >
+                    {answer.isReported ? "Reported" : "Report"}
+                  </button>
+                </div>
+
+                <p>{parse(answer.content)}</p>
+                {answer.images?.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img || "https://via.placeholder.com/150"}
+                    alt={`Answer Image ${index}`}
+                    className="img-fluid rounded my-2"
+                  />
+                ))}
               </div>
             </div>
-            {/* Nút Report */}
-            <button
-              className={`report-button ${answer.isReported ? "reported" : ""}`}
-              disabled={answer.isReported} // Vô hiệu hóa nút nếu đã report
-              onClick={() => handleAnswerReport(answer._id)} // Gọi hàm report
-            >
-              {answer.isReported ? "Reported" : "Report"}
-            </button>
-          </div>
-
-          <p>{parse(answer.content)}</p>
-          {answer.images?.map((img, index) => (
-            <img
-              key={index}
-              src={img || "https://via.placeholder.com/150"}
-              alt={`Answer Image ${index}`}
-              className="img-fluid rounded my-2"
-            />
-          ))}
-        </div>
-      </div>
-    ))
-  ) : (
-    <p>No answers available.</p>
-  )}
+          ))
+        ) : (
+          <p>No answers available.</p>
+        )}
 
         {/* Thêm các câu trả lời khác */}
         <AnswerEditor

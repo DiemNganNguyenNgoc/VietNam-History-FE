@@ -108,9 +108,20 @@ const location = useLocation()
     
   };
 
-  const handleQuestionClick = (questionId) => {
-    navigate(`/question-detail/${questionId}`); // Chuyển hướng đến trang chi tiết câu hỏi
+  const handleQuestionClick = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User ID is missing");
+        return;
+      }
+      await QuestionService.updateViewCount(questionId, user.id);
+  
+      navigate(`/question-detail/${questionId}`);
+    } catch (error) {
+      console.error("Failed to update view count:", error.response?.data || error.message);
+    }
   };
+  
   return (
     <div className="container mt-4" >
       <div>

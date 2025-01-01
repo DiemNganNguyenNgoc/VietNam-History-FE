@@ -181,3 +181,9 @@ export const getAllQuestionByActive = async (active, page = 1, limit = 10) => {
 //     }
 //   }
 // };
+
+
+export const updateViewCount = async (id, userId) => {
+  const response = await axios.put(`${process.env.REACT_APP_API_URL_BACKEND}/question/update-view/${id}/${userId}`);
+  return response.data;
+};

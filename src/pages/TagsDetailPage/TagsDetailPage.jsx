@@ -7,6 +7,7 @@ import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService"; // Giả sử bạn có dịch vụ này để lấy thông tin người dùng
 import { useQuery } from "@tanstack/react-query";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
+import { useSelector } from "react-redux";
 
 const TagsDetailPage = () => {
     const { tagId } = useParams();
@@ -25,6 +26,7 @@ const TagsDetailPage = () => {
     });
     const [users, setUsers] = useState({});
     const [tags, setTags] = useState({});
+    const user = useSelector((state)=>state.user)
 
     const handleCheckboxChange = (event) => {
         const { name, checked } = event.target;
@@ -112,9 +114,22 @@ const TagsDetailPage = () => {
         return <p>Loading...</p>;
     }
 
-    const handleQuestionClick = (questionId) => {
-        navigate(`/question-detail/${questionId}`);
-    };
+      const handleQuestionClick = async (questionId) => {
+        try {
+          if (!user?.id) {
+            console.error("User ID is missing");
+            return;
+          }
+      
+          // Gọi API updateViewCount
+          await QuestionService.updateViewCount(questionId, user.id);
+      
+          // Điều hướng sau khi gọi API thành công
+          navigate(`/question-detail/${questionId}`);
+        } catch (error) {
+          console.error("Failed to update view count:", error.response?.data || error.message);
+        }
+      };
 
     return (
         <div
