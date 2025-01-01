@@ -68,9 +68,20 @@ const LogInPage = () => {
   }, [isSuccess]);
 
   const handleGetDetailsUser = async (id, token) => {
+    try {
     const res = await UserService.getDetailsUser(id, token);
-    dispatch(updateUser({ ...res?.data, access_token: token }));
-  };
+    const followingUsers = res?.data?.following || [];
+    localStorage.setItem("followingUsers", JSON.stringify(followingUsers)); // Lưu danh sách vào localStorage
+
+    dispatch(
+      updateUser({
+        ...res?.data,
+        access_token: token,
+      })
+    );
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+  }  };
 
   const handleGetDetailsAdmin = async (id, token) => {
     const res = await AdminService.getDetailsAdmin(id, token);
