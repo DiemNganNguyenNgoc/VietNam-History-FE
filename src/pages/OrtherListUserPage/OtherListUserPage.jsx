@@ -100,12 +100,19 @@ const OtherListUserPage = () => {
       // };
 
       dispatch(
-        setFollowStatus({
-          userId,
-          isFollowed: !isFollowed,
-          followerCount: isFollowed ? followerCount - 1 : followerCount + 1,
-          // updateUserFollowStatus, 
-        })
+        setAllUser(
+          allUser.map((user) =>
+            user._id === userId
+              ? {
+                  ...user,
+                  isFollowed: !isFollowed,
+                  followerCount: isFollowed
+                    ? followerCount - 1
+                    : followerCount + 1,
+                }
+              : user
+          )
+        )
       );
 
       alert(isFollowed ? "Unfollowed successfully!" : "Followed successfully!");
