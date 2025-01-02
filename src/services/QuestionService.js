@@ -154,6 +154,34 @@ export const getAllQuestionByActive = async (active, page = 1, limit = 10) => {
   return response.data;
 };
 
+export const searchQuestion = async (tags = [], keyword = '', page = 1, limit = 10, sort = {}) => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/search`,
+      {
+        params: {
+          tags: tags.join(','), // Join tags array into a comma-separated string
+          keyword,
+          page,
+          limit,
+          sortField: sort.field || '', // Optional sorting field
+          sortOrder: sort.order || '', // Optional sorting order
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi khi tìm kiếm câu hỏi.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
+
+
 // export const updateAnswerCount = async (id, data) => {
 //   try {
 //     const res = await axiosJWT.put(

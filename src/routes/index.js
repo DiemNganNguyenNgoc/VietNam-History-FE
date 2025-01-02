@@ -1,5 +1,6 @@
 import HomePage from "../pages/HomePage/HomePage";
 import QuestionPage from "../pages/QuestionPage/QuestionPage";
+import SearchQuestionPage from "../pages/SearchQuestionPage/SearchQuestionPage"; 
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
 import LogInPage from "../pages/LogInPage/LogInPage";
@@ -53,6 +54,12 @@ export const routes = [
   {
     path: "/question",
     page: QuestionPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/search-results",
+    page: SearchQuestionPage,
     isShowHeader: true,
   },
 

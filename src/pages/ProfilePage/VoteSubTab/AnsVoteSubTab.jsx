@@ -59,44 +59,48 @@ const AnsVoteSubTab = () => {
       </div>
       <div className="container my-4">
         {answers.map((vote, index) => (
-          <div
-            key={index}
-            className="d-flex flex-row align-items-center border rounded p-3 mb-3"
-            style={{
-              backgroundColor: "#F2F5FF", // Màu xanh nhạt giống ảnh
-              borderColor: "#d0e6f5", // Màu viền nhẹ để hài hòa với nền
-            }}
-            onClick={() => handleQuestionClick(vote.question._id)}
-          >
-            {/* Phần loại vote */}
-            <div className="me-4" style={{ width: "100px", fontWeight: "bold" }}>
-              {vote.voteType === true ? (
-                <span className="text-success">upvote</span>
-              ) : (
-                <span className="text-danger">downvote</span>
-              )}
-            </div>
-
-            {/* Nội dung câu hỏi */}
-            <div className="flex-grow-1">
-              <div className="question_title">{vote.question.title || 'Chưa có tiêu đề'}</div>
-              <div className="mt-2">
-                Answer of <span style={{ fontWeight: 'bold' }}>{vote.userAns.name}</span>
+          // Kiểm tra nếu có tiêu đề câu hỏi mới render vote
+          vote.question?.title && (
+            <div
+              key={index}
+              className="d-flex flex-row align-items-center border rounded p-3 mb-3"
+              style={{
+                backgroundColor: "#F2F5FF", // Màu xanh nhạt giống ảnh
+                borderColor: "#d0e6f5", // Màu viền nhẹ để hài hòa với nền
+              }}
+              onClick={() => handleQuestionClick(vote.question._id)}
+            >
+              {/* Phần loại vote */}
+              <div className="me-4" style={{ width: "100px", fontWeight: "bold" }}>
+                {vote.voteType === true ? (
+                  <span className="text-success">upvote</span>
+                ) : (
+                  <span className="text-danger">downvote</span>
+                )}
+              </div>
+  
+              {/* Nội dung câu hỏi */}
+              <div className="flex-grow-1">
+                <div className="question_title">{vote.question.title}</div>
+                <div className="mt-2">
+                  Answer of <span style={{ fontWeight: 'bold' }}>{vote.userAns.name}</span>
+                </div>
+              </div>
+  
+              {/* Thời gian */}
+              <div
+                className="text-muted text-end"
+                style={{ fontSize: "15px", minWidth: "150px" }}
+              >
+                voted at {new Date(vote.voteCreatedAt).toLocaleString()}
               </div>
             </div>
-
-            {/* Thời gian */}
-            <div
-              className="text-muted text-end"
-              style={{ fontSize: "15px", minWidth: "150px" }}
-            >
-              voted at {new Date(vote.voteCreatedAt).toLocaleString()}
-            </div>
-          </div>
+          )
         ))}
       </div>
     </div>
   );
+  
 };
 
 export default AnsVoteSubTab;
