@@ -7,19 +7,48 @@ import * as UserService from "../../services/UserService";
 import * as AdminService from "../../services/AdminService";
 import { resetUser } from "../../redux/slides/userSlide";
 import { resetAdmin } from "../../redux/slides/adminSlide";
+import * as  QuestionService from "../../services/QuestionService";
+import * as  TagService from "../../services/TagService";
+import './SearchButton.css';
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
-  console.log("user", user);
-
   const admin = useSelector((state) => state.admin);
-  console.log("admin", admin);
-
   const dispatch = useDispatch();
 
   const [img, setImg] = useState("");
   const [name, setName] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState(""); // State to store the search input
+  const [searchResults, setSearchResults] = useState([]); // State to store search results
+  const [tags, setTags] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const fetchTags = async () => {
+  //     try {
+  //       const tagsData = await TagService.getAllTag(); // Gọi API để lấy danh sách tags
+  //       setTags(tagsData); // Lưu tags vào state
+  //     } catch (error) {
+  //       console.error("Error fetching tags:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTags();
+  // }, []);
+
+  const checkIfTagExists = async (tag) => {
+    try {
+      // Gọi API để lấy danh sách tag (dựa trên API của bạn)
+      const tags = await TagService.getAllTag();
+      return tags.some(t => t.name.toLowerCase() === tag.toLowerCase());  // Kiểm tra xem tag có tồn tại không
+    } catch (error) {
+      console.error("Error checking if tag exists:", error);
+      return false;
+    }
+  };
 
   const handleNavigateLogin = () => {
     navigate("/login");
@@ -43,7 +72,47 @@ const HeaderComponent = () => {
       window.location.assign("/profile");
     }
   };
+
+  const handleSearch = async () => {
+    try {
+      let tagList = [];
+      let keyword = "";
   
+      // Kiểm tra nếu người dùng nhập các tag phân tách bằng dấu phẩy
+      if (searchKeyword.includes(",")) {
+        tagList = searchKeyword
+          .split(",") // Tách chuỗi theo dấu phẩy
+          .map((tag) => tag.trim()) // Loại bỏ khoảng trắng thừa
+          .filter((tag) => tag !== ""); // Loại bỏ tag rỗng
+      } else {
+        // Nếu không phải danh sách tag, kiểm tra từ khóa có phải là tag không
+        const isTagSearch = await checkIfTagExists(searchKeyword);
+        if (isTagSearch) {
+          tagList = [searchKeyword];
+        } else {
+          keyword = searchKeyword; // Tìm kiếm theo từ khóa
+        }
+      }
+  
+      // Gửi yêu cầu tìm kiếm
+      const results = await QuestionService.searchQuestion(
+        tagList, // Danh sách các tag
+        keyword, // Từ khóa tìm kiếm
+        1, // Trang bắt đầu
+        10, // Số lượng kết quả trên mỗi trang
+        {} // Tuỳ chọn sắp xếp
+      );
+  
+      setSearchResults(results); // Lưu kết quả tìm kiếm vào state
+      navigate("/search-results", {
+        state: { searchKeyword, searchResults: results },
+      });
+    } catch (error) {
+      console.error("Search error:", error);
+    }
+  };
+  
+
 
   const content = (
     <div>
@@ -73,10 +142,15 @@ const HeaderComponent = () => {
   );
 
   useEffect(() => {
-    // console.log("User state:", user); // To debug the user state after logout
     setName(user?.name || admin?.name);
     setImg(user?.img || admin?.img);
   }, [user, admin]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <>
@@ -86,42 +160,56 @@ const HeaderComponent = () => {
             SHARING-CODE
           </a>
 
-          <input
-            class="form-control"
-            type="text"
-            placeholder="Search question"
-            style={{ width: "500px", height: "35px" }}
-          ></input>
+          <div className="search-container">
+      <input
+        className="form-control search-input"
+        type="text"
+        placeholder="Search question"
+        value={searchKeyword}
+        onChange={(e) => setSearchKeyword(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <button onClick={handleSearch} className="search-button">Search</button>
+    </div>
+
+          {/* Display search results */}
+          {searchResults.length > 0 && (
+            <div>
+              {searchResults.map((result, index) => (
+                <div key={index}>
+                  <a href={`/question/${result.id}`}>{result.title}</a>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div>
             <div className="btn">
               {user?.name || admin?.name ? (
-                <>
-                  <Popover content={content} trigger="click">
-                    <div
+                <Popover content={content} trigger="click">
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <i
+                      className="bi bi-person-circle"
+                      style={Styles.iconHeader}
+                    ></i>
+                    <span
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
+                        marginTop: "0px",
+                        fontSize: "15px",
+                        fontWeight: "500",
+                        color: "#FFFFFF",
                       }}
                     >
-                      <i
-                        class="bi bi-person-circle"
-                        style={Styles.iconHeader}
-                      ></i>
-                      <span
-                        style={{
-                          marginTop: "0px",
-                          fontSize: "15px",
-                          fontWeight: "500",
-                          color: "#FFFFFF",
-                        }}
-                      >
-                        {user.name || admin.name}
-                      </span>
-                    </div>
-                  </Popover>
-                </>
+                      {user.name || admin.name}
+                    </span>
+                  </div>
+                </Popover>
               ) : (
                 <div
                   onClick={handleNavigateLogin}
@@ -150,64 +238,60 @@ const HeaderComponent = () => {
             <div className="btn">
               <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
             </div>
-
           </div>
         </div>
       </nav>
 
-      {/* <hr style={{ background: 'black', height: '2px', border: 'none' }} /> */}
-
-      {/* Tại chưa dẫn link nên nó cảnh báo thôi, kh sao đâu nha */}
       <nav
         className="navbar"
         style={{ backgroundColor: "#023E73", height: "65px" }}
       >
-        <div class="container">
-          <ul class="nav nav-underline">
-            <li class="nav-item">
-              <a class="nav-link" href="/" style={Styles.textHeader}>
-                <i class="bi bi-house-door-fill" style={Styles.iconHeader}></i>
+        <div className="container">
+          <ul className="nav nav-underline">
+            <li className="nav-item">
+              <a className="nav-link" href="/" style={Styles.textHeader}>
+                <i className="bi bi-house-door-fill" style={Styles.iconHeader}></i>
                 Home
               </a>
             </li>
           </ul>
-          <ul class="nav nav-underline">
-            <li class="nav-item">
-              <a class="nav-link" href="/question" style={Styles.textHeader}>
-                <i class="bi bi-chat-left-fill" style={Styles.iconHeader}></i>
+          <ul className="nav nav-underline">
+            <li className="nav-item">
+              <a className="nav-link" href="/question" style={Styles.textHeader}>
+                <i className="bi bi-chat-left-fill" style={Styles.iconHeader}></i>
                 Questions
               </a>
             </li>
           </ul>
-          <ul class="nav nav-underline">
-            <li class="nav-item">
-              <a class="nav-link" href="/tag" style={Styles.textHeader}>
-                <i class="bi bi-tags-fill" style={Styles.iconHeader}></i>
+          <ul className="nav nav-underline">
+            <li className="nav-item">
+              <a className="nav-link" href="/tag" style={Styles.textHeader}>
+                <i className="bi bi-tags-fill" style={Styles.iconHeader}></i>
                 Tags
               </a>
             </li>
           </ul>
-          <ul class="nav nav-underline">
-            <li class="nav-item">
+          <ul className="nav nav-underline">
+            <li className="nav-item">
               <a
-                class="nav-link"
+                className="nav-link"
                 href="/other-list-user"
                 style={Styles.textHeader}
               >
-                <i class="bi bi-people-fill" style={Styles.iconHeader}></i>
+                <i className="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
               </a>
             </li>
           </ul>
           {admin?.isAdmin && (
-            <ul class="nav nav-underline">
-              <li class="nav-item">
+            <ul className="nav nav-underline">
+              <li className="nav-item">
                 <a
-                  class="nav-link"
+                  className="nav-link"
                   href="/admin/manage"
                   style={Styles.textHeader}
                 >
-                  <i class="bi bi-gear" style={Styles.iconHeader}></i>
+                  <i className="bi bi-gear" style={Styles.iconHeader}></i>
                   Manage System
                 </a>
               </li>
