@@ -44,6 +44,7 @@ const QuestionDetails = () => {
   const [upVotes, setUpVotes] = useState(0); // Số lượt upvote hiện tại
   const [reportedCommentList, setReportedCommentList] = useState([]);
   const [reportedAnswerList, setReportedAnswerList] = useState([]);
+  const [comconten,setComConten] = useState("");
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -424,6 +425,10 @@ const QuestionDetails = () => {
     setTextCom(value);
   };
 
+  const handleContentCom = (value,n) => {
+    setComConten(value);
+  };
+
   console.log('vvjjbh', questionDetail)
 
   // useEffect(() => {
@@ -587,9 +592,9 @@ const QuestionDetails = () => {
     }
   }, [isSuccessCom, isErrorCom]);
 
-  //Lấy tất cả comment
+  //Lấy tất cả comment của 
   const getAllCom = async () => {
-    const res = await CommentService.getCommentByQuestionId(questionId);
+    const res = await CommentService.getAllComment(questionId);
     return res.data;
   };
 
@@ -601,6 +606,21 @@ const QuestionDetails = () => {
     queryKey: ["commentQuess"],
     queryFn: getAllCom,
   });
+
+  const useCommentsForAnswers = (answers) => {
+    return useQuery({
+      queryKey: ["commentsForAnswers", answers.map((a) => a.id)],
+      queryFn: async () => {
+        // Sử dụng Promise.all để xử lý đồng thời
+        const comments = await Promise.all(
+          answers.map((answer) => CommentService.getCommentByQuestionId(answer.id))
+        );
+        return comments;
+      },
+      enabled: !!answers?.length, // Chỉ chạy khi có danh sách câu trả lời
+    });
+  };
+  const { data: comments2, isLoading : isLoading2, error : error2 } = useCommentsForAnswers(answers);
 
   
 
@@ -614,7 +634,27 @@ const QuestionDetails = () => {
     const commentData = {
       content: TextCom,
       user: userAns,
-      answer: questionId,
+      question : questionId,
+    };
+
+    await mutationComment.mutateAsync(commentData);
+    setTextCom("");
+
+    reloadPage();
+   
+  }, [content, mutationComment, answers, user]);
+
+  const handleAddCommentClick2 = useCallback( async (answerId,n) => {
+
+    if (!userAns) {
+      alert("User ID is missing. Please log in again.");
+      return;
+    }
+
+    const commentData = {
+      content: comconten,
+      user: userAns,
+      answer : answerId,
     };
 
     await mutationComment.mutateAsync(commentData);
@@ -845,7 +885,9 @@ const QuestionDetails = () => {
       <div>
         <h5 className="mb-3">{answers.length} Answer{answers.length > 1 ? 's' : ''}</h5>
         {Array.isArray(answers) && answers.length > 0 ? (
-          answers.map((answer, index) => (
+          answers.map((answer, index) => {
+            const comments = useCommentsForAnswers[answer._id] || [];
+            return(
             <div key={index} className="d-flex align-items-start p-3 border rounded mb-3">
               {/* Phần bỏ phiếu nằm bên trái, cùng dòng với nội dung */}
               <div className="vote-buttons me-3 d-flex flex-column align-items-center">
@@ -875,8 +917,10 @@ const QuestionDetails = () => {
                     ▼
                   </button>
                   -{answer.downVoteCount}
+                  
                 </div>
               </div>
+              
 
               {/* Phần hiển thị câu trả lời nằm bên phải */}
               <div className="answer-content flex-grow-1">
@@ -916,10 +960,43 @@ const QuestionDetails = () => {
                     className="img-fluid rounded my-2"
                   />
                 ))}
+                <div >
+                <h5 className="mb-3"> Comments</h5>
+        {Array.isArray(comments) && comments.length > 0 ? (
+          comments.map((commentQues) => {
+            //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
+            return (
+              <Comment
+                name={commentQues.user.name || "Unknown"}
+                text={commentQues.content || "Unknown"}
+                date={new Date(commentQues.createdAt).toLocaleString()}
+                key={commentQues._id || commentQues.id || commentQues}
+                onReport={() => handleCommentReport(commentQues)}
+                isReported={reportedCommentList.includes(commentQues._id)}
+              />
+            );
+          })
+          ) : (
+          <p>No conmment available.</p>
+        )}
+      </div>
+                  
+        <textarea
+          className="form-control"
+          placeholder="Add a comment"
+          rows="2"
+          value={comconten}
+          onChange={(e) => handleContentCom(e.target.value)}
+        ></textarea>
+        <ButtonComponent
+        textButton="Submit comment"
+        onClick={()=>handleAddCommentClick2(answer.id,index)}
+      />
+      </div>
+      
               </div>
-            </div>
-          ))
-        ) : (
+            
+          )})) : (
           <p>No answers available.</p>
         )}
 

@@ -24,15 +24,7 @@ const Comment = ({ id, name, img, text, date, isReported, onReport ,isDelete,onc
           />
           <strong>{name}</strong>
         </div>
-        <div>
-          {isDelete === "True"? (
-        <button
-                        style={{ marginLeft: 10 }}
-                        className={"btn-danger"}
-                        disabled={isDelete}
-                        onClick={onclick1}
-                      > {isDelete ? "Delete" :""}</button>) :(null)}
-        </div>
+
         <button
           className={`report-button ${isReported ? "reported" : ""}`}
           type="text"
@@ -45,6 +37,14 @@ const Comment = ({ id, name, img, text, date, isReported, onReport ,isDelete,onc
         >
           {isReported ? "Reported" : "Report"}
         </button>
+        <button
+          className="btn btn-sm btn-light"
+          onClick={onclick1} // Truyền event vào hàm
+        >
+          <i className="bi bi-trash text-danger"></i>
+        </button>
+
+    
       </div>
       <p className="mb-1">{text}</p>
       <p className="text-muted" style={{ fontSize: "0.9em" }}>

@@ -10,6 +10,7 @@ import { updateUser } from "../../redux/slides/userSlide";
 import { Upload } from "antd";
 import { getBase64 } from "../../utils";
 import * as CommentService from "../../services/CommentService"
+import { useQuery } from "@tanstack/react-query";
 
 const ProfileTab = () => {
   const user = useSelector((state) => state.user);
@@ -21,7 +22,7 @@ const ProfileTab = () => {
   const [statusMessage, setStatusMessage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [commentCount, setCommentCount] = useState(0); 
-  
+  const [userID, setUserID] = useState("null"); 
 
   //   const [name, setName] = useState(user?.name);
   //   const [email, setEmail] = useState(user?.email);
@@ -36,6 +37,7 @@ const ProfileTab = () => {
   //   const [password, setPassword] = useState(user?.password);
 
   const [formData, setFormData] = useState({
+    id : "",
     name: "",
     email: "",
     phone: "",
@@ -109,6 +111,7 @@ const ProfileTab = () => {
   useEffect(() => {
     if (user) {
       setFormData({
+        id : user?.id ||"",
         name: user?.name || "",
         email: user?.email || "",
         phone: user?.phone || "",
@@ -125,6 +128,7 @@ const ProfileTab = () => {
         followingCount: user?.followingCount || 0,
         savedCount: user?.savedCount || 0,
         reputation: user?.reputation || 0,
+        answerCount : user?.answerCount ||0,
       });
     }
   }, [user]);
@@ -235,11 +239,11 @@ const ProfileTab = () => {
       try {
         // Gọi API để lấy câu hỏi theo userId
         const response = await QuestionService.getQuestionsByUserId(user.id);
-        const response2 = await CommentService.getCommentByUserId(user.id);
+
         
         // Nếu có dữ liệu, cập nhật số lượng câu hỏi
         setQuestionCount(response?.total || 0); 
-        setCommentCount(response2?.total||0);
+        setCommentCount(commentQuess?.length||0);
       } catch (error) {
         // Nếu có lỗi, cập nhật thông báo lỗi
         setStatusMessage({
@@ -247,17 +251,29 @@ const ProfileTab = () => {
           message: error.message || "Đã xảy ra lỗi khi tải dữ liệu.",
         });
       }
-
-      
     };
   
     // Gọi hàm fetch khi userId thay đổi
     if (user.id) {
       fetchQuestionCount();
-      
     }
   
   }, [user.id]); // Chạy lại khi userId thay đổi
+ //Lấy tất cả comment
+   const getAllCom = async () => {
+    setUserID(user.id);
+     const res = await CommentService.getCommentByUserId(formData.id);
+     return res.data;
+   };
+ 
+   const {
+     isLoading: isLoadingQues,
+     data: commentQuess,
+     error,
+   } = useQuery({
+     queryKey: ["commentQuess"],
+     queryFn: getAllCom,
+   });
   
   
   return (
@@ -286,7 +302,7 @@ const ProfileTab = () => {
               </tr>
               <tr>
                 <td className="fw-bold fs-5">{questionCount}</td>
-                <td className="fw-bold fs-5">12</td>
+                <td className="fw-bold fs-5">{formData.answerCount}</td>
               </tr>
               <tr className="row-2">
                 <td className="text-muted">questions</td>
