@@ -184,57 +184,75 @@ const HeaderComponent = () => {
           )}
 
           <div>
-            <div className="btn">
-              {user?.name || admin?.name ? (
-                <Popover content={content} trigger="click">
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <i
-                      className="bi bi-person-circle"
-                      style={Styles.iconHeader}
-                    ></i>
-                    <span
-                      style={{
-                        marginTop: "0px",
-                        fontSize: "15px",
-                        fontWeight: "500",
-                        color: "#FFFFFF",
-                      }}
-                    >
-                      {user.name || admin.name}
-                    </span>
-                  </div>
-                </Popover>
-              ) : (
-                <div
-                  onClick={handleNavigateLogin}
-                  style={{ cursor: "pointer" }}
-                >
-                  {img ? (
-                    <img
-                      src={img}
-                      alt="avatar"
-                      style={{
-                        width: "10px",
-                        height: "10px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  ) : (
-                    <i
-                      className="bi bi-person-circle"
-                      style={Styles.iconHeader}
-                    ></i>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className="btn">
+  {user?.name || admin?.name ? (
+    <Popover content={content} trigger="click">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: "20px"
+        }}
+      >
+        <img
+              src={img || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"} // Ảnh mặc định nếu không có img
+              alt={`${name}'s avatar`}
+              className="img-fluid rounded-circle p-2"
+              style={{
+                height: "50px",
+                width: "50px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+        <span
+          style={{
+            marginTop: "0px",
+            fontSize: "15px",
+            fontWeight: "500",
+            color: "#FFFFFF",
+          }}
+        >
+          {user.name || admin.name}
+        </span>
+      </div>
+    </Popover>
+  ) : (
+    <div
+      onClick={handleNavigateLogin}
+      style={{ cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px" }}
+    >
+      {img ? (
+        <img
+          src={img}
+          alt="avatar"
+          style={{
+            width: "10px",
+            height: "10px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+      ) : (
+        <i
+          className="bi bi-person-circle"
+          style={Styles.iconHeader}
+        ></i>
+      )}
+      <span
+        style={{
+          fontSize: "16px",
+          fontWeight: "100px",
+          color: "#FFFFFF",
+        }}
+      >
+        Login
+      </span>
+    </div>
+  )}
+</div>
+
             <div className="btn">
               <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
             </div>

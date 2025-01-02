@@ -23,7 +23,7 @@
 
   iconHeader: {
     color: '#FFFFFF',
-    fontSize: '24px',
+    fontSize: '30px',
     marginRight: '8px',
     marginLeft: '8px',
   },
