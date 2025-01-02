@@ -108,12 +108,24 @@ const StatisticQuestionPage = () => {
             (question) => question.answerCount === 0
           ).length;
   
-          // Trả về tag này cùng với câu hỏi đã lọc và notAnswered
+          // Tính tổng upVote và downVote
+          const upVote = filteredQuestions.reduce(
+            (sum, question) => sum + (question.upVoteCount || 0),
+            0
+          );
+          const downVote = filteredQuestions.reduce(
+            (sum, question) => sum + (question.downVoteCount || 0),
+            0
+          );
+  
+          // Trả về tag này cùng với câu hỏi đã lọc và thông tin tổng hợp
           return {
             ...item,
             questions: filteredQuestions,
             quantity: filteredQuestions.length,
             notAnswered: notAnswered,
+            upVote: upVote,
+            downVote: downVote,
           };
         })
       );
@@ -128,11 +140,10 @@ const StatisticQuestionPage = () => {
     filterData();
   }, [year, month, dataQuestion]);
   
+  
   // Tính tổng
   const totalQuestions = filteredData.reduce((sum, item) => sum + item.quantity, 0);
-  const averageRating = (
-    filteredData.reduce((sum, item) => sum + parseFloat(item.rate), 0) / filteredData.length || 0
-  ).toFixed(1);
+  
 
   // Chuẩn bị dữ liệu cho PieChart
   const dataTopic = filteredData.map((item) => item.quantity);
@@ -188,10 +199,6 @@ const StatisticQuestionPage = () => {
             <label className="total__title">Total Questions</label>
             <h2 className="total__number">{totalQuestions}</h2>
           </section>
-          <section className="section__total-question">
-            <label className="total__title">Average Rating</label>
-            <h2 className="total__number">{averageRating}</h2>
-          </section>
         </div>
 
         {/* Biểu đồ tròn */}
@@ -214,7 +221,8 @@ const StatisticQuestionPage = () => {
                     <th>Tag</th>
                     <th>Quantity</th>
                     <th>Not Answered</th>
-                    <th>Rate</th>
+                    <th>Up Vote</th>
+                    <th>Down Vote</th>
                   </tr>
                 </thead>
               </table>
@@ -227,7 +235,8 @@ const StatisticQuestionPage = () => {
                         <td>{row.name}</td>
                         <td>{row.quantity}</td>
                         <td>{row.notAnswered}</td>
-                        <td>{row.rate}</td>
+                        <td>{row.upVote}</td>
+                        <td>{row.downVote}</td>
                       </tr>
                     ))}
                   </tbody>

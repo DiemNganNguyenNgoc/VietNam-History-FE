@@ -84,21 +84,28 @@ const UpdateQuestionPage = () => {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
+  
     files.forEach((file) => {
       new Compressor(file, {
-        quality: 0.6,
-        maxWidth: 800,
-        maxHeight: 800,
+        quality: 0.6, 
+        maxWidth: 800, 
+        maxHeight: 800, 
         success(result) {
-          const compressedImage = URL.createObjectURL(result);
-          setImageSrcs(prevImages => [...prevImages, compressedImage]);
+          // Đọc file đã nén thành Base64
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = reader.result; 
+            setImageSrcs((prevImages) => [...prevImages, base64String]); 
+          };
+          reader.readAsDataURL(result); 
         },
         error(err) {
           console.error(err);
-        }
+        },
       });
     });
   };
+  
 
   const handleRemoveImage = (index) => {
     const newImageSrcs = [...imageSrcs];

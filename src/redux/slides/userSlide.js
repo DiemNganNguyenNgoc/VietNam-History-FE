@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { floatButtonPrefixCls } from "antd/es/float-button/FloatButton";
 
 const initialState = {
   id: "",
@@ -30,6 +31,7 @@ const initialState = {
   followers: [],
   following: [],
   createdAt: "",
+  active: true,
 };
 
 export const userSlide = createSlice({
@@ -59,6 +61,7 @@ export const userSlide = createSlice({
         reputation = "",
         access_token,
         createdAt = "",
+        active = true,
       } = action.payload;
 
       state.name = name || email;
@@ -82,6 +85,7 @@ export const userSlide = createSlice({
       state.access_token = access_token;
       state.id = _id;
       state.createdAt = createdAt;
+      state.active = active;
     },
     resetUser: (state) => {
       state.id = "";
@@ -105,6 +109,7 @@ export const userSlide = createSlice({
       state.savedCount = "";
       state.reputation = "";
       state.createdAt = "";
+      state.active = true;
     },
     setAllUser: (state, action) => {
       state.allUser = action.payload; // Lưu danh sách Question từ API

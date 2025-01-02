@@ -14,6 +14,12 @@ function ProfilePage() {
     month: "2-digit",
     day: "2-digit",
   });
+
+  const recentAccess = new Date(user.updatedAt).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
   
   console.log('vjvj', user)
 
@@ -42,11 +48,11 @@ function ProfilePage() {
           <div className="row">
             <div className="col">
           <i class="bi bi-calendar"></i>
-          <p>Be a member at {memberAt}</p>
+          <p>Member since: {memberAt}</p>
           </div>
           <div className="col">
           <i class="bi bi-clock-history"></i>
-          <p>Recent access history: 01/01/2024</p>
+          <p>Recent access: {recentAccess}</p>
           </div>
           </div>
           </div>

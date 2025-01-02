@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import slider1 from '../../assets/image/slider1.webp';
-import slider2 from '../../assets/image/slider2.webp';
-import slider3 from '../../assets/image/slider3.webp';
+import { useLocation, useNavigate } from "react-router-dom";
+import slider1 from "../../assets/image/slider1.webp";
+import slider2 from "../../assets/image/slider2.webp";
+import slider3 from "../../assets/image/slider3.webp";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
-import SliderComponent from '../../components/SliderComponent/SliderComponent';
+import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import SortBtnHome from '../../components/SortBtnHome/SortBtnHome';
+import SortBtnHome from "../../components/SortBtnHome/SortBtnHome";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
 import { useQuery } from "@tanstack/react-query";
 import * as TagService from "../../services/TagService";
+import { useSelector } from "react-redux";
 
 function HomePage() {
+  /////////------xét login---------///////////////
+  const location = useLocation();
+
   const [activeTab, setActiveTab] = useState("interesting");
+  const user = useSelector((state) => state.user);
 
   const navigate = useNavigate();
 
@@ -27,7 +32,7 @@ function HomePage() {
     const res = await QuestionService.getAllQuestionByActive(true); // Truyền active = true
     return res.data;
   };
-  
+
   const {
     isLoading: isLoadingQues,
     data: questions,
@@ -93,26 +98,47 @@ function HomePage() {
   }
 
   const handleAskQuestionClick = () => {
-    navigate("/askquestion");
+    if (!user?.id) {
+      alert("Please log in to ask question!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a question at this time."
+      );
+    } else {
+      navigate("/askquestion");
+    }
   };
 
-  const handleQuestionClick = (questionId) => {
-    navigate(`/question-detail/${questionId}`); // Chuyển hướng đến trang chi tiết câu hỏi
+  const handleQuestionClick = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User ID is missing");
+        return;
+      }
+      await QuestionService.updateViewCount(questionId, user.id);
+  
+      navigate(`/question-detail/${questionId}`);
+    } catch (error) {
+      console.error("Failed to update view count:", error.response?.data || error.message);
+    }
   };
+  
   return (
-    <div className="container mt-4" >
+    <div className="container mt-4">
       <div>
         <SliderComponent arrImg={[slider1, slider2, slider3]} />
       </div>
       <br></br>
       <div className="row">
         <div className="col">
-          <span className='title'>TOP QUESTION MAY INTEREST YOU</span>
+          <span className="title">TOP QUESTION MAY INTEREST YOU</span>
         </div>
-        <div className="col-2" style={{ marginTop: '10px' }}>
+        <div className="col-2" style={{ marginTop: "10px" }}>
           <ButtonComponent
             textButton="Ask question"
-            onClick={handleAskQuestionClick} />
+            onClick={handleAskQuestionClick}
+          />
         </div>
       </div>
       <SortBtnHome></SortBtnHome>
@@ -132,7 +158,13 @@ function HomePage() {
                     reputation={user?.reputation || 0}
                     followers={user?.followerCount || 0}
                     title={question.title}
-                    tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []} // Lấy tên tag từ tags map
+                    tags={
+                      question.tags
+                        ? question.tags.map(
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
+                        : []
+                    } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}
                     views={question.view}
                     answers={question.answerCount}
@@ -142,13 +174,12 @@ function HomePage() {
               );
             })
           ) : (
-            <LoadingComponent isLoading={isLoadingQues}/>
+            <LoadingComponent isLoading={isLoadingQues} />
           )}
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

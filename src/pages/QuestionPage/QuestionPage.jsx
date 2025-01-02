@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
@@ -17,8 +17,10 @@ import { createSaved } from "../../services/SavedService";
 import Pagination from "../../components/Pagination/Pagination";
 
 const QuestionPage = () => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  console.log("user1", user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
   const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
@@ -62,8 +64,6 @@ const QuestionPage = () => {
     queryKey: ["questions", currentPage], // Thêm currentPage vào queryKey để phản ánh tham số phân trang
     queryFn: () => getAllQuesByActive(currentPage, questionsPerPage),
   });
-
-
 
   // Lấy thông tin người dùng dựa trên userId từ câu hỏi
   const getUserDetails = async (userId) => {
@@ -144,12 +144,31 @@ const QuestionPage = () => {
 
 
   const handleAskQuestionClick = () => {
-    navigate("/askquestion");
+    if (!user?.id) {
+      alert("Please log in to ask question!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a question at this time."
+      );
+    } else {
+      navigate("/askquestion");
+    }
   };
 
-  const handleQuestionClick = (questionId) => {
-    navigate(`/question-detail/${questionId}`); // Chuyển hướng đến trang chi tiết câu hỏi
-  };
+   const handleQuestionClick = async (questionId) => {
+     try {
+       if (!user?.id) {
+         console.error("User ID is missing");
+         return;
+       }
+       await QuestionService.updateViewCount(questionId, user.id);
+   
+       navigate(`/question-detail/${questionId}`);
+     } catch (error) {
+       console.error("Failed to update view count:", error.response?.data || error.message);
+     }
+   };
 
   //xử lí like
 
@@ -285,6 +304,17 @@ const getFilteredQuestion = () => {
   
   let filteredQuestions = questions;
 
+// Sắp xếp theo "New" hoặc "Active"
+if (filterOption === "Newest") {
+  filteredQuestions = filteredQuestions.sort(
+    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+  );
+} else if (filterOption === "Active") {
+  filteredQuestions = filteredQuestions.sort((a, b) => b.answerCount - a.answerCount);
+} else if (filterOption === "Unanswered") {
+filteredQuestions = filteredQuestions.filter((question) => question.answerCount === 0); // Chỉ hiển thị câu hỏi chưa có câu trả lời
+}
+
  // Lọc theo các filter
  if (filters.no_answers) {
   filteredQuestions = filteredQuestions.filter((q) => q.answerCount === 0);
@@ -306,7 +336,6 @@ if (filters.sort_by) {
   }
 }
 
-
 // Lọc theo tag
 if (filters.tag) {
   const searchTag = filters.tag?.trim().toLowerCase(); // Đảm bảo filters.tag hợp lệ
@@ -317,21 +346,6 @@ if (filters.tag) {
     })
   );
 }
-
-  
-
-  // Sắp xếp theo "New" hoặc "Popular"
-  if (filterOption === "Newest") {
-    filteredQuestions = filteredQuestions.sort(
-      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-    );
-  } else if (filterOption === "Active") {
-    filteredQuestions = filteredQuestions.sort((a, b) => b.answerCount - a.answerCount);
-  } else if (filterOption === "Unanswered") {
-  filteredQuestions = filteredQuestions.filter((question) => question.answerCount === 0); // Chỉ hiển thị câu hỏi chưa có câu trả lời
-  }
-
-    // Lọc theo tags nếu "the_following_tags" được chọn
     
   return filteredQuestions;
 };
@@ -382,7 +396,7 @@ if (filters.tag) {
             fontWeight: "600",
           }}
         >
-         {questions.length} questions
+          {questions.length} questions
         </p>
         <br />
         <SortBtn setFilterOption={setFilterOption} />
@@ -407,7 +421,10 @@ if (filters.tag) {
           ) : Array.isArray(questions) && questions.length > 0 ? (
             getFilteredQuestion().map((question) => {
               console.log("question", question);
-              console.log("Questions length:", Array.isArray(questions) ? questions.length : "Not an array");
+              console.log(
+                "Questions length:",
+                Array.isArray(questions) ? questions.length : "Not an array"
+              );
 
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
               return (
@@ -433,8 +450,8 @@ if (filters.tag) {
                     tags={
                       question.tags
                         ? question.tags.map(
-                          (tagId) => tags[tagId]?.name || tagId
-                        )
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
                         : []
                     } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}
