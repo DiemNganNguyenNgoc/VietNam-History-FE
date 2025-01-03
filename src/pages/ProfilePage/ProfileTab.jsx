@@ -22,6 +22,7 @@ const ProfileTab = () => {
   const [statusMessage, setStatusMessage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
+  const [commentList,setCommentList]= useState([]);
   const [userID, setUserID] = useState("null");
 
   //   const [name, setName] = useState(user?.name);
@@ -241,10 +242,11 @@ const ProfileTab = () => {
       try {
         // Gọi API để lấy câu hỏi theo userId
         const response = await QuestionService.getQuestionsByUserId(user.id);
+        const response2 = await CommentService.getCommentByUserId(user.id);
 
         // Nếu có dữ liệu, cập nhật số lượng câu hỏi
         setQuestionCount(response?.total || 0);
-        setCommentCount(commentQuess?.length || 0);
+        setCommentCount(response2.length);
       } catch (error) {
         // Nếu có lỗi, cập nhật thông báo lỗi
         setStatusMessage({
@@ -260,20 +262,9 @@ const ProfileTab = () => {
     }
   }, [user.id]); // Chạy lại khi userId thay đổi
   //Lấy tất cả comment
-  const getAllCom = async () => {
-    setUserID(user.id);
-    const res = await CommentService.getCommentByUserId(formData.id);
-    return res.data;
-  };
+  
 
-  const {
-    isLoading: isLoadingQues,
-    data: commentQuess,
-    error,
-  } = useQuery({
-    queryKey: ["commentQuess"],
-    queryFn: getAllCom,
-  });
+  
 
   return (
     <div className="row">

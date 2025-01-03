@@ -16,7 +16,7 @@ import * as CommentService from "../../services/CommentService";
 import * as CommentReportService from "../../services/CommentReportService";
 import * as AnswerReportService from "../../services/AnswerReportService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { setDetailAnswer, addAnswer } from '../../redux/slides/AnswerSlice'; // Import action
 import {
@@ -45,6 +45,7 @@ const QuestionDetails = () => {
   const [reportedCommentList, setReportedCommentList] = useState([]);
   const [reportedAnswerList, setReportedAnswerList] = useState([]);
   const [comconten,setComConten] = useState("");
+  const location = useLocation();
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -626,9 +627,15 @@ const QuestionDetails = () => {
 
   const handleAddCommentClick = useCallback( async () => {
 
-    if (!userAns) {
-      alert("User ID is missing. Please log in again.");
-      return;
+    if (!user?.id) {
+      alert("Please log in to ask question!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a question at this time."
+      );
+    } else {
+      
     }
 
     const commentData = {
