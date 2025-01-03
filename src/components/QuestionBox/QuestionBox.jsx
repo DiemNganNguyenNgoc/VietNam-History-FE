@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./QuestionBox.css";
 import { Popover, Button } from "antd";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import * as TagService from "../../services/TagService";
 
 const QuestionBox = ({
   id,
@@ -23,6 +24,12 @@ const QuestionBox = ({
   onUnsave,
   onReport,
 }) => {
+  const getAllTag = async () => {
+    const res = await TagService.getAllTag();
+    // console.log("res.data", res);
+    return res;
+  };
+
   return (
     <div className="question-box">
       {/* Thông tin người dùng */}
@@ -51,13 +58,13 @@ const QuestionBox = ({
       <div className="question-content">
         <div className="title-and-tags">
           <h3 className="question_title">{title}</h3>
-          <div className="tags-container">
+          {/* <div className="tags-container">
             {tags.map((tag, index) => (
               <span key={index} className="tag-item">
                 {tag}
               </span>
             ))}
-          </div>
+          </div> */}
         </div>
 
         <div className="question-details">

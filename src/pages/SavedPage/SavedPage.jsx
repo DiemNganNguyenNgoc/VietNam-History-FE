@@ -5,10 +5,14 @@ import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as UserService from "../../services/UserService";
 import * as QuestionService from "../../services/QuestionService";
 import * as SavedService from "../../services/SavedService";
+import { useNavigate } from "react-router-dom";
 
 const SavedPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const allSaved = useSelector((state) => state.saved.allSaved);
+  // console.log("allSaved", allSaved);
+  const user = useSelector((state) => state.user);
   const [enrichedSavedData, setEnrichedSavedData] = useState([]);
 
   // Hàm lấy thông tin người dùng
@@ -80,27 +84,49 @@ const SavedPage = () => {
     fetchData();
   }, [dispatch]);
 
+  const handleQuestionClick = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User ID is missing");
+        return;
+      }
+      await QuestionService.updateViewCount(questionId, user.id);
+
+      navigate(`/question-detail/${questionId}`);
+    } catch (error) {
+      console.error(
+        "Failed to update view count:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
   return (
     <div className="container">
       <h1>Saved Questions</h1>
       {enrichedSavedData.length > 0 ? (
         enrichedSavedData.map((saved) => (
-          <QuestionBox
-            key={saved._id}
-            id={saved.question._id}
-            img={saved.question.img}
-            username={saved.user.username}
-            reputation={saved.user.reputation}
-            followerCount={saved.user.followerCount}
-            title={saved.question.title}
-            tags={saved.question.tags}
-            date={saved.createdAt}
-            views={saved.question.views}
-            answers={saved.question.answers}
-            likes={saved.question.upVoteCount}
-            isSaved={true}
-            onUnsave={() => handleUnsave(saved._id)} // Gọi handleUnsave
-          />
+          <div
+            key={allSaved.question}
+            onClick={() => handleQuestionClick(allSaved.question)}
+          >
+            <QuestionBox
+              key={saved._id}
+              id={saved.question._id}
+              img={saved.question.img}
+              username={saved.user.username}
+              reputation={saved.user.reputation}
+              followerCount={saved.user.followerCount}
+              title={saved.question.title}
+              tags={saved.question.tags}
+              date={saved.createdAt}
+              views={saved.question.views}
+              answers={saved.question.answers}
+              likes={saved.question.upVoteCount}
+              isSaved={true}
+              onUnsave={() => handleUnsave(saved._id)} // Gọi handleUnsave
+            />
+          </div>
         ))
       ) : (
         <p>No saved questions yet.</p>
