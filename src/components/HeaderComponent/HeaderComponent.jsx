@@ -7,9 +7,9 @@ import * as UserService from "../../services/UserService";
 import * as AdminService from "../../services/AdminService";
 import { resetUser } from "../../redux/slides/userSlide";
 import { resetAdmin } from "../../redux/slides/adminSlide";
-import * as  QuestionService from "../../services/QuestionService";
-import * as  TagService from "../../services/TagService";
-import './SearchButton.css';
+import * as QuestionService from "../../services/QuestionService";
+import * as TagService from "../../services/TagService";
+import "./SearchButton.css";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const HeaderComponent = () => {
     try {
       // Gọi API để lấy danh sách tag (dựa trên API của bạn)
       const tags = await TagService.getAllTag();
-      return tags.some(t => t.name.toLowerCase() === tag.toLowerCase());  // Kiểm tra xem tag có tồn tại không
+      return tags.some((t) => t.name.toLowerCase() === tag.toLowerCase()); // Kiểm tra xem tag có tồn tại không
     } catch (error) {
       console.error("Error checking if tag exists:", error);
       return false;
@@ -77,7 +77,7 @@ const HeaderComponent = () => {
     try {
       let tagList = [];
       let keyword = "";
-  
+
       // Kiểm tra nếu người dùng nhập các tag phân tách bằng dấu phẩy
       if (searchKeyword.includes(",")) {
         tagList = searchKeyword
@@ -93,7 +93,7 @@ const HeaderComponent = () => {
           keyword = searchKeyword; // Tìm kiếm theo từ khóa
         }
       }
-  
+
       // Gửi yêu cầu tìm kiếm
       const results = await QuestionService.searchQuestion(
         tagList, // Danh sách các tag
@@ -102,7 +102,7 @@ const HeaderComponent = () => {
         10, // Số lượng kết quả trên mỗi trang
         {} // Tuỳ chọn sắp xếp
       );
-  
+
       setSearchResults(results); // Lưu kết quả tìm kiếm vào state
       navigate("/search-results", {
         state: { searchKeyword, searchResults: results },
@@ -111,8 +111,6 @@ const HeaderComponent = () => {
       console.error("Search error:", error);
     }
   };
-  
-
 
   const content = (
     <div>
@@ -156,21 +154,27 @@ const HeaderComponent = () => {
     <>
       <nav className="navbar" style={{ backgroundColor: "#023E73" }}>
         <div className="container">
-          <a className="navbar-brand" href="/">
+          <a
+            className="navbar-brand"
+            href="/"
+            style={{ color: "#FFFFFF", fontSize: "2rem", fontWeight: "bold" }}
+          >
             SHARING-CODE
           </a>
 
           <div className="search-container">
-      <input
-        className="form-control search-input"
-        type="text"
-        placeholder="Search question"
-        value={searchKeyword}
-        onChange={(e) => setSearchKeyword(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <button onClick={handleSearch} className="search-button">Search</button>
-    </div>
+            <input
+              className="form-control search-input"
+              type="text"
+              placeholder="Search question"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button onClick={handleSearch} className="search-button">
+              Search
+            </button>
+          </div>
 
           {/* Display search results */}
           {searchResults.length > 0 && (
@@ -184,74 +188,83 @@ const HeaderComponent = () => {
           )}
 
           <div>
-          <div className="btn">
-  {user?.name || admin?.name ? (
-    <Popover content={content} trigger="click">
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          marginTop: "20px"
-        }}
-      >
-        <img
-              src={img || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"} // Ảnh mặc định nếu không có img
-              alt={`${name}'s avatar`}
-              className="img-fluid rounded-circle p-2"
-              style={{
-                height: "50px",
-                width: "50px",
-                borderRadius: "50%",
-                objectFit: "cover",
-              }}
-            />
-        <span
-          style={{
-            marginTop: "0px",
-            fontSize: "15px",
-            fontWeight: "500",
-            color: "#FFFFFF",
-          }}
-        >
-          {user.name || admin.name}
-        </span>
-      </div>
-    </Popover>
-  ) : (
-    <div
-      onClick={handleNavigateLogin}
-      style={{ cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px" }}
-    >
-      {img ? (
-        <img
-          src={img}
-          alt="avatar"
-          style={{
-            width: "10px",
-            height: "10px",
-            borderRadius: "50%",
-            objectFit: "cover",
-          }}
-        />
-      ) : (
-        <i
-          className="bi bi-person-circle"
-          style={Styles.iconHeader}
-        ></i>
-      )}
-      <span
-        style={{
-          fontSize: "16px",
-          fontWeight: "100px",
-          color: "#FFFFFF",
-        }}
-      >
-        Login
-      </span>
-    </div>
-  )}
-</div>
+            <div className="btn">
+              {user?.name || admin?.name ? (
+                <Popover content={content} trigger="click">
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginTop: "20px",
+                    }}
+                  >
+                    <img
+                      src={
+                        img ||
+                        "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                      } // Ảnh mặc định nếu không có img
+                      alt={`${name}'s avatar`}
+                      className="img-fluid rounded-circle p-2"
+                      style={{
+                        height: "50px",
+                        width: "50px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <span
+                      style={{
+                        marginTop: "0px",
+                        fontSize: "15px",
+                        fontWeight: "500",
+                        color: "#FFFFFF",
+                      }}
+                    >
+                      {user.name || admin.name}
+                    </span>
+                  </div>
+                </Popover>
+              ) : (
+                <div
+                  onClick={handleNavigateLogin}
+                  style={{
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    marginTop: "20px",
+                  }}
+                >
+                  {img ? (
+                    <img
+                      src={img}
+                      alt="avatar"
+                      style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <i
+                      className="bi bi-person-circle"
+                      style={Styles.iconHeader}
+                    ></i>
+                  )}
+                  <span
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "100px",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    Login
+                  </span>
+                </div>
+              )}
+            </div>
 
             <div className="btn">
               <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
@@ -268,15 +281,25 @@ const HeaderComponent = () => {
           <ul className="nav nav-underline">
             <li className="nav-item">
               <a className="nav-link" href="/" style={Styles.textHeader}>
-                <i className="bi bi-house-door-fill" style={Styles.iconHeader}></i>
+                <i
+                  className="bi bi-house-door-fill"
+                  style={Styles.iconHeader}
+                ></i>
                 Home
               </a>
             </li>
           </ul>
           <ul className="nav nav-underline">
             <li className="nav-item">
-              <a className="nav-link" href="/question" style={Styles.textHeader}>
-                <i className="bi bi-chat-left-fill" style={Styles.iconHeader}></i>
+              <a
+                className="nav-link"
+                href="/question"
+                style={Styles.textHeader}
+              >
+                <i
+                  className="bi bi-chat-left-fill"
+                  style={Styles.iconHeader}
+                ></i>
                 Questions
               </a>
             </li>

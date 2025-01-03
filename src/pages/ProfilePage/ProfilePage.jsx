@@ -4,10 +4,9 @@ import ActivityTab from "./ActivityTab";
 import ProfileTab from "./ProfileTab";
 import { useSelector } from "react-redux";
 
-
-
 function ProfilePage() {
   const user = useSelector((state) => state.user);
+  console.log("userpage", user);
   const [activeTab, setActiveTab] = useState("profile");
   const memberAt = new Date(user.createdAt).toLocaleDateString("vi-VN", {
     year: "numeric",
@@ -15,13 +14,13 @@ function ProfilePage() {
     day: "2-digit",
   });
 
-  const recentAccess = new Date(user.updatedAt).toLocaleDateString("vi-VN", {
+  const recentAccess = new Date().toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   });
-  
-  console.log('vjvj', user)
+
+  console.log("vjvj", user);
 
   return (
     <div className="container mt-4">
@@ -37,25 +36,25 @@ function ProfilePage() {
               height: "150px",
               borderRadius: "50%",
               objectFit: "cover",
-              boxShadow: "0px 0px 10px rgba(0,0,0,0.2)"
+              boxShadow: "0px 0px 10px rgba(0,0,0,0.2)",
             }}
           />
-          </div>
-          <div className="col-9">
-            <div className="row">
-          <h2 className="mt-3">{user.name}</h2>
+        </div>
+        <div className="col-9">
+          <div className="row">
+            <h2 className="mt-3">{user.name}</h2>
           </div>
           <div className="row">
             <div className="col">
-          <i class="bi bi-calendar"></i>
-          <p>Member since: {memberAt}</p>
+              <i class="bi bi-calendar"></i>
+              <p>Member since: {memberAt}</p>
+            </div>
+            <div className="col">
+              <i class="bi bi-clock-history"></i>
+              <p>Recent access: {recentAccess}</p>
+            </div>
           </div>
-          <div className="col">
-          <i class="bi bi-clock-history"></i>
-          <p>Recent access: {recentAccess}</p>
-          </div>
-          </div>
-          </div>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -64,7 +63,9 @@ function ProfilePage() {
           <ul className="nav nav-tabs">
             <li className="nav-item">
               <button
-                className={`nav-link ${activeTab === "profile" ? "active" : ""}`}
+                className={`nav-link ${
+                  activeTab === "profile" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("profile")}
               >
                 Profile
@@ -72,7 +73,9 @@ function ProfilePage() {
             </li>
             <li className="nav-item">
               <button
-                className={`nav-link ${activeTab === "activity" ? "active" : ""}`}
+                className={`nav-link ${
+                  activeTab === "activity" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("activity")}
               >
                 Activity
