@@ -91,7 +91,7 @@ const SavedPage = () => {
             img={saved.question.img}
             username={saved.user.username}
             reputation={saved.user.reputation}
-            followers={saved.user.followers}
+            followerCount={saved.user.followerCount}
             title={saved.question.title}
             tags={saved.question.tags}
             date={saved.createdAt}

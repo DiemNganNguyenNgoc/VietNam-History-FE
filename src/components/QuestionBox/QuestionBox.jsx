@@ -8,7 +8,7 @@ const QuestionBox = ({
   img,
   username,
   reputation,
-  followers,
+  followerCount,
   title,
   tags,
   date,
@@ -40,7 +40,7 @@ const QuestionBox = ({
             <i className="bi bi-trophy-fill trophy-icon"></i> {reputation}
           </span>
           <span className="detail-item">
-            <i className="bi bi-heart-fill heart-icon"></i> {followers}
+            <i className="bi bi-person-fill person-icon"></i> {followerCount}
           </span>
         </div>
       </div>

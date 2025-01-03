@@ -443,7 +443,7 @@ const QuestionPage = () => {
                     img={user?.img || ""}
                     username={user?.name || "Unknown"}
                     reputation={user?.reputation || 0}
-                    followers={user?.followerCount || 0}
+                    followerCount={user?.followerCount || 0}
                     title={question.title}
                     // tags={
                     //   question.tags

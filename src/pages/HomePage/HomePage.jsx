@@ -12,7 +12,10 @@ import * as QuestionService from "../../services/QuestionService";
 import * as UserService from "../../services/UserService";
 import { useQuery } from "@tanstack/react-query";
 import * as TagService from "../../services/TagService";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import * as SavedService from "../../services/SavedService";
+import * as QuestionReportService from "../../services/QuestionReportService";
+import { setAllSaved } from "../../redux/slides/savedSlide";
 
 function HomePage() {
   /////////------xét login---------///////////////
@@ -26,6 +29,22 @@ function HomePage() {
   //const [userInfo, setUserInfo] = useState({});
   const [users, setUsers] = useState({});
   const [tags, setTags] = useState({});
+
+  const dispatch = useDispatch();
+
+  console.log("user1", user);
+  const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
+  const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
+  const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
+  const [likeCounts, setLikeCounts] = useState({}); // Lưu số lượt like của mỗi câu hỏi
+  const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
+  //Phan trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 10; // Số câu hỏi mỗi trang
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  // console.log("user", user);
+  // Lấy `allSaved` từ Redux state
+  const allSaved = useSelector((state) => state.saved.allSaved);
 
   // Lấy danh sách câu hỏi từ API
   const getAllQuesByActive = async () => {
@@ -117,13 +136,98 @@ function HomePage() {
         return;
       }
       await QuestionService.updateViewCount(questionId, user.id);
-  
+
       navigate(`/question-detail/${questionId}`);
     } catch (error) {
-      console.error("Failed to update view count:", error.response?.data || error.message);
+      console.error(
+        "Failed to update view count:",
+        error.response?.data || error.message
+      );
     }
   };
-  
+
+  const handleSaved = async (questionId, userQues) => {
+    // e.stopPropagation();
+    try {
+      if (savedList.includes(questionId)) {
+        alert("Question already saved");
+        return;
+      }
+
+      const savedResponse = await SavedService.createSaved({
+        question: questionId,
+        user: userQues,
+      });
+
+      console.log("Saved response:", savedResponse);
+
+      setSavedList((prev) => [...prev, questionId]);
+
+      // Lưu vào Redux (nếu cần)
+      const updatedSavedList = [...allSaved, savedResponse.data]; // allSaved là state hiện tại
+      dispatch(setAllSaved(updatedSavedList));
+    } catch (error) {
+      alert("Error saving question:", error);
+    }
+  };
+
+  const handleUnsave = async (savedId) => {
+    try {
+      await SavedService.deleteSaved(savedId); // API xóa bài đã lưu
+
+      const updatedSavedList = allSaved.filter(
+        (saved) => saved._id !== savedId
+      );
+
+      // Cập nhật Redux và localStorage
+      dispatch(setAllSaved(updatedSavedList));
+      localStorage.setItem("allSaved", JSON.stringify(updatedSavedList));
+    } catch (error) {
+      console.error("Error unsaving question:", error);
+    }
+  };
+
+  const handleReport = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User must be logged in to report questions.");
+        return;
+      }
+
+      const isConfirmed = window.confirm(
+        "Are you sure you want to report this question?"
+      );
+
+      if (!isConfirmed) {
+        return; // Nếu người dùng nhấn "Cancel", thoát khỏi hàm
+      }
+
+      const response = await QuestionReportService.createQuestionReport({
+        question: questionId,
+        user: user.id, // ID người dùng
+      });
+
+      // Lấy danh sách đã báo cáo từ localStorage và cập nhật
+      const updatedReported = [...reportedList, questionId];
+      localStorage.setItem(
+        "reportedQuestions",
+        JSON.stringify(updatedReported)
+      );
+
+      setReportedList(updatedReported); // Cập nhật danh sách báo cáo trong state
+      setQuestionList((prevQuestions) =>
+        prevQuestions.map((q) =>
+          q._id === questionId ? { ...q, isReported: true } : q
+        )
+      );
+      console.log("Report submitted successfully:", response);
+      alert(response.message); // Thông báo sau khi báo cáo thành công hoặc lỗi
+    } catch (error) {
+      console.error("Error reporting question:", error);
+      alert("An error occurred while reporting the question.");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <div>
@@ -169,6 +273,21 @@ function HomePage() {
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}
+                    isSaved={allSaved.some(
+                      (saved) => saved.question === question._id
+                    )}
+                    isReported={reportedList.includes(question._id)}
+                    // onLike={(e) =>
+                    //   handleSaved(e, question._id, question.userQues)
+                    // }
+                    onSave={() => handleSaved(question._id, question.userQues)}
+                    onUnsave={() => {
+                      const savedItem = allSaved.find(
+                        (saved) => saved.question === question._id
+                      );
+                      if (savedItem) handleUnsave(savedItem._id); // Truyền `_id` của bài đã lưu
+                    }}
+                    onReport={() => handleReport(question._id)}
                   />
                 </div>
               );
