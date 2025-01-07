@@ -10,21 +10,20 @@ import * as TagService from "../../services/TagService";
 import * as UserService from "../../services/UserService";
 
 const QuestionAdmin = () => {
-  const [filters, setFilters] = useState({
-    no_answers: false,
-    no_accepted_answer: false,
-    has_bounty: false,
-    newest: false,
-    recent_activity: false,
-    highest_score: false,
-    most_frequent: false,
-    bounty_ending_soon: false,
-    the_following_tags: false,
-  });
+
+  // Danh sách câu hỏi để filter
+    const [filters, setFilters] = useState({
+      no_answers: false,
+      no_accepted_answer: false,
+      tag: "",
+      sort_by: "", // Lưu giá trị của "Sorted by"
+      the_following_tags: false,
+    });
 
   const [users, setUsers] = useState({});
   const [tags, setTags] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
 
   const navigate = useNavigate();
 
@@ -41,6 +40,84 @@ const QuestionAdmin = () => {
     queryKey: ["questions"],
     queryFn: getAllQues,
   });
+
+  const handleApplyFilters = (updatedFilters) => {
+    console.log("Filters nhận được từ QuestionFilter:", updatedFilters);
+    // Kiểm tra các trường hợp dữ liệu trống hoặc không hợp lệ
+
+    if (!updatedFilters || typeof updatedFilters !== "object") {
+      console.error("Filters không hợp lệ:", updatedFilters);
+      return;
+    }
+
+    const safeFilters = {
+      ...updatedFilters,
+    };
+
+    console.log("Filters đã áp dụng:", safeFilters);
+    setFilters(safeFilters); // Cập nhật state với bộ lọc an toàn
+  };
+
+  const getFilteredQuestion = () => {
+    let filteredQuestions = questions;
+
+    // Sắp xếp theo "New" hoặc "Active"
+    if (filterOption === "Newest") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+    } else if (filterOption === "Reported") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => b.reportCount - a.reportCount
+      );
+    } else if (filterOption === "Unanswered") {
+      filteredQuestions = filteredQuestions.filter(
+        (question) => question.answerCount === 0
+      ); // Chỉ hiển thị câu hỏi chưa có câu trả lời
+    }
+
+    // Lọc theo các filter
+    if (filters.no_answers) {
+      filteredQuestions = filteredQuestions.filter((q) => q.answerCount === 0);
+    }
+
+    if (filters.no_accepted_answer) {
+      filteredQuestions = filteredQuestions.filter((q) => !q.acceptedAnswer);
+    }
+
+    if (filters.sort_by) {
+      if (filters.sort_by === "newest") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+      } else if (filters.sort_by === "recent_activity") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+      } else if (filters.sort_by === "highest_score") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => b.upVoteCount - a.upVoteCount
+        );
+      } else if (filters.sort_by === "most_frequent") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => b.answerCount - a.answerCount
+        );
+      }
+    }
+
+    // Lọc theo tag
+    if (filters.tag) {
+      const searchTag = filters.tag?.trim().toLowerCase(); // Đảm bảo filters.tag hợp lệ
+      filteredQuestions = filteredQuestions.filter((q) =>
+        q.tags?.some((t) => {
+          const tagName = tags[t]?.name || ""; // Giá trị mặc định
+          return tagName.toLowerCase() === searchTag;
+        })
+      );
+    }
+
+    return filteredQuestions;
+  };
 
   const getUserDetails = async (userId) => {
     if (!userId) return null;
@@ -132,9 +209,9 @@ const QuestionAdmin = () => {
         {questions.length} questions
       </p>
       <br />
-      <SortBtnAdmin />
+      <SortBtnAdmin setFilterOption={setFilterOption}/>
       <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", width: "100%" }}>
-        <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
+        <QuestionFilter onApplyFilters={handleApplyFilters} />
       </div>
       {/* Render các câu hỏi */}
       <div style={{ marginTop: "20px" }}>
@@ -142,7 +219,7 @@ const QuestionAdmin = () => {
           <LoadingComponent isLoading={isLoadingQues} />
         ) :
           Array.isArray(questions) && questions.length > 0 ? (
-            questions.map((question) => {
+            getFilteredQuestion().map((question) => {
               const user = users[question.userQues];
               return (
                 <div key={question._id} onClick={() => handleQuestionClick(question._id)}>

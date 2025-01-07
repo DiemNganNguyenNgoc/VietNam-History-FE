@@ -46,6 +46,7 @@ const QuestionDetails = () => {
   const [reportedAnswerList, setReportedAnswerList] = useState([]);
   const [comconten,setComConten] = useState("");
   const location = useLocation();
+  const [selectedAnswerId, setSelectedAnswerId] = useState(null);
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -385,27 +386,8 @@ const QuestionDetails = () => {
   };
   
 
-  // Lấy danh sách bình luận
-  const fetchComments = async () => {
-    try {
-      const response = await CommentService.getCommentByQuestionId(questionId);
-      setComments(response.data.data); // Cập nhật danh sách câu trả lời
-      // // In từng câu trả lời trong mảng answers
-      // response.data.data.forEach((answer, index) => {
-      //   console.log(`Answer ${index + 1}:`, answer); // In ra từng câu trả lời
-      //   console.log("Content:", answer.content); // In ra nội dung câu trả lời
-      //   console.log("Created At:", answer.createdAt); // In ra thời gian tạo câu trả lời
-      //   // Nếu câu trả lời có ảnh, in ra đường dẫn ảnh
-      //   if (answer.images) {
-      //     answer.images.forEach((img, imgIndex) => {
-      //       console.log(`Image ${imgIndex + 1}:`, img);
-      //     });
-      //   }
-      // });
-    } catch (error) {
-      console.error("Error fetching answers:", error);
-    }
-  };
+
+  
 
   //handle answer content
   const handleContentChange = (value) => {
@@ -481,7 +463,7 @@ const QuestionDetails = () => {
     if (isSuccessCom && dataCom?.status !== "ERR") {
       message.success();
       alert("Comment has been added successfully!");
-      fetchComments(); // Cập nhật danh sách câu trả lời sau khi thêm
+     
     }
     if (isErrorCom) {
       message.error();
@@ -608,13 +590,29 @@ const QuestionDetails = () => {
     queryFn: getAllCom,
   });
 
+   //Lấy tất cả comment của câu hỏi
+   const getAllComAns = async () => {
+    const res = await CommentService.getCommentByQuestionId(questionId);
+    return res.data;
+  };
+
+  const {
+    isLoading: isLoadingQuesAns,
+    data: commentAns,
+    error : errorCom,
+  } = useQuery({
+    queryKey: ["commentAns"],
+    queryFn: getAllComAns,
+  });
+
+
   const useCommentsForAnswers = (answers) => {
     return useQuery({
-      queryKey: ["commentsForAnswers", answers.map((a) => a.id)],
+      queryKey: ["commentsForAnswers", answers.map((a) => a._id)],
       queryFn: async () => {
         // Sử dụng Promise.all để xử lý đồng thời
         const comments = await Promise.all(
-          answers.map((answer) => CommentService.getCommentByQuestionId(answer.id))
+          answers.map((answer) => CommentService.getCommentByQuestionId(answer._id))
         );
         return comments;
       },
@@ -646,6 +644,7 @@ const QuestionDetails = () => {
 
     await mutationComment.mutateAsync(commentData);
     setTextCom("");
+    alert("Thêm bình luận thành công");
 
     reloadPage();
    
@@ -661,11 +660,13 @@ const QuestionDetails = () => {
     const commentData = {
       content: comconten,
       user: userAns,
-      answer : answerId,
+      answer : selectedAnswerId,
+      question : questionId
     };
 
     await mutationComment.mutateAsync(commentData);
-    setTextCom("");
+    setComConten("");
+    alert("Thêm bình luận thành công");
 
     reloadPage();
    
@@ -969,8 +970,9 @@ const QuestionDetails = () => {
                 ))}
                 <div >
                 <h5 className="mb-3"> Comments</h5>
-        {Array.isArray(comments) && comments.length > 0 ? (
-          comments.map((commentQues) => {
+        {Array.isArray(commentAns) && commentAns.length > 0 ? (
+          commentAns.filter((commentQues) => commentQues.answer === answer._id) // Lọc các comment có answer = answer.id
+          .map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
             return (
               <Comment
@@ -987,7 +989,12 @@ const QuestionDetails = () => {
           <p>No conmment available.</p>
         )}
       </div>
-                  
+      <ButtonComponent
+        textButton="Add comment"
+        onClick={()=>setSelectedAnswerId(answer._id)}
+      />
+      {selectedAnswerId === answer._id && (   
+        <div>      
         <textarea
           className="form-control"
           placeholder="Add a comment"
@@ -997,9 +1004,10 @@ const QuestionDetails = () => {
         ></textarea>
         <ButtonComponent
         textButton="Submit comment"
-        onClick={()=>handleAddCommentClick2(answer.id,index)}
+        onClick={()=>handleAddCommentClick2(answer._id,index)}
       />
-      </div>
+      </div>)}
+      </div>  
       
               </div>
             
