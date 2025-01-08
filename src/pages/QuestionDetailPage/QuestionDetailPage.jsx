@@ -15,6 +15,7 @@ import * as AnswerVoteService from "../../services/AnswerVoteService";
 import * as CommentService from "../../services/CommentService";
 import * as CommentReportService from "../../services/CommentReportService";
 import * as AnswerReportService from "../../services/AnswerReportService";
+import * as NotificationService from "../../services/NotificationService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -74,7 +75,6 @@ const QuestionDetails = () => {
 
   const [quesVoteStatus, setQuesVoteStatus] = useState({ hasVoted: false, type: null });
   const [ansVoteStatus, setAnsVoteStatus] = useState({ hasVoted: false, type: null });
-  const [votes, setVotes] = useState({});
 
   useEffect(() => {
     // Kiểm tra trạng thái vote khi load page
@@ -148,6 +148,35 @@ const QuestionDetails = () => {
     }
   }, [answers]); // Chạy lại effect khi answers hoặc user thay đổi
 
+  const createVoteNotification = async (userId, questionId) => {
+    try {
+      // Lấy thông tin vote của câu hỏi
+      const quesVoteData = await QuestionVoteService.getVote(userId, questionId);
+  
+      // Kiểm tra nếu không có dữ liệu vote, thoát ra
+      if (!quesVoteData || !quesVoteData.data) {
+        throw new Error('Không tìm thấy dữ liệu vote.');
+      }
+  
+      // Tạo dữ liệu thông báo
+      const notificationData = {
+        user_id: questionDetail?.data?.userQues,  // user của câu hỏi
+        message: "Một người đã vote cho câu hỏi của bạn",
+        type: "vote",
+        metadata: {
+          question_id: questionId,
+          quesVote_id: quesVoteData.data?._id,  // ID của vote
+        },
+      };
+  
+      // Gọi API để tạo thông báo
+      await NotificationService.createNotification(notificationData);
+  
+    } catch (error) {
+      console.error("Error creating vote notification:", error);
+      // Có thể xử lý lỗi tại đây như trả về thông báo cho người dùng hoặc log lỗi
+    }
+  };  
 
   // Hàm xử lý UpVote
   const handleQuesUpVote = async () => {
@@ -170,6 +199,7 @@ const QuestionDetails = () => {
         questionId
       );
       dispatch(setDetailQuestion(updatedQuestion));
+      createVoteNotification(user?.id, questionId);
     } catch (error) {
       console.error("Error handling upvote:", error);
     }
@@ -196,6 +226,7 @@ const QuestionDetails = () => {
         questionId
       );
       dispatch(setDetailQuestion(updatedQuestion));
+      createVoteNotification(user?.id, questionId);
     } catch (error) {
       console.error("Error handling downvote:", error);
     }
@@ -523,6 +554,19 @@ const QuestionDetails = () => {
         await mutationUpdate.mutateAsync(userAns);
         // Gọi hàm fetchAnswers để cập nhật danh sách câu trả lời
         fetchAnswersWithUserDetails();
+
+        // Gửi thông báo
+      const notificationData = {
+        user_id: questionDetail?.data?.userQues,
+        message: "Bạn có một câu trả lời mới cho câu hỏi của mình",
+        type: "answer",
+        metadata: {
+          question_id: questionId,
+          answer_id: response?.data?._id || "Unknown Answer ID",
+        },
+      };
+
+      await NotificationService.createNotification(notificationData);
 
         // Hiển thị thông báo thành công
         message.success("Answer has been added successfully!");

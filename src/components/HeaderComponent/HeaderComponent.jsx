@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Styles } from "../../style";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Popover } from "antd";
 import * as UserService from "../../services/UserService";
 import * as AdminService from "../../services/AdminService";
+import * as NotificationService from "../../services/NotificationService";
 import { resetUser } from "../../redux/slides/userSlide";
 import { resetAdmin } from "../../redux/slides/adminSlide";
 import * as QuestionService from "../../services/QuestionService";
 import * as TagService from "../../services/TagService";
+import Modal from "react-modal";
 import "./SearchButton.css";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const admin = useSelector((state) => state.admin);
+  const [notifications, setNotifications] = useState([]);
+  const [modalIsOpen, setModalIsOpen] = useState(false); 
+  const buttonRef = useRef(null);
   const dispatch = useDispatch();
 
   const [img, setImg] = useState("");
@@ -150,6 +155,68 @@ const HeaderComponent = () => {
     }
   };
 
+  // Hàm lấy thông báo của người dùng
+const fetchNotifications = async () => {
+  try {
+    const data = await NotificationService.getNotificationsByUserId(user?.id); // Gọi API để lấy thông báo
+
+    // Duyệt qua từng thông báo để kiểm tra và xóa nếu không có answer_id hoặc quesVote_id
+    for (const notification of data.notifications) {
+      if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id) {
+        // Nếu không có answer_id hoặc quesVote_id, xóa thông báo
+        await NotificationService.deleteNotification(notification._id);
+      }
+    }
+
+    // Sau khi xóa, lấy lại danh sách thông báo mới
+    const filteredNotifications = data.notifications.filter(notification => 
+      notification.metadata?.answer_id || notification.metadata?.quesVote_id
+    );
+    setNotifications(filteredNotifications); // Lưu thông báo hợp lệ vào state
+    setLoading(false);
+
+  } catch (err) {
+    setLoading(false);
+    console.error('Error fetching or deleting notifications:', err);
+  }
+};
+
+useEffect(() => {
+  if (user?.id) {
+    fetchNotifications(); // Gọi hàm khi component được mount
+  }
+}, [user?.id]);
+
+
+  // Hàm đánh dấu thông báo đã đọc
+  const handleMarkAsRead = async (notificationId, questionId) => {
+    try {
+      await NotificationService.markAsRead(notificationId); 
+      fetchNotifications();
+      // Đánh dấu thông báo đã đọc
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) =>
+          notif._id === notificationId ? { ...notif, read: true } : notif
+        )
+      );
+      if (questionId) {
+        navigate(`/question-detail/${questionId}`);
+        closeModal();
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error.message);
+    }
+  };
+   // Mở modal
+   const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  // Đóng modal
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
     <>
       <nav className="navbar" style={{ backgroundColor: "#023E73" }}>
@@ -266,11 +333,96 @@ const HeaderComponent = () => {
               )}
             </div>
 
-            <div className="btn">
-              <i className="bi bi-bell-fill" style={Styles.iconHeader}></i>
-            </div>
-          </div>
-        </div>
+         
+      {/* Icon thông báo */}
+<div className="btn" onClick={openModal} ref={buttonRef} style={{ position: 'relative' }}>
+  <i className="bi bi-bell-fill" style={{ fontSize: "30px", cursor: "pointer", color: "white" }}>
+    {notifications.some((notification) => !notification.is_read) && (
+      <span
+        style={{
+          position: "absolute",
+          top: "12px",
+          right: "11px",
+          width: "10px",
+          height: "10px",
+          borderRadius: "50%",
+          backgroundColor: "red",
+          display: "inline-block",
+        }}
+      />
+    )}
+  </i>
+</div>
+
+      {/* Modal hiển thị thông báo */}
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Thông báo"
+        ariaHideApp={false}
+        className="notification-modal"
+        overlayClassName="notification-overlay"
+        style={{
+          content: {
+            position: "absolute",
+            top: buttonRef.current ? buttonRef.current.getBoundingClientRect().bottom + 10 : 0, // Đặt vị trí modal dưới button
+            left: buttonRef.current ? Math.min(buttonRef.current.getBoundingClientRect().left, window.innerWidth - 310) : 0, // Đặt cùng vị trí ngang với button
+            width: "280px",
+            backgroundColor: "white",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          },
+          overlay: {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+          },
+        }}
+      >
+        <h2 style={{ fontSize: "18px" }} >Thông báo</h2>
+        {loading && <p>Đang tải thông báo...</p>}
+        {!loading && notifications.length === 0 && <p>Không có thông báo.</p>}
+        
+        <div className="notification-list">
+  {notifications.map((notification) => {
+    let message = '';
+
+    if (notification.type === 'answer' && notification.metadata.answer_id) {
+      // Trường hợp trả lời câu hỏi
+      const userName = notification.metadata.answer_id.userAns?.name; // Lấy tên người trả lời
+      const questionTitle = notification.metadata.question_id?.title;
+      message = `${userName} đã trả lời câu hỏi "${questionTitle}" của bạn`;
+    } else if (notification.type === 'vote' && notification.metadata.quesVote_id) {
+      // Trường hợp vote câu hỏi
+      const userName = notification.metadata.quesVote_id.user?.name; // Lấy tên người đã vote
+      const questionTitle = notification.metadata.question_id?.title;
+      message = `${userName} đã vote cho câu hỏi "${questionTitle}" của bạn`;
+    } else {
+      // Trường hợp khác, sử dụng message gốc
+      message = notification.message;
+    }
+
+    return (
+      <div
+        key={notification._id}
+        className={`notification-item ${notification.is_read ? 'read' : 'unread'}`}
+        onClick={() => handleMarkAsRead(notification._id, notification.metadata.question_id._id)}
+      >
+        <p>{message}</p>
+        {!notification.is_read && <span>(Chưa đọc)</span>}
+      </div>
+    );
+  })}
+</div>
+
+        <button onClick={closeModal}>Đóng</button>
+      </Modal>
+    </div>
+    </div>
       </nav>
 
       <nav

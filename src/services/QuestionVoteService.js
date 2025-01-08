@@ -60,3 +60,26 @@ export const getVotesAndQuestionsFromUser = async (userId) => {
     }
   }
 };
+
+export const getVote = async (userId, questionId) => {
+  try {
+    // Gọi API để lấy thông tin vote và câu hỏi từ userId
+    const res = await axiosJWT.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question-vote/vote-detail/${userId}/${questionId}`
+    );
+    return res.data; // Trả về dữ liệu từ API
+  } catch (error) {
+    if (error.response) {
+      // Trả về lỗi từ phản hồi của server
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      // Trả về lỗi khi không kết nối được với máy chủ
+      throw {
+        status: 500,
+        message: "Không thể kết nối đến máy chủ.",
+      };
+    }
+  }
+};
