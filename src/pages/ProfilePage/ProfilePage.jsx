@@ -20,7 +20,7 @@ function ProfilePage() {
     month: "2-digit",
     day: "2-digit",
   });
-  
+
   console.log('vjvj', user)
 
   return (
@@ -40,22 +40,18 @@ function ProfilePage() {
               boxShadow: "0px 0px 10px rgba(0,0,0,0.2)"
             }}
           />
-          </div>
-          <div className="col-9">
-            <div className="row">
-          <h2 className="mt-3">{user.name}</h2>
+        </div>
+        <div className="col-9">
+          <div className="row">
+            <h2 className="mt-3">{user.name}</h2>
           </div>
           <div className="row">
             <div className="col">
-          <i class="bi bi-calendar"></i>
-          <p>Member since: {memberAt}</p>
+              <i class="bi bi-calendar"></i>
+              <p>Member since: {memberAt}</p>
+            </div>
           </div>
-          <div className="col">
-          <i class="bi bi-clock-history"></i>
-          <p>Recent access: {recentAccess}</p>
-          </div>
-          </div>
-          </div>
+        </div>
       </div>
 
       {/* Tabs */}

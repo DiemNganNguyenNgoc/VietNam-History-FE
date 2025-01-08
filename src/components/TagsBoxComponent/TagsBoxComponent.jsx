@@ -16,7 +16,6 @@ const TagsBoxComponent = ({ tagsname, description, quantity }) => {
         </span>
       </div>
     </div>
-
   );
 };
 

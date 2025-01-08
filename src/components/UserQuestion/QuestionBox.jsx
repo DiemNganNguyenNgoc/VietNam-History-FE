@@ -44,7 +44,7 @@ const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDel
           transition: "background-color 0.3s",
         }}
       >
-        {isHidden ?  "Hidden" :"Show"}
+        {isHidden ? "Hidden" : "Show"}
       </p>
     </div>
   );
@@ -76,9 +76,9 @@ const QuestionBox = ({ tags, title, date, views, answers, likes, onUpdate, onDel
           <span className="date-item">{date}</span>
         </div>
 
-                {/* Hiển thị thông báo nếu câu hỏi bị ẩn */}
-                {!isHidden && (
-          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginBottom: "10px", fontSize:'14px' }}>
+        {/* Hiển thị thông báo nếu câu hỏi bị ẩn */}
+        {!isHidden && (
+          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginBottom: "10px", fontSize: '14px' }}>
             This question was hidden
           </div>
         )}
