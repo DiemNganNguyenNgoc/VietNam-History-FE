@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import "./SortBtn.css";
 
-const SortBtn = () => {
+const SortBtn = ({ setFilterOption }) => {
   const [selectedOption, setSelectedOption] = useState(null);
-  const [hoveredOption, setHoveredOption] = useState(null);
-
-  const handleOptionClick = (option) => {
-    setSelectedOption(option);
-  };
+    const [hoveredOption, setHoveredOption] = useState(null);
+  
+    const handleOptionClick = (option) => {
+      setSelectedOption(option);
+      setFilterOption(option); // Truyền giá trị "New" hoặc "Popular" về TagsPage
+    };
 
   return (
     <div className="container">
       <button className="button">
-        {["Newest", "Active", "Bountied", "Unanswered"].map((option, index) => (
+        {["Newest", "Active",  "Unanswered"].map((option, index) => (
           <React.Fragment key={index}>
             <span
               className={`options ${

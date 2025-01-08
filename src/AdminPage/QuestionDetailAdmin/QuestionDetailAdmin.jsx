@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
-import Comment from "../../components/Comment/CommentComponent"
+import Comment from "../../components/CommentDelete/CommentDelete"
 import Compressor from "compressorjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutationHook } from "../../hooks/useMutationHook";
@@ -15,6 +15,7 @@ import LoadingComponent from "../../components/LoadingComponent/LoadingComponent
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { addAnswer } from '../../redux/slides/AnswerSlice'; // Import action
+import * as CommentReportService from "../../services/CommentReportService";
 import {
   setDetailAsker,
   setDetailQuestion,
@@ -36,6 +37,7 @@ const QuestionDetails = () => {
   const [idQues, setIdQues] = useState("");
   const [userCom, setIdUserCom] = useState('');
   const [TextCom, setTextCom] = useState('');
+  const [reportedCommentList, setReportedCommentList] = useState([]);
   // console.log("user", user)
 
   // const [userDetails, setUserDetails] = useState(null); // State lưu thông tin người hỏi
@@ -277,6 +279,51 @@ const QuestionDetails = () => {
     }
   };
 
+  //report comment
+    const handleCommentReport = async (commentQuess) => {
+      try {
+        if (!user?.id) {
+          console.error("User must be logged in to report comments.");
+          return;
+        }
+  
+        const isConfirmed = window.confirm(
+          "Are you sure you want to report this comment?"
+        );
+  
+        if (!isConfirmed) {
+          return; // Nếu người dùng nhấn "Cancel", thoát khỏi hàm
+        }
+  
+        const response = await CommentReportService.createCommentReport({
+          comment: commentQuess._id, // ID của bình luận
+          user: user.id, // ID của người dùng
+        });
+  
+        // Cập nhật danh sách báo cáo
+        const updatedList = [...reportedCommentList, commentQuess._id];
+        setReportedCommentList(updatedList);
+        localStorage.setItem("reportedComments", JSON.stringify(updatedList)); // Lưu vào localStorage
+  
+        console.log("Report submitted successfully:", response);
+  
+        // Cập nhật danh sách các bình luận đã báo cáo
+        // setReportedCommentList((prev) => [...prev, commentQuess._id]);
+  
+        alert(response.message); // Thông báo sau khi báo cáo thành công
+      } catch (error) {
+        console.error("Error reporting comment:", error);
+        alert("An error occurred while reporting the comment.");
+      }
+    };
+
+  //load comment bị report
+    useEffect(() => {
+      // Lấy danh sách đã báo cáo từ localStorage
+      const reported = JSON.parse(localStorage.getItem("reportedComments")) || [];
+      setReportedCommentList(reported);
+    }, []);
+
 
 
   useEffect(() => {
@@ -305,25 +352,48 @@ const QuestionDetails = () => {
     queryFn: getAllCom,
   });
 
-  const handleAddCommentClick = async () => {
-
-    if (!userAns) {
-      alert("User ID is missing. Please log in again.");
-      return;
-    }
-
-    const commentData = {
-
-      TextCom,
-      userAns,
-      questionId,
-      images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
-
+  //Lấy tất cả comment của câu hỏi
+     const getAllComAns = async () => {
+      const res = await CommentService.getCommentByQuestionId(questionId);
+      return res.data;
     };
+  
+    const {
+      isLoading: isLoadingQuesAns,
+      data: commentAns,
+      error : errorCom,
+    } = useQuery({
+      queryKey: ["commentAns"],
+      queryFn: getAllComAns,
+    });
+  
+ 
 
-    await mutationComment.mutateAsync(commentData);
-    TextCom = "";
+  //Xóa bình luận 
+  const deleteMutation = useMutationHook(data => CommentService.deleteComment(data));
+  const { isSuccess: isSuccessDelete, isError: isErrorDelete } = deleteMutation;
+  useEffect(() => {
+        
+    if ( isErrorDelete) {
+        message.error();
+    }
+}, [ isSuccessDelete, isErrorDelete, ]);
+
+const reloadPage = () => {
+    window.location.reload();
   };
+
+const handleDeleteComment = (comment,event) => {
+    // Ngừng sự kiện lan truyền
+    event.stopPropagation();
+       const isConfirmed = window.confirm("Are you sure you want to delete this comment?");
+       if (isConfirmed) {
+           deleteMutation.mutate(comment);
+           alert("Question deleted successfully!");
+       }
+       reloadPage();
+};
+  
 
 
   return (
@@ -404,9 +474,16 @@ const QuestionDetails = () => {
             return (
               <div
                 key={commentQues._id}
-                onClick={() => handleAddCommentClick(userAns)}
+                
               >
                 <Comment
+                name={commentQues.user.name || "Unknown"}
+                text={commentQues.content || "Unknown"}
+                date={new Date(commentQues.createdAt).toLocaleString()}
+                key={commentQues._id || commentQues.id || commentQues}
+                onReport={() => handleCommentReport(commentQues)}
+                isReported={reportedCommentList.includes(commentQues._id)}
+                onclick1={(event)=> handleDeleteComment(commentQues._id,event)}
 
                 />
               </div>
@@ -416,19 +493,7 @@ const QuestionDetails = () => {
           <p>No conmment available.</p>
         )}
       </div>
-      <div className="mt-4">
-        <textarea
-          className="form-control"
-          placeholder="Add a comment"
-          rows="2"
-          value={TextCom}
-          onChange={(e) => handleTextCom(e.target.value)}
-        ></textarea>
-      </div>
-      <ButtonComponent
-        textButton="Submit comment"
-        onClick={handleAddCommentClick}
-      />
+      
 
       {/* Danh sách câu trả lời */}
       <div>
@@ -471,6 +536,28 @@ const QuestionDetails = () => {
 
                 />
               ))}
+              <div >
+                <h5 className="mb-3"> Comments</h5>
+        {Array.isArray(commentAns) && commentAns.length > 0 ? (
+          commentAns.filter((commentQues) => commentQues.answer === answer._id) // Lọc các comment có answer = answer.id
+          .map((commentQues) => {
+            //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
+            return (
+              <Comment
+                name={commentQues.user.name || "Unknown"}
+                text={commentQues.content || "Unknown"}
+                date={new Date(commentQues.createdAt).toLocaleString()}
+                key={commentQues._id || commentQues.id || commentQues}
+                onReport={() => handleCommentReport(commentQues)}
+                isReported={reportedCommentList.includes(commentQues._id)}
+                onclick1={(event)=> handleDeleteComment(commentQues._id,event)}
+              />
+            );
+          })
+          ) : (
+          <p>No conmment available.</p>
+        )}
+      </div>
             </div>
           ))
         ) : (

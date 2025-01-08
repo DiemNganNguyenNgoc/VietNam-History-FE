@@ -7,10 +7,16 @@ export const addTag = async (data) => {
   return res.data
 }
 
-export const getAllTag = async (data) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all`, data)
-  return res
-}
+export const getAllTag = async () => {
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all`);
+    return res.data; // Trả về dữ liệu từ response
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    throw error; // Ném lỗi nếu có vấn đề
+  }
+};
+
 
 // export const getAllTagByUser = async (userId) => {
 //   const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all?userTag=${userId}`)

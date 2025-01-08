@@ -25,6 +25,7 @@ const QuestionPage = () => {
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
   const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
   const [likeCounts, setLikeCounts] = useState({}); // Lưu số lượt like của mỗi câu hỏi
+  const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
   //Phan trang
   const [currentPage, setCurrentPage] = useState(1);
   const questionsPerPage = 10; // Số câu hỏi mỗi trang
@@ -35,15 +36,12 @@ const QuestionPage = () => {
 
   const navigate = useNavigate();
 
+  // Danh sách câu hỏi để filter
   const [filters, setFilters] = useState({
     no_answers: false,
     no_accepted_answer: false,
-    has_bounty: false,
-    newest: false,
-    recent_activity: false,
-    highest_score: false,
-    most_frequent: false,
-    bounty_ending_soon: false,
+    tag: "",
+    sort_by: "", // Lưu giá trị của "Sorted by"
     the_following_tags: false,
   });
 
@@ -143,14 +141,6 @@ const QuestionPage = () => {
     return <div>Error loading questions: {error.message}</div>;
   }
 
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setFilters({
-      ...filters,
-      [name]: checked,
-    });
-  };
-
   const handleAskQuestionClick = () => {
     if (!user?.id) {
       alert("Please log in to ask question!");
@@ -164,19 +154,22 @@ const QuestionPage = () => {
     }
   };
 
-   const handleQuestionClick = async (questionId) => {
-     try {
-       if (!user?.id) {
-         console.error("User ID is missing");
-         return;
-       }
-       await QuestionService.updateViewCount(questionId, user.id);
-   
-       navigate(`/question-detail/${questionId}`);
-     } catch (error) {
-       console.error("Failed to update view count:", error.response?.data || error.message);
-     }
-   };
+  const handleQuestionClick = async (questionId) => {
+    try {
+      if (!user?.id) {
+        console.error("User ID is missing");
+        return;
+      }
+      await QuestionService.updateViewCount(questionId, user.id);
+
+      navigate(`/question-detail/${questionId}`);
+    } catch (error) {
+      console.error(
+        "Failed to update view count:",
+        error.response?.data || error.message
+      );
+    }
+  };
 
   //xử lí like
 
@@ -184,7 +177,7 @@ const QuestionPage = () => {
     // e.stopPropagation();
     try {
       if (savedList.includes(questionId)) {
-        console.log("Question already saved");
+        alert("Question already saved");
         return;
       }
 
@@ -201,7 +194,7 @@ const QuestionPage = () => {
       const updatedSavedList = [...allSaved, savedResponse.data]; // allSaved là state hiện tại
       dispatch(setAllSaved(updatedSavedList));
     } catch (error) {
-      console.error("Error saving question:", error);
+      alert("Error saving question:", error);
     }
   };
 
@@ -266,6 +259,31 @@ const QuestionPage = () => {
     navigate("/saved-list");
   };
 
+  // Hàm xử lý khi một checkbox thay đổi
+  const handleCheckboxChanges = ({ name, checked }) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: name === "tag" ? checked || "" : checked, // Xử lý riêng với tag
+    }));
+  };
+
+  const handleApplyFilters = (updatedFilters) => {
+    console.log("Filters nhận được từ QuestionFilter:", updatedFilters);
+    // Kiểm tra các trường hợp dữ liệu trống hoặc không hợp lệ
+
+    if (!updatedFilters || typeof updatedFilters !== "object") {
+      console.error("Filters không hợp lệ:", updatedFilters);
+      return;
+    }
+
+    const safeFilters = {
+      ...updatedFilters,
+    };
+
+    console.log("Filters đã áp dụng:", safeFilters);
+    setFilters(safeFilters); // Cập nhật state với bộ lọc an toàn
+  };
+
   // Hàm để thay đổi trang
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -278,6 +296,68 @@ const QuestionPage = () => {
   if (error) {
     return <div>Error loading questions: {error.message}</div>;
   }
+
+  //Sort theo filter
+  const getFilteredQuestion = () => {
+    let filteredQuestions = questions;
+
+    // Sắp xếp theo "New" hoặc "Active"
+    if (filterOption === "Newest") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+    } else if (filterOption === "Active") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => b.answerCount - a.answerCount
+      );
+    } else if (filterOption === "Unanswered") {
+      filteredQuestions = filteredQuestions.filter(
+        (question) => question.answerCount === 0
+      ); // Chỉ hiển thị câu hỏi chưa có câu trả lời
+    }
+
+    // Lọc theo các filter
+    if (filters.no_answers) {
+      filteredQuestions = filteredQuestions.filter((q) => q.answerCount === 0);
+    }
+
+    if (filters.no_accepted_answer) {
+      filteredQuestions = filteredQuestions.filter((q) => !q.acceptedAnswer);
+    }
+
+    if (filters.sort_by) {
+      if (filters.sort_by === "newest") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+      } else if (filters.sort_by === "recent_activity") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+        );
+      } else if (filters.sort_by === "highest_score") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => b.upVoteCount - a.upVoteCount
+        );
+      } else if (filters.sort_by === "most_frequent") {
+        filteredQuestions = filteredQuestions.sort(
+          (a, b) => b.answerCount - a.answerCount
+        );
+      }
+    }
+
+    // Lọc theo tag
+    if (filters.tag) {
+      const searchTag = filters.tag?.trim().toLowerCase(); // Đảm bảo filters.tag hợp lệ
+      filteredQuestions = filteredQuestions.filter((q) =>
+        q.tags?.some((t) => {
+          const tagName = tags[t]?.name || ""; // Giá trị mặc định
+          return tagName.toLowerCase() === searchTag;
+        })
+      );
+    }
+
+    return filteredQuestions;
+  };
 
   return (
     <div className="container">
@@ -327,7 +407,7 @@ const QuestionPage = () => {
           {questions.length} questions
         </p>
         <br />
-        <SortBtn />
+        <SortBtn setFilterOption={setFilterOption} />
 
         <div
           style={{
@@ -337,17 +417,14 @@ const QuestionPage = () => {
             width: "100%",
           }}
         >
-          <QuestionFilter
-            filters={filters}
-            onCheckboxChange={handleCheckboxChange}
-          />
+          <QuestionFilter onApplyFilters={handleApplyFilters} />
         </div>
         {/* Render các câu hỏi */}
         <div style={{ marginTop: "20px" }}>
           {isLoadingQues ? (
             <LoadingComponent isLoading={isLoadingQues} />
           ) : Array.isArray(questions) && questions.length > 0 ? (
-            questions.map((question) => {
+            getFilteredQuestion().map((question) => {
               console.log("question", question);
               console.log(
                 "Questions length:",
@@ -366,7 +443,7 @@ const QuestionPage = () => {
                     img={user?.img || ""}
                     username={user?.name || "Unknown"}
                     reputation={user?.reputation || 0}
-                    followers={user?.followerCount || 0}
+                    followerCount={user?.followerCount || 0}
                     title={question.title}
                     // tags={
                     //   question.tags

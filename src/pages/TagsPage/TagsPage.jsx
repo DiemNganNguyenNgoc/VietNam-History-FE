@@ -61,11 +61,13 @@ const TagsPage = () => {
   // Lấy danh sách tag từ API
   const getAllTag = async () => {
     const res = await TagService.getAllTag();
-    return res.data;
+    // console.log("res.data", res);
+    return res;
   };
 
   const getAllQuesByTag = async (tagId) => {
     const res = await QuestionService.getAllQuesByTag(tagId);
+    // console.log("res.length", res.data.length);
     return res.data.length; // Trả về số lượng câu hỏi
   };
 

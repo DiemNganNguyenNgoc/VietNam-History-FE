@@ -9,9 +9,12 @@ import AnswerSubTab from "./AnswerSubTab";
 import TagSubTab from "./TagSubTab";
 import SaveSubTab from "./SaveSubTab";
 import VoteSubTab from "./VoteSubTab/VoteSubTab";
+import { useSelector } from "react-redux";
 
 const ActivityTab = () => {
   const [activeTab, setActiveTab] = useState("questions");
+  const user = useSelector((state) => state.user);
+  console.log("usertab", user);
 
   return (
     <div className="d-flex">
@@ -31,12 +34,6 @@ const ActivityTab = () => {
           onClick={() => setActiveTab("answers")}
         >
           Answers
-        </button>
-        <button
-          className={`nav-link ${activeTab === "responses" ? "active" : ""}`}
-          onClick={() => setActiveTab("responses")}
-        >
-          Responses
         </button>
         <button
           className={`nav-link ${activeTab === "tags" ? "active" : ""}`}
@@ -63,12 +60,6 @@ const ActivityTab = () => {
           Following
         </button>
         <button
-          className={`nav-link ${activeTab === "reputation" ? "active" : ""}`}
-          onClick={() => setActiveTab("reputation")}
-        >
-          Reputation
-        </button>
-        <button
           className={`nav-link ${activeTab === "voted" ? "active" : ""}`}
           onClick={() => setActiveTab("voted")}
         >
@@ -79,17 +70,18 @@ const ActivityTab = () => {
       {/* Nội dung Tab */}
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
-
-          
-          {activeTab === "responses" && <div><ResponsesSubTab/></div>}
           {activeTab === "questions" && <QuestionSubTab />}
           {activeTab === "answers" && <AnswerSubTab />}
           {activeTab === "tags" && <TagSubTab />}
-          {activeTab === "saved" && <SaveSubTab/>}
-          {activeTab === "followers" && <FollowerSubTab />}
-          {activeTab === "following" && <FollowingSubTab />}
-          {activeTab === "reputation" && <ReputationSubTab />}
-          {activeTab === "voted" && <VoteSubTab/>}
+          {activeTab === "saved" && <SaveSubTab />}
+          {activeTab === "followers" && (
+            <FollowerSubTab followers={user.followers} />
+          )}
+          {activeTab === "following" && (
+            <FollowingSubTab following={user.following} />
+          )}
+  
+          {activeTab === "voted" && <VoteSubTab />}
         </div>
       </div>
     </div>

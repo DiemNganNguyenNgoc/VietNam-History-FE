@@ -9,17 +9,21 @@ import * as QuestionService from "../../services/QuestionService";
 import { updateUser } from "../../redux/slides/userSlide";
 import { Upload } from "antd";
 import { getBase64 } from "../../utils";
+import * as CommentService from "../../services/CommentService";
+import { useQuery } from "@tanstack/react-query";
 
 const ProfileTab = () => {
   const user = useSelector((state) => state.user);
   //   console.log("User state:", user);
   const dispatch = useDispatch();
 
-// Lấy userId từ localStorage
-  const [questionCount, setQuestionCount] = useState(0); 
+  // Lấy userId từ localStorage
+  const [questionCount, setQuestionCount] = useState(0);
   const [statusMessage, setStatusMessage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+  const [commentCount, setCommentCount] = useState(0);
+  const [commentList,setCommentList]= useState([]);
+  const [userID, setUserID] = useState("null");
 
   //   const [name, setName] = useState(user?.name);
   //   const [email, setEmail] = useState(user?.email);
@@ -34,6 +38,7 @@ const ProfileTab = () => {
   //   const [password, setPassword] = useState(user?.password);
 
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     email: "",
     phone: "",
@@ -46,7 +51,7 @@ const ProfileTab = () => {
     gender: "",
     password: "",
     reportCount: 0,
-    followerCount: 0,   
+    followerCount: 0,
     followingCount: 0,
     savedCount: 0,
     reputation: 0,
@@ -107,6 +112,7 @@ const ProfileTab = () => {
   useEffect(() => {
     if (user) {
       setFormData({
+        id: user?.id || "",
         name: user?.name || "",
         email: user?.email || "",
         phone: user?.phone || "",
@@ -119,13 +125,16 @@ const ProfileTab = () => {
         gender: user?.gender || "",
         password: user?.password || "", // Không lưu lại mật khẩu trong form
         reportCount: user?.reportCount || 0,
-        followerCount: user?.followerCount || 0,   
+        followerCount: user?.followerCount || 0,
         followingCount: user?.followingCount || 0,
         savedCount: user?.savedCount || 0,
         reputation: user?.reputation || 0,
+        answerCount: user?.answerCount || 0,
       });
     }
   }, [user]);
+
+  console.log("userupdate", user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -209,7 +218,7 @@ const ProfileTab = () => {
       });
     }
   }, [mutation.isSuccess, mutation.isError, mutation.error]);
-  
+
   useEffect(() => {
     if (statusMessage) {
       alert(statusMessage.message);
@@ -233,9 +242,11 @@ const ProfileTab = () => {
       try {
         // Gọi API để lấy câu hỏi theo userId
         const response = await QuestionService.getQuestionsByUserId(user.id);
-        
+        const response2 = await CommentService.getCommentByUserId(user.id);
+
         // Nếu có dữ liệu, cập nhật số lượng câu hỏi
-        setQuestionCount(response?.total || 0); 
+        setQuestionCount(response?.total || 0);
+        setCommentCount(response2.length);
       } catch (error) {
         // Nếu có lỗi, cập nhật thông báo lỗi
         setStatusMessage({
@@ -244,14 +255,17 @@ const ProfileTab = () => {
         });
       }
     };
-  
+
     // Gọi hàm fetch khi userId thay đổi
     if (user.id) {
       fetchQuestionCount();
     }
-  
   }, [user.id]); // Chạy lại khi userId thay đổi
+  //Lấy tất cả comment
   
+
+  
+
   return (
     <div className="row">
       <div className="col-3">
@@ -278,11 +292,17 @@ const ProfileTab = () => {
               </tr>
               <tr>
                 <td className="fw-bold fs-5">{questionCount}</td>
-                <td className="fw-bold fs-5">12</td>
+                <td className="fw-bold fs-5">{formData.answerCount}</td>
               </tr>
               <tr className="row-2">
                 <td className="text-muted">questions</td>
                 <td className="text-muted">answers</td>
+              </tr>
+              <tr className="row-2">
+                <td className="fw-bold fs-5">{commentCount}</td>
+              </tr>
+              <tr className="row-2">
+                <td className="text-muted">comments</td>
               </tr>
             </tbody>
           </table>
@@ -305,7 +325,7 @@ const ProfileTab = () => {
                     height: "80px",
                     borderRadius: "50%",
                     objectFit: "cover",
-                    boxShadow: "0px 0px 5px rgba(0,0,0,0.2)"
+                    boxShadow: "0px 0px 5px rgba(0,0,0,0.2)",
                   }}
                 />
               )}
@@ -358,7 +378,11 @@ const ProfileTab = () => {
                 label="Birthday"
                 type="date"
                 placeholder="Enter your birthday"
-                value={formData.birthday}
+                value={
+                  formData.birthday
+                    ? new Date(formData.birthday).toISOString().split("T")[0]
+                    : ""
+                }
                 onChange={handleChange}
               />
               <FormComponent

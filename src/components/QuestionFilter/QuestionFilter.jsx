@@ -1,12 +1,55 @@
-// ChecklistFilter.js
 import React from 'react';
 import ApplyBtn from '../../components/ApplyBtn/ApplyBtn';
 
-const QuestionFilter = ({ filters, onCheckboxChange }) => {
+const QuestionFilter = ({ onApplyFilters }) => {
+  const [filters, setFilters] = React.useState({
+    no_answers: false,
+    no_accepted_answer: false,
+    tag : '',
+    sort_by: '', // Lưu giá trị của "Sorted by"
+    the_following_tags: false,
+  });
 
-    const handleApplyClick = () => {
-        alert('Nút đã được nhấn');
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+
+    setFilters((prevFilters) => {
+      // Xử lý checkbox nhóm "Sorted by"
+      if (["newest", "recent_activity", "highest_score", "most_frequent"].includes(name)) {
+        return {
+          ...prevFilters,
+          sort_by: checked ? name : '', // Chỉ lưu giá trị của checkbox được chọn
+        };
+      }
+
+      
+
+      // Checkbox khác
+      return {
+        ...prevFilters,
+        [name]: checked,
       };
+    });
+  };
+
+  const handleInputChange = (event) => {
+    const { value } = event.target;
+    
+
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      tag: value,
+    }));
+  };
+
+  
+
+  const handleApplyClick = () => {
+    if (onApplyFilters) {
+        onApplyFilters(filters); // Truyền dữ liệu filter khi nhấn nút "Apply"
+        alert('Đã áp dụng bộ lọc.');
+    }
+};
 
   return (
     <div
@@ -35,7 +78,7 @@ const QuestionFilter = ({ filters, onCheckboxChange }) => {
             type="checkbox"
             name="no_answers"
             checked={filters.no_answers}
-            onChange={onCheckboxChange}
+            onChange={handleCheckboxChange} // Cập nhật sự thay đổi trạng thái
           />
           <label style={{ marginLeft: '8px', color: '#121212' }}>No answers</label>
         </div>
@@ -44,18 +87,9 @@ const QuestionFilter = ({ filters, onCheckboxChange }) => {
             type="checkbox"
             name="no_accepted_answer"
             checked={filters.no_accepted_answer}
-            onChange={onCheckboxChange}
+            onChange={handleCheckboxChange} // Cập nhật sự thay đổi trạng thái
           />
           <label style={{ marginLeft: '8px', color: '#121212' }}>No accepted answer</label>
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="has_bounty"
-            checked={filters.has_bounty}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Has bounty</label>
         </div>
       </div>
 
@@ -64,84 +98,54 @@ const QuestionFilter = ({ filters, onCheckboxChange }) => {
         <h4 style={{ marginBottom: '15px', color: '#121212', fontSize: '20px', fontWeight: '700' }}>
           Sorted by
         </h4>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="newest"
-            checked={filters.most_viewed}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Newest</label>
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="recent_activity"
-            checked={filters.recently_asked}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Recent activity</label>
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="highest_score"
-            checked={filters.has_media}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Highest score</label>
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="most_frequent"
-            checked={filters.most_frequent}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Most frequent</label>
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            name="bounty_ending_soon"
-            checked={filters.bounty_ending_soon}
-            onChange={onCheckboxChange}
-          />
-          <label style={{ marginLeft: '8px', color: '#121212' }}>Bounty ending soon</label>
-        </div>
+        {["newest", "recent_activity", "highest_score", "most_frequent"].map((sortOption) => (
+          <div style={{ marginBottom: '12px' }} key={sortOption}>
+            <input
+              type="checkbox"
+              name={sortOption}
+              checked={filters.sort_by === sortOption}
+              onChange={handleCheckboxChange}
+            />
+            <label style={{ marginLeft: '8px', color: '#121212' }}>
+              {sortOption.replace(/_/g, ' ')}
+            </label>
+          </div>
+        ))}
       </div>
 
       {/* Cột thứ ba */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-  <div>
-    <h4 style={{ marginBottom: '15px', color: '#121212', fontSize: '20px', fontWeight: '700' }}>
-      Sorted by
-    </h4>
-    <div style={{ marginBottom: '12px' }}>
-      <input
-        type="checkbox"
-        name="the_following_tags"
-        checked={filters.the_following_tags}
-        onChange={onCheckboxChange}
-      />
-      <label style={{ marginLeft: '8px', color: '#121212' }}>The following tags:</label>
-    </div>
-    <input
-      className="form-control"
-      type="text"
-      placeholder="e.g. javascript, python, ..."
-      style={{
-        width: '100%',
-        height: '35px',
-        marginTop: '10px',
-        border: '1px solid #023E73',
-      }}
-    />
-  </div>
-  <div style={{ position: 'absolute', bottom: '10px', right: '0px' }}>
-        <ApplyBtn onClick={handleApplyClick} />
+        <div>
+          <h4 style={{ marginBottom: '15px', color: '#121212', fontSize: '20px', fontWeight: '700' }}>
+            Tags
+          </h4>
+          <div style={{ marginBottom: '12px' }}>
+            <input
+              type="checkbox"
+              name="the_following_tags"
+              checked={filters.the_following_tags} // Chuyển đối giá trị boolean cho tags
+              onChange={handleCheckboxChange}
+            />
+            <label style={{ marginLeft: '8px', color: '#121212' }}>The following tags:</label>
+          </div>
+          <input
+            className="form-control"
+            type="text"
+            placeholder="e.g. javascript, python, ..."
+            value={filters.tag}
+            onChange={handleInputChange}
+            style={{
+              width: '100%',
+              height: '35px',
+              marginTop: '10px',
+              border: '1px solid #023E73',
+            }}
+          />
+        </div>
+        <div style={{ position: 'absolute', bottom: '10px', right: '0px' }}>
+          <ApplyBtn onClick={handleApplyClick} />
+        </div>
       </div>
-    </div>
     </div>
   );
 };
