@@ -9,6 +9,7 @@ import AnswerSubTab from "./AnswerSubTab";
 import TagSubTab from "./TagSubTab";
 import SaveSubTab from "./SaveSubTab";
 import VoteSubTab from "./VoteSubTab/VoteSubTab";
+import CommentSubTab from "./CommentSubTab";
 import { useSelector } from "react-redux";
 
 const ActivityTab = () => {
@@ -34,6 +35,12 @@ const ActivityTab = () => {
           onClick={() => setActiveTab("answers")}
         >
           Answers
+        </button>
+        <button
+          className={`nav-link ${activeTab === "comments" ? "active" : ""}`}
+          onClick={() => setActiveTab("comments")}
+        >
+          Comments
         </button>
         <button
           className={`nav-link ${activeTab === "tags" ? "active" : ""}`}
@@ -72,6 +79,7 @@ const ActivityTab = () => {
         <div className="tab-pane fade show active">
           {activeTab === "questions" && <QuestionSubTab />}
           {activeTab === "answers" && <AnswerSubTab />}
+          {activeTab === "comments" && <CommentSubTab />}
           {activeTab === "tags" && <TagSubTab />}
           {activeTab === "saved" && <SaveSubTab />}
           {activeTab === "followers" && (

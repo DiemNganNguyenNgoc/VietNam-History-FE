@@ -111,6 +111,23 @@ export const getQuestionsFromUserAnswers = async (userId) => {
   }
 };
 
+export const getQuestionsFromUserComments = async (userId) => {
+  try {
+    const res = await axiosJWT.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/question/comments/user/${userId}`
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        message: error.response.data?.message || "Đã xảy ra lỗi.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};
+
 export const addVote = async (questionId, userId, isUpVote) => {
   try {
     const res = await axiosJWT.post(

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import Comment from "../../components/Comment/CommentComponent";
+import Comment2 from "../../components/CommentDelete/CommentDelete";
 import Compressor from "compressorjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutationHook } from "../../hooks/useMutationHook";
@@ -511,6 +512,27 @@ const QuestionDetails = () => {
     isError: isErrorUpdate,
   } = mutationUpdate;
 
+   //Xóa bình luận 
+    const deleteMutation = useMutationHook(data => CommentService.deleteComment(data));
+    const { isSuccess: isSuccessDelete, isError: isErrorDelete } = deleteMutation;
+    useEffect(() => {
+          
+      if ( isErrorDelete) {
+          message.error();
+      }
+  }, [ isSuccessDelete, isErrorDelete, ]);
+
+  const handleDeleteComment = (comment,event) => {
+    // Ngừng sự kiện lan truyền
+    event.stopPropagation();
+       const isConfirmed = window.confirm("Are you sure you want to delete this comment?");
+       if (isConfirmed) {
+           deleteMutation.mutate(comment);
+           alert("Question deleted successfully!");
+       }
+       reloadPage();
+};
+
   //useEffect cho update answerCount cua User
   useEffect(() => {
     if (isSuccessUpdate && dataUpdate?.status !== "ERR") {
@@ -908,7 +930,18 @@ const QuestionDetails = () => {
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
           commentQuess.map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
-            return (
+            const isCurrentUser = commentQues.user._id === user.id; // So sánh user của comment với userId
+            return isCurrentUser ? (
+              <Comment2
+                name={commentQues.user.name || "Unknown"}
+                text={commentQues.content || "Unknown"}
+                date={new Date(commentQues.createdAt).toLocaleString()}
+                key={commentQues._id || commentQues.id || commentQues}
+                onReport={() => handleCommentReport(commentQues)}
+                isReported={reportedCommentList.includes(commentQues._id)}
+                onclick1={(event)=> handleDeleteComment(commentQues._id,event)}
+              />
+            ) : (
               <Comment
                 name={commentQues.user.name || "Unknown"}
                 text={commentQues.content || "Unknown"}
@@ -916,13 +949,14 @@ const QuestionDetails = () => {
                 key={commentQues._id || commentQues.id || commentQues}
                 onReport={() => handleCommentReport(commentQues)}
                 isReported={reportedCommentList.includes(commentQues._id)}
+
               />
             );
           })
-        ) : (
-          <p>No conmment available.</p>
-        )}
-      </div>
+      ) : (
+        <p>No comments available.</p>
+      )}
+    </div>
       <div className="mt-4">
         <textarea
           className="form-control"
@@ -1022,7 +1056,18 @@ const QuestionDetails = () => {
           commentAns.filter((commentQues) => commentQues.answer === answer._id) // Lọc các comment có answer = answer.id
           .map((commentQues) => {
             //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
-            return (
+            const isCurrentUser = commentQues.user._id === user.id; // So sánh user của comment với userId
+            return isCurrentUser ? (
+              <Comment2
+                name={commentQues.user.name || "Unknown"}
+                text={commentQues.content || "Unknown"}
+                date={new Date(commentQues.createdAt).toLocaleString()}
+                key={commentQues._id || commentQues.id || commentQues}
+                onReport={() => handleCommentReport(commentQues)}
+                isReported={reportedCommentList.includes(commentQues._id)}
+                onclick1={(event)=> handleDeleteComment(commentQues._id,event)}
+              />
+            ) : (
               <Comment
                 name={commentQues.user.name || "Unknown"}
                 text={commentQues.content || "Unknown"}
@@ -1033,10 +1078,10 @@ const QuestionDetails = () => {
               />
             );
           })
-          ) : (
-          <p>No conmment available.</p>
-        )}
-      </div>
+      ) : (
+        <p>No comments available.</p>
+      )}
+    </div>
       <ButtonComponent
         textButton="Add comment"
         onClick={()=>setSelectedAnswerId(answer._id)}
