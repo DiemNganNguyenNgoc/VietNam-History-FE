@@ -128,8 +128,8 @@ const ProfileTab = () => {
         followerCount: user?.followerCount || 0,
         followingCount: user?.followingCount || 0,
         savedCount: user?.savedCount || 0,
-        reputation: user?.reputation || 0,
         answerCount: user?.answerCount || 0,
+        quesCount: user?.quesCount || 0,
       });
     }
   }, [user]);
@@ -275,34 +275,28 @@ const ProfileTab = () => {
           <table className="table table-borderless">
             <tbody style={{ verticalAlign: "middle" }}>
               <tr>
-                <td className="fw-bold fs-5">{formData.reputation}</td>
+              <td className="fw-bold fs-5">{formData.savedCount}</td>
                 <td className="fw-bold fs-5">{formData.followerCount}</td>
               </tr>
               <tr className="row-2">
-                <td className="text-muted">reputation</td>
+              <td className="text-muted">saved</td>
                 <td className="text-muted">followers</td>
               </tr>
               <tr>
-                <td className="fw-bold fs-5">{formData.savedCount}</td>
+              <td className="fw-bold fs-5">{commentCount}</td>
                 <td className="fw-bold fs-5">{formData.followingCount}</td>
               </tr>
               <tr className="row-2">
-                <td className="text-muted">saved</td>
+              <td className="text-muted">comments</td>
                 <td className="text-muted">following</td>
               </tr>
               <tr>
-                <td className="fw-bold fs-5">{questionCount}</td>
+                <td className="fw-bold fs-5">{formData.quesCount}</td>
                 <td className="fw-bold fs-5">{formData.answerCount}</td>
               </tr>
               <tr className="row-2">
                 <td className="text-muted">questions</td>
                 <td className="text-muted">answers</td>
-              </tr>
-              <tr className="row-2">
-                <td className="fw-bold fs-5">{commentCount}</td>
-              </tr>
-              <tr className="row-2">
-                <td className="text-muted">comments</td>
               </tr>
             </tbody>
           </table>

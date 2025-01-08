@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import "../../../src/css/QuestionPage.css"
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -387,14 +388,21 @@ const QuestionPage = () => {
           >
             All Questions
           </h1>
-          <ButtonComponent
-            textButton="Ask question"
-            onClick={handleAskQuestionClick}
-          />
-          <ButtonComponent
-            textButton="Saved questions"
-            onClick={handleNavToSavedPage}
-          />
+          <div className="btn-holder">
+            <div className="askQues">
+              <ButtonComponent
+
+                textButton="Ask question"
+                onClick={handleAskQuestionClick}
+              />
+            </div>
+
+            <ButtonComponent
+              textButton="Saved questions"
+              onClick={handleNavToSavedPage}
+            />
+
+          </div>
         </div>
         <p
           style={{
@@ -462,8 +470,8 @@ const QuestionPage = () => {
                     tags={
                       question.tags
                         ? question.tags.map(
-                            (tagId) => tags[tagId]?.name || tagId
-                          )
+                          (tagId) => tags[tagId]?.name || tagId
+                        )
                         : []
                     } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}
