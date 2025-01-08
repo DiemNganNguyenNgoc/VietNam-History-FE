@@ -60,17 +60,23 @@ const AnswerSubTab = () => {
   };
 
   useEffect(() => {
+    console.log("TAG")
     const fetchTags = async () => {
       const tagMap = {};
+      console.log("TAG1")
       for (let answer of answers) {
-        if (answer.tags) {
-          for (let tagId of answer.tags) {
+      if(answer.question){
+        if (answer.question.tags) {
+          console.log("TAG", answer)
+          for (let tagId of answer.question.tags) {
+            console.log("TAG ID", tagId)
             if (!tagMap[tagId]) {
               const tag = await getTagDetails(tagId);
               tagMap[tagId] = tag;
             }
           }
         }
+      }
       }
       setTags(tagMap);
     };
@@ -108,6 +114,8 @@ const AnswerSubTab = () => {
     }
   };
 
+ 
+
   return (
     <div style={{ padding: '20px' }}>
        <div className="title">
@@ -122,7 +130,7 @@ const AnswerSubTab = () => {
           <QuestionAnswerBox
             key={answer._id}
             questionTitle={answer.question?.title || "Unknown Question"}
-            questionTags={answer.question?.tags ? answer.question.tags.map(_id => tags[_id]?.name || "Unknown Tag") : []}
+            questionTags={answer.question?.tags ? answer.question.tags.map(tagId=> tags[tagId]?.name || "Unknown Tag") : []}
             questionDate={new Date(answer.question?.createdAt).toLocaleString()}
             answerContent={answer.content}
             answerDate={new Date(answer.updatedAt).toLocaleString()}

@@ -40,7 +40,7 @@ const QuestionAnswerBox = ({
                 </p>
             ))}
 
-            {/* Thêm nút "Show/Hidden" */}
+           
             <p
                 onClick={(e) => {
                     e.stopPropagation();
@@ -59,7 +59,7 @@ const QuestionAnswerBox = ({
             </p>
         </div>
     );
-
+console.log("URAT", questionTags)
     return (
         <div className="question-answer-box">
             {/* Phần câu hỏi */}
