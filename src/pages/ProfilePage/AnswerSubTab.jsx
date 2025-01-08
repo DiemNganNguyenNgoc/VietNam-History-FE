@@ -60,16 +60,13 @@ const AnswerSubTab = () => {
   };
 
   useEffect(() => {
-    console.log("TAG")
+  
     const fetchTags = async () => {
       const tagMap = {};
-      console.log("TAG1")
       for (let answer of answers) {
       if(answer.question){
         if (answer.question.tags) {
-          console.log("TAG", answer)
           for (let tagId of answer.question.tags) {
-            console.log("TAG ID", tagId)
             if (!tagMap[tagId]) {
               const tag = await getTagDetails(tagId);
               tagMap[tagId] = tag;
