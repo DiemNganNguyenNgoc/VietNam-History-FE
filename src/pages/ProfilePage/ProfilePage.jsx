@@ -41,20 +41,17 @@ function ProfilePage() {
           />
         </div>
         <div className="col-9">
-          <div className="row">
-            <h2 className="mt-3">{user.name}</h2>
-        </div>
-        <div className="col-9">
-          <div className="row">
-            <h2 className="mt-3">{user.name}</h2>
-          </div>
-          <div className="row">
-            <div className="col">
-              <i class="bi bi-calendar"></i>
-              <p>Member since: {memberAt}</p>
+          <div className="col-9">
+            <div className="row">
+              <h2 className="mt-3">{user.name}</h2>
+            </div>
+            <div className="row">
+              <div className="col">
+                <i class="bi bi-calendar"></i>
+                <p>Member since: {memberAt}</p>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
 
@@ -64,9 +61,8 @@ function ProfilePage() {
           <ul className="nav nav-tabs">
             <li className="nav-item">
               <button
-                className={`nav-link ${
-                  activeTab === "profile" ? "active" : ""
-                }`}
+                className={`nav-link ${activeTab === "profile" ? "active" : ""
+                  }`}
                 onClick={() => setActiveTab("profile")}
               >
                 Profile
@@ -74,9 +70,8 @@ function ProfilePage() {
             </li>
             <li className="nav-item">
               <button
-                className={`nav-link ${
-                  activeTab === "activity" ? "active" : ""
-                }`}
+                className={`nav-link ${activeTab === "activity" ? "active" : ""
+                  }`}
                 onClick={() => setActiveTab("activity")}
               >
                 Activity
