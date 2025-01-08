@@ -19,14 +19,14 @@ export const getDetailsAnswer = async (id) => {
 };
 
 // Lấy câu trả lời theo ID câu hỏi
-export const getAnswersByQuestionId = async (questionId) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-question/${questionId}`);
+export const getAnswersByQuestionId = async (ansId) => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/get-by-question/${ansId}`);
   return res.data;
 };
 
 // Lấy câu trả lời theo ID câu hỏi
-export const getAnswersByQuestionIdAdmin = async (questionId) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/admin/get-by-question/${questionId}`);
+export const getAnswersByQuestionIdAdmin = async (ansId) => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/answer/admin/get-by-question/${ansId}`);
   return res.data;
 };
 
