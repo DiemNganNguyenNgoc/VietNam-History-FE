@@ -230,10 +230,7 @@ function HomePage() {
 
   return (
     <div className="container mt-4">
-      <div>
-        <SliderComponent arrImg={[slider1, slider2, slider3]} />
-      </div>
-      <br></br>
+      
       <div className="row">
         <div className="col">
           <span className="title">TOP QUESTION MAY INTEREST YOU</span>
