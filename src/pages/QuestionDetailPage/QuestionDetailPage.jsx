@@ -626,36 +626,40 @@ const QuestionDetails = () => {
   const handleAddCommentClick = useCallback( async () => {
 
     if (!user?.id) {
-      alert("Please log in to ask question!");
+      alert("Please log in to comment!");
       navigate("/login", { state: location?.pathname });
     } else if (!user?.active) {
       alert(
-        "Your account is inactive. You cannot add a question at this time."
+        "Your account is inactive. You cannot add a comment at this time."
       );
     } else {
-      
+      const commentData = {
+        content: TextCom,
+        user: userAns,
+        question : questionId,
+      };
+  
+      await mutationComment.mutateAsync(commentData);
+      setTextCom("");
+      alert("Thêm bình luận thành công");
+  
+      reloadPage();
     }
 
-    const commentData = {
-      content: TextCom,
-      user: userAns,
-      question : questionId,
-    };
-
-    await mutationComment.mutateAsync(commentData);
-    setTextCom("");
-    alert("Thêm bình luận thành công");
-
-    reloadPage();
+    
    
   }, [content, mutationComment, answers, user]);
 
   const handleAddCommentClick2 = useCallback( async (answerId,n) => {
 
     if (!userAns) {
-      alert("User ID is missing. Please log in again.");
-      return;
-    }
+      alert("Please log in to comment!");
+      navigate("/login", { state: location?.pathname });
+    } else if (!user?.active) {
+      alert(
+        "Your account is inactive. You cannot add a comment at this time."
+      );
+    } else {
 
     const commentData = {
       content: comconten,
@@ -668,7 +672,7 @@ const QuestionDetails = () => {
     setComConten("");
     alert("Thêm bình luận thành công");
 
-    reloadPage();
+    reloadPage();}
    
   }, [content, mutationComment, answers, user]);
 
