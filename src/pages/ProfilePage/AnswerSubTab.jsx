@@ -38,7 +38,7 @@ const AnswerSubTab = () => {
         
         // Gán answers với thông tin câu hỏi vào state
         setAnswers(answersWithQuestions);
-        console.log("ANSWERWQ", answersWithQuestions)
+       
       } else {
         setError('Không thể tải câu trả lời');
       }
@@ -111,7 +111,9 @@ const AnswerSubTab = () => {
     }
   };
 
- 
+  const handleQuestionClick = (questionId) => {
+    navigate(`/question-detail/${questionId}`);
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -124,6 +126,7 @@ const AnswerSubTab = () => {
         if (!answer.question) return null;
 
         return (
+          <div onClick={()=> handleQuestionClick(answer.question._id)} >
           <QuestionAnswerBox
             key={answer._id}
             questionTitle={answer.question?.title || "Unknown Question"}
@@ -137,6 +140,7 @@ const AnswerSubTab = () => {
             onDeleteAnswer={() => handleDelete(answer._id)}
             isHiddenQuestion={answer.question?.active}
           />
+          </div>
         );
       })}
     </div>
