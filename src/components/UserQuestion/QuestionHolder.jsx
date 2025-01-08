@@ -115,6 +115,34 @@ const QuestionHolder = () => {
       }
     };
 
+    const handleDelete = async (quesId) => {
+      const isConfirmed = window.confirm(`Are you sure you want to delete this question?`);
+    
+      if (!isConfirmed) return;
+    
+      if (!quesId) {
+        console.error("Question ID is missing");
+        return;
+      }
+    
+      try {
+        const res = await QuestionService.deleteQuestion(quesId);
+        console.log("Successfully deleted question:", res.data);
+    
+        // Hiển thị thông báo xóa thành công
+        alert("Question deleted successfully!");
+    
+        // Tải lại danh sách câu hỏi
+        fetchQuestions();
+      } catch (error) {
+        console.error("Failed to delete question:", error.response?.data || error.message);
+    
+        // Hiển thị thông báo lỗi nếu có
+        alert("Failed to delete question. Please try again.");
+      }
+    };
+    
+
   return (
     <div style={{ padding: '20px' }}>
       {questions.map((question) => (
@@ -130,6 +158,7 @@ const QuestionHolder = () => {
             onUpdate={() => handleOnUpdate(question._id)}
             isHidden={question.active}
             onHidden={() => handleToggleHidden(question._id, question.active)} 
+            onDelete={()=>handleDelete(question._id)}
           />
         </div>
       ))}

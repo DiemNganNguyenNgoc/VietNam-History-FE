@@ -20,7 +20,7 @@ function ProfilePage() {
     day: "2-digit",
   });
 
-  console.log("vjvj", user);
+  console.log('vjvj', user)
 
   return (
     <div className="container mt-4">
@@ -43,17 +43,18 @@ function ProfilePage() {
         <div className="col-9">
           <div className="row">
             <h2 className="mt-3">{user.name}</h2>
+        </div>
+        <div className="col-9">
+          <div className="row">
+            <h2 className="mt-3">{user.name}</h2>
           </div>
           <div className="row">
             <div className="col">
               <i class="bi bi-calendar"></i>
               <p>Member since: {memberAt}</p>
             </div>
-            <div className="col">
-              <i class="bi bi-clock-history"></i>
-              <p>Recent access: {recentAccess}</p>
-            </div>
           </div>
+        </div>
         </div>
       </div>
 

@@ -169,13 +169,6 @@ function OtherUserProfilePage() {
                   {new Date(detailUser.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <div className="col">
-                <i className="bi bi-clock-history"></i>
-                <p>
-                  Recent access:{" "}
-                  {new Date(detailUser.updatedAt).toLocaleDateString()}
-                </p>
-              </div>
             </div>
           </div>
         </div>

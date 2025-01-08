@@ -47,6 +47,13 @@ export const deleteTag = async (tagId) => {
   return res.data;
 };
 
+export const updateTag = async (tagId, data) => {
+  const res = await axios.put(
+    `${process.env.REACT_APP_API_URL_BACKEND}/tag/update/${tagId}`,
+    data
+  );
+  return res.data;
+};
 
 
 // export const getDetailsTag = async (tagId) => {

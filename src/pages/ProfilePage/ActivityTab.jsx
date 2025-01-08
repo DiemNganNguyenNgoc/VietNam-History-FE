@@ -36,12 +36,6 @@ const ActivityTab = () => {
           Answers
         </button>
         <button
-          className={`nav-link ${activeTab === "responses" ? "active" : ""}`}
-          onClick={() => setActiveTab("responses")}
-        >
-          Responses
-        </button>
-        <button
           className={`nav-link ${activeTab === "tags" ? "active" : ""}`}
           onClick={() => setActiveTab("tags")}
         >
@@ -66,12 +60,6 @@ const ActivityTab = () => {
           Following
         </button>
         <button
-          className={`nav-link ${activeTab === "reputation" ? "active" : ""}`}
-          onClick={() => setActiveTab("reputation")}
-        >
-          Reputation
-        </button>
-        <button
           className={`nav-link ${activeTab === "voted" ? "active" : ""}`}
           onClick={() => setActiveTab("voted")}
         >
@@ -82,11 +70,6 @@ const ActivityTab = () => {
       {/* Nội dung Tab */}
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
-          {activeTab === "responses" && (
-            <div>
-              <ResponsesSubTab />
-            </div>
-          )}
           {activeTab === "questions" && <QuestionSubTab />}
           {activeTab === "answers" && <AnswerSubTab />}
           {activeTab === "tags" && <TagSubTab />}
@@ -97,7 +80,7 @@ const ActivityTab = () => {
           {activeTab === "following" && (
             <FollowingSubTab following={user.following} />
           )}
-          {activeTab === "reputation" && <ReputationSubTab />}
+  
           {activeTab === "voted" && <VoteSubTab />}
         </div>
       </div>
