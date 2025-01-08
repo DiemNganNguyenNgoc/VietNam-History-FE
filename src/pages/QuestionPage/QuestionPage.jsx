@@ -20,7 +20,7 @@ const QuestionPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  console.log("user1", user);
+  // console.log("user1", user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
   const [questionList, setQuestionList] = useState([]); // Danh sách câu hỏi
@@ -74,6 +74,7 @@ const QuestionPage = () => {
   // Lấy thông tin tag dựa trên tagId
   const getTagDetails = async (tagId) => {
     const res = await TagService.getDetailsTag(tagId);
+    console.log("res.data", res.data);
     return res.data;
   };
 
@@ -432,6 +433,12 @@ const QuestionPage = () => {
               );
 
               const user = users[question.userQues]; // Lấy thông tin người dùng từ state
+              // console.log("tags", tags);
+              // console.log("question.tags", question.tags);
+              // console.log(
+              //   "question.tags.map((tagId) => tags[tagId]?.name || tagId)",
+              //   question.tags.map((tagId) => tags[tagId]?.name || tagId)
+              // );
               return (
                 <div
                   key={question._id}
