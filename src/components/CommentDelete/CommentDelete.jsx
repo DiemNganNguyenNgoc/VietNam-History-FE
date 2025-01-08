@@ -25,18 +25,7 @@ const Comment = ({ id, name, img, text, date, isReported, onReport ,isDelete,onc
           <strong>{name}</strong>
         </div>
 
-        <button
-          className={`report-button ${isReported ? "reported" : ""}`}
-          type="text"
-          danger
-          disabled={isReported}
-          onClick={(e) => {
-            e.stopPropagation();
-            onReport();
-          }}
-        >
-          {isReported ? "Reported" : "Report"}
-        </button>
+        
         <button
           className="btn btn-sm btn-light"
           onClick={onclick1} // Truyền event vào hàm
