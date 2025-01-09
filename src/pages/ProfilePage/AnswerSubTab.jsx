@@ -126,8 +126,9 @@ const AnswerSubTab = () => {
         if (!answer.question) return null;
 
         return (
-          <div onClick={()=> handleQuestionClick(answer.question._id)} >
+          
           <QuestionAnswerBox
+            onClick={()=>handleQuestionClick(answer.question._id)}
             key={answer._id}
             questionTitle={answer.question?.title || "Unknown Question"}
             questionTags={answer.question?.tags ? answer.question.tags.map(tagId=> tags[tagId]?.name || "Unknown Tag") : []}
@@ -140,7 +141,7 @@ const AnswerSubTab = () => {
             onDeleteAnswer={() => handleDelete(answer._id)}
             isHiddenQuestion={answer.question?.active}
           />
-          </div>
+          
         );
       })}
     </div>

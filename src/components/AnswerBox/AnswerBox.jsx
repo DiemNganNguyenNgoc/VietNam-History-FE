@@ -9,61 +9,15 @@ const QuestionAnswerBox = ({
     questionDate,
     answerContent,
     answerDate,
-    onUpdateAnswer,
     onDeleteAnswer,
-    onHiddenAnswer,
     isHiddenAnswer,
+    onClick
 }) => {
-    const questionPopoverContent = (
-        <div>
-            {[ "Delete"].map((item, index) => (
-                <p
-                    key={index}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        if (item === "Update") {
-                            onUpdateAnswer();
-                        } else if (item === "Delete") {
-                            onDeleteAnswer && onDeleteAnswer();
-                        }
-                    }}
-                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
-                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-                    style={{
-                        padding: "10px",
-                        margin: 0,
-                        cursor: "pointer",
-                        transition: "background-color 0.3s",
-                    }}
-                >
-                    {item}
-                </p>
-            ))}
 
-           
-            <p
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onHiddenAnswer && onHiddenAnswer();
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#C5E3FC")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-                style={{
-                    padding: "10px",
-                    margin: 0,
-                    cursor: "pointer",
-                    transition: "background-color 0.3s",
-                }}
-            >
-                {isHiddenAnswer ? true : false}
-            </p>
-        </div>
-    );
-console.log("URAT", questionTags)
     return (
         <div className="question-answer-box">
             {/* Phần câu hỏi */}
-            <div className="question-section">
+            <div className="question-section" onClick={onClick}>
                 <div className="title-and-tags">
                     <h3 className="question_title">{parse(questionTitle)}</h3>
                     <div className="tags-container">
@@ -87,27 +41,14 @@ console.log("URAT", questionTags)
 
             {/* Phần câu trả lời */}
             <div className="answer-section">
-                <div className='Answerdetail'>
-                   
-                        <h4>Answer:</h4>
-                 
-                    <div className="btn">
-                        <Popover content={questionPopoverContent} trigger="click">
-                            <div
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <i
-                                    className="bi bi-three-dots-vertical"
-                                    style={{ color: '#777' }}
-                                ></i>
-                            </div>
-                        </Popover>
-                    </div>
+                <div className='answer-detail'>
+                    <h4>Answer:</h4>
+                    
+                    <button className='btn btn-sm btn-light'
+                        onClick={onDeleteAnswer}>
+                        <i className="bi bi-trash text-danger"></i>
+                    </button>
+                    
                 </div>
                 <p className="answer-content">{parse(answerContent)}</p>
                 <div className="answer-date-container">

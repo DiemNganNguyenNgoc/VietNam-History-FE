@@ -126,6 +126,15 @@
 .popover-content p:hover {
   background-color: #C5E3FC;
 }
+.answer-detail {
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: space-between; /* Giãn đều khoảng cách giữa các phần tử */
+}
+
+.answer-detail button {
+  margin-left: auto; /* Đẩy button sang phải */
+}
 
 
 
