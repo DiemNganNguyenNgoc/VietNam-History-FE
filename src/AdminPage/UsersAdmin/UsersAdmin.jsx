@@ -133,7 +133,6 @@ const UsersAdmin = () => {
                 <th>Phone number</th>
                 <th>Questions</th>
                 <th>Answers</th>
-                <th>Reputation</th>
                 <th>Report</th>
                 <th></th>
               </tr>
@@ -150,11 +149,11 @@ const UsersAdmin = () => {
                     <td>{row.phone}</td>
                     <td>{row.quesCount}</td>
                     <td>{row.answerCount}</td>
-                    <td>{row.reputation}</td>
                     <td>{row.reportCount}</td>
                     <td>
                       <button className='view-profile' onClick={() => handleViewProfile(row._id)}>View</button>
                       <button
+                      style={{marginLeft:25, marginTop:5}}
                         className={`btn btn-sm ${row.active ? "btn-danger" : "btn-success"}`}
                         onClick={() => handleToggleUserStatus(row._id, row.active)}
                       >
