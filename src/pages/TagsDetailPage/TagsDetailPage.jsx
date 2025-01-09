@@ -13,6 +13,7 @@ const TagsDetailPage = () => {
     const { tagId } = useParams();
     const navigate = useNavigate();
     const [tagDetails, setTagDetails] = useState(null);
+     const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
     const [filters, setFilters] = useState({
         no_answers: false,
         no_accepted_answer: false,
@@ -35,6 +36,27 @@ const TagsDetailPage = () => {
             [name]: checked,
         });
     };
+    //Sort theo filter
+  const getFilteredQuestion = () => {
+    let filteredQuestions = questions;
+
+    // Sắp xếp theo "New" hoặc "Active"
+    if (filterOption === "Newest") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      );
+    } else if (filterOption === "Active") {
+      filteredQuestions = filteredQuestions.sort(
+        (a, b) => b.answerCount - a.answerCount
+      );
+    } else if (filterOption === "Unanswered") {
+      filteredQuestions = filteredQuestions.filter(
+        (question) => question.answerCount === 0
+      ); // Chỉ hiển thị câu hỏi chưa có câu trả lời
+    }
+ 
+    return filteredQuestions;
+  };
 
     // Lấy thông tin tag
     useEffect(() => {
@@ -165,7 +187,7 @@ const TagsDetailPage = () => {
                     </p>
                 </div>
                 <div className="col">
-                    <SortBtn />
+                    <SortBtn setFilterOption={setFilterOption} />
                 </div>
             </div>
 
@@ -177,11 +199,11 @@ const TagsDetailPage = () => {
                     width: "100%",
                 }}
             >
-                <QuestionFilter filters={filters} onCheckboxChange={handleCheckboxChange} />
+               
             </div>
             <div style={{ marginTop: "20px" }}>
                 {Array.isArray(questions) && questions.length > 0 ? (
-                    questions.map((question) => {
+                    getFilteredQuestion().map((question) => {
                         const user = users[question.userQues]; // Lấy thông tin người dùng từ state
                         return (
                             <div

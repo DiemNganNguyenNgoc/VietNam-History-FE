@@ -453,29 +453,25 @@ const QuestionDetails = () => {
   // }, [question]);
 
   //Upload anh
-    const handleImageUpload = (event) => {
-      const files = Array.from(event.target.files);
-  
-      files.forEach((file) => {
-        new Compressor(file, {
-          quality: 0.6,
-          maxWidth: 800,
-          maxHeight: 800,
-          success(result) {
-            // Đọc file đã nén thành Base64
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64String = reader.result;
-              setImageSrcs((prevImages) => [...prevImages, base64String]);
-            };
-            reader.readAsDataURL(result);
-          },
-          error(err) {
-            console.error(err);
-          },
-        });
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+
+    files.forEach((file) => {
+      new Compressor(file, {
+        quality: 0.6, // Quality (60%)
+        maxWidth: 800, // Max width
+        maxHeight: 800, // Max height
+        success(result) {
+          // Tạo URL tạm cho các ảnh đã nén
+          const compressedImage = URL.createObjectURL(result);
+          setImageSrcs((prevImages) => [...prevImages, compressedImage]); // Thêm ảnh vào mảng
+        },
+        error(err) {
+          console.error(err);
+        },
       });
-    };
+    });
+  };
 
   // Xử lý xóa ảnh
   const handleRemoveImage = useCallback((index) => {
