@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import QuestionHolder from "../../components/UserQuestion/QuestionHolder";
 import "../../css/QuestionSubTab.css";
 import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as UserService from "../../services/UserService";
@@ -8,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as SavedService from "../../services/SavedService";
 import { setAllSaved } from "../../redux/slides/savedSlide";
+import * as TagService from "../../services/TagService";
 
 const SaveSubTab = () => {
   const dispatch = useDispatch();
@@ -37,15 +37,32 @@ const SaveSubTab = () => {
       savedList.map(async (saved) => {
         const user = await getUserDetails(saved.user); // Lấy thông tin người dùng
         const question = await getQuestionDetails(saved.question); // Lấy thông tin câu hỏi
+        // console.log("questionssss", question);
 
+        // Ánh xạ tagId sang tagName
+        const tagsWithNames = await Promise.all(
+          question.tags.map(async (tagId) => {
+            const tagDetails = await getTagDetails(tagId); // Gọi API để lấy tagName
+            return tagDetails.name; // Giả sử API trả về đối tượng { name: "TagName" }
+          })
+        );
         return {
           ...saved,
           user,
-          question,
+          question: {
+            ...question,
+            tags: tagsWithNames, // Thay đổi danh sách tags từ ID sang tên
+          },
         };
       })
     );
     return enrichedData;
+  };
+
+  const getTagDetails = async (tagId) => {
+    const res = await TagService.getDetailsTag(tagId);
+    // console.log("res.data", res.data);
+    return res.data;
   };
 
   // Hàm xử lý bỏ lưu câu hỏi (Unsave)
@@ -112,20 +129,20 @@ const SaveSubTab = () => {
         enrichedSavedData.map((saved) => (
           <div
             key={allSaved.question}
-            onClick={() => handleQuestionClick(allSaved.question)}
+            onClick={() => handleQuestionClick(saved.question._id)}
           >
             <QuestionBox
               key={saved._id}
               id={saved.question._id}
-              img={saved.question.img}
-              username={saved.user.username}
+              img={saved.user.img}
+              username={saved.user.name}
               reputation={saved.user.reputation}
               followerCount={saved.user.followerCount}
               title={saved.question.title}
               tags={saved.question.tags}
-              date={saved.createdAt}
-              views={saved.question.views}
-              answers={saved.question.answers}
+              date={new Date(saved.question.createdAt).toLocaleString()}
+              views={saved.question.view}
+              answers={saved.question.answerCount}
               likes={saved.question.upVoteCount}
               isSaved={true}
               onUnsave={() => handleUnsave(saved._id)} // Gọi handleUnsave
@@ -136,7 +153,7 @@ const SaveSubTab = () => {
         <p>No saved questions yet.</p>
       )}
     </div>
-  )
+  );
 };
 
 export default SaveSubTab;

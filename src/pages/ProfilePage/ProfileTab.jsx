@@ -269,7 +269,7 @@ const ProfileTab = () => {
   return (
     <div className="row">
       <div className="col-3">
-        <h3 className="title-profile">Summary</h3>
+        {/* <h3 className="title-profile">Summary</h3>
 
         <div className="card-profile" style={{ padding: "0 10px" }}>
           <table className="table table-borderless">
@@ -299,7 +299,7 @@ const ProfileTab = () => {
               </tr>
             </tbody>
           </table>
-        </div>
+        </div> */}
       </div>
 
       <div className="col-9">

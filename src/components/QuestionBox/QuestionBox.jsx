@@ -44,9 +44,6 @@ const QuestionBox = ({
         <span className="username">{username}</span>
         <div className="details-container">
           <span className="detail-item">
-            <i className="bi bi-trophy-fill trophy-icon"></i> {reputation}
-          </span>
-          <span className="detail-item">
             <i className="bi bi-person-fill person-icon"></i> {followerCount}
           </span>
         </div>

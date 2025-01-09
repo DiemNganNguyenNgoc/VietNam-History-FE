@@ -217,18 +217,6 @@ const LogInPage = () => {
                   {errorMessage}
                 </span>
               )}
-              <a
-                href="#"
-                className="forgot-password"
-                style={{
-                  textAlign: "right",
-                  fontSize: "14px",
-                  color: "#003366",
-                  textDecoration: "none",
-                }}
-              >
-                Forgot password?
-              </a>
               <div
                 style={{
                   display: "flex",

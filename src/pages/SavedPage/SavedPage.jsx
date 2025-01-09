@@ -126,20 +126,20 @@ const SavedPage = () => {
         enrichedSavedData.map((saved) => (
           <div
             key={allSaved.question}
-            onClick={() => handleQuestionClick(allSaved.question)}
+            onClick={() => handleQuestionClick(saved.question._id)}
           >
             <QuestionBox
               key={saved._id}
               id={saved.question._id}
-              img={saved.question.img}
-              username={saved.user.username}
+              img={saved.user.img}
+              username={saved.user.name}
               reputation={saved.user.reputation}
               followerCount={saved.user.followerCount}
               title={saved.question.title}
               tags={saved.question.tags}
-              date={saved.createdAt}
-              views={saved.question.views}
-              answers={saved.question.answers}
+              date={new Date(saved.question.createdAt).toLocaleString()}
+              views={saved.question.view}
+              answers={saved.question.answerCount}
               likes={saved.question.upVoteCount}
               isSaved={true}
               onUnsave={() => handleUnsave(saved._id)} // Gọi handleUnsave

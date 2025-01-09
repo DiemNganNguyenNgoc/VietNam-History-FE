@@ -16,7 +16,7 @@ function TagAdmin() {
       setIsLoading(true);
       try {
         const res = await TagService.getAllTag();
-        const tags = res.data;
+        const tags = res;
 
         // Sau khi lấy danh sách tags, gọi API để lấy số lượng câu hỏi
         const updatedTags = await Promise.all(
@@ -36,6 +36,8 @@ function TagAdmin() {
 
     fetchTagsWithCount();
   }, []);
+
+  console.log('jhbjb', tagsWithCount)
 
   // Hàm lấy danh sách câu hỏi theo tagId
   const getAllQues = async (tagId) => {

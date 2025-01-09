@@ -177,7 +177,7 @@ function OtherUserProfilePage() {
       <div className="container">
         <div className="row">
           <div className="col-3">
-            <h3 className="title-profile">Summary</h3>
+            {/* <h3 className="title-profile">Summary</h3>
             <div className="card-profile" style={{ padding: "0 10px" }}>
               <table className="table table-borderless">
                 <tbody style={{ verticalAlign: "middle" }}>
@@ -205,7 +205,7 @@ function OtherUserProfilePage() {
                   </tr>
                 </tbody>
               </table>
-            </div>
+            </div> */}
           </div>
 
           <div className="col-9">
