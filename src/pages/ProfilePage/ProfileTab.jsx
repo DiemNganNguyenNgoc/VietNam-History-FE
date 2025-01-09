@@ -283,7 +283,6 @@ const ProfileTab = () => {
                 <td className="text-muted">followers</td>
               </tr>
               <tr>
-              <td className="fw-bold fs-5">{commentCount}</td>
                 <td className="fw-bold fs-5">{formData.followingCount}</td>
               </tr>
               <tr className="row-2">
