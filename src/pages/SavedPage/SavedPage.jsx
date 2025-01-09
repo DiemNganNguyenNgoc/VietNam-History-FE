@@ -5,6 +5,7 @@ import QuestionBox from "../../components/QuestionBox/QuestionBox";
 import * as UserService from "../../services/UserService";
 import * as QuestionService from "../../services/QuestionService";
 import * as SavedService from "../../services/SavedService";
+import * as TagService from "../../services/TagService";
 import { useNavigate } from "react-router-dom";
 
 const SavedPage = () => {
@@ -35,15 +36,32 @@ const SavedPage = () => {
       savedList.map(async (saved) => {
         const user = await getUserDetails(saved.user); // Lấy thông tin người dùng
         const question = await getQuestionDetails(saved.question); // Lấy thông tin câu hỏi
+        console.log("questionssss", question);
 
+        // Ánh xạ tagId sang tagName
+        const tagsWithNames = await Promise.all(
+          question.tags.map(async (tagId) => {
+            const tagDetails = await getTagDetails(tagId); // Gọi API để lấy tagName
+            return tagDetails.name; // Giả sử API trả về đối tượng { name: "TagName" }
+          })
+        );
         return {
           ...saved,
           user,
-          question,
+          question: {
+            ...question,
+            tags: tagsWithNames, // Thay đổi danh sách tags từ ID sang tên
+          },
         };
       })
     );
     return enrichedData;
+  };
+
+  const getTagDetails = async (tagId) => {
+    const res = await TagService.getDetailsTag(tagId);
+    console.log("res.data", res.data);
+    return res.data;
   };
 
   // Hàm xử lý bỏ lưu câu hỏi (Unsave)
