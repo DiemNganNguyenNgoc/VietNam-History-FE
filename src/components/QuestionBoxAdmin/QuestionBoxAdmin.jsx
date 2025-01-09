@@ -13,6 +13,8 @@ const QuestionBoxAdmin = ({
   answers,
   likes,
   onDelete,
+  report,
+  onHidden,
   isHidden, // Thêm trạng thái hiện tại
 }) => {
 
@@ -29,9 +31,6 @@ const QuestionBoxAdmin = ({
         <span className="username">{username}</span>
         <div className="details-container">
           <span className="detail-item">
-            <i className="bi bi-trophy-fill trophy-icon"></i> {reputation}
-          </span>
-          <span className="detail-item">
             <i className="bi bi-heart-fill heart-icon"></i> {followers}
           </span>
         </div>
@@ -41,8 +40,9 @@ const QuestionBoxAdmin = ({
         <div className="question-details">
           <span className="detail-item">{views} views</span>
           <span className="detail-item">{answers} answers</span>
+          <span className="detail-item">{report} reports</span>
           <span className="detail-item">
-            {likes} <i className="bi bi-hand-thumbs-up like-icon"></i>
+            {likes} liked
           </span>
         </div>
         <div className="title-and-tags">
@@ -58,11 +58,23 @@ const QuestionBoxAdmin = ({
         </div>
 
         {/* Hiển thị thông báo nếu câu hỏi đang bị ẩn */}
-        {isHidden && (
-          <div className="hidden-notice" style={{ color: "#ff0000", fontWeight: "bold", marginTop: "10px", fontSize:'14px' }}>
-            This question was hidden by the user.
+        {!isHidden ? (
+          <div
+            className="hidden-notice"
+            style={{
+              color: "#ff0000",
+              fontWeight: "bold",
+              marginTop: "10px",
+              fontSize: "14px",
+            }}
+          >
+            {report > 2
+              ? "This question was hidden by the admin."
+              : "This question was hidden by the user."}
           </div>
-        )}
+        ) : null}
+
+
       </div>
 
       <div>
@@ -72,6 +84,17 @@ const QuestionBoxAdmin = ({
         >
           <i className="bi bi-trash text-danger"></i>
         </button>
+
+{(isHidden === true || report > 2) && (
+  <button
+    className="btn btn-sm btn-light"
+    onClick={onHidden} // Truyền event vào hàm
+  >
+    {isHidden ? "Hidden" : "Show"}
+  </button>
+)}
+
+
 
       </div>
     </div>

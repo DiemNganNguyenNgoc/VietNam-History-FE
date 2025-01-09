@@ -199,7 +199,38 @@ const QuestionAdmin = () => {
   };
 
 
-
+  const handleToggleHidden = async (ques, currentStatus) => {
+    if (!ques._id) {
+      console.error("Question ID is missing");
+      return;
+    }
+    try {
+      const isConfirmed = window.confirm(
+        `Are you sure you want to ${currentStatus ? "hide" : "show"} this question?`
+      );
+      if (!isConfirmed) return;
+  
+      // Xác định giá trị count cần cập nhật
+      const updatedCount = currentStatus ? 3 : 0;
+  
+      // Gọi service để cập nhật count
+      const res = await QuestionService.updateReportCount(ques._id, { count: updatedCount });
+      await QuestionService.toggleActiceQues(ques._id)
+      console.log("Successfully toggled question status:", res.data);
+  
+      // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
+      const updatedQuestions = questions.map((question) =>
+        question._id === ques._id
+          ? { ...question, active: !currentStatus }
+          : question
+      );
+      setQuestions(updatedQuestions);
+      window.location.reload()
+    } catch (error) {
+      console.error("Failed to toggle question status:", error.response?.data || error.message);
+    }
+  };
+  
 
 
   return (
@@ -222,11 +253,13 @@ const QuestionAdmin = () => {
             getFilteredQuestion().map((question) => {
               const user = users[question.userQues];
               return (
-                <div key={question._id} onClick={() => handleQuestionClick(question._id)}>
+                <div key={question._id} 
+                //onClick={() => handleQuestionClick(question._id)}
+                >
                   <QuestionBoxAdmin
                     img={user?.img || ""}
                     username={user?.name || "Unknown"}
-                    reputation={user?.reputation || 0}
+                    report={question?.reportCount || 0}
                     followers={user?.followerCount || 0}
                     title={question.title}
                     tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || tagId) : []}
@@ -234,6 +267,8 @@ const QuestionAdmin = () => {
                     views={question.view}
                     answers={question.answerCount}
                     likes={question.upVoteCount}
+                    isHidden={question.active}
+                    onHidden={() => handleToggleHidden(question, question.active)}
                     onDelete={(event) => handleOnDelete(question._id, event)} // Truyền event vào handleOnDelete
                   />
 

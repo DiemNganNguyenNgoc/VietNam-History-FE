@@ -24,7 +24,7 @@ const StatisticTopicPage = () => {
       setIsLoading(true);
       try {
         const res = await TagService.getAllTag();
-        const tags = res.data;
+        const tags = res;
 
         const updatedTags = await Promise.all(
           tags.map(async (tag) => {

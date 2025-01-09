@@ -242,7 +242,7 @@ function HomePage() {
           />
         </div>
       </div>
-      <SortBtnHome></SortBtnHome>
+      {/* <SortBtnHome></SortBtnHome> */}
       <div className="row mt-4">
         <div className="col-12">
           {Array.isArray(questions) && questions.length > 0 ? (

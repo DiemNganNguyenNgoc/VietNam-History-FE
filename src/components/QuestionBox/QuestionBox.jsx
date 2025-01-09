@@ -74,8 +74,8 @@ const QuestionBox = ({
           <span className="detail-item">{views} views</span>
           <span className="detail-item">{answers} answers</span>
           <span className="detail-item">
-            {likes}
-            <span
+            {likes} upVotes
+            {/* <span
               className={`like-icon-container ${isLiked ? "liked" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -91,7 +91,7 @@ const QuestionBox = ({
               ) : (
                 <i className="bi bi-hand-thumbs-up like-icon"></i>
               )}
-            </span>
+            </span> */}
           </span>
         </div>
 

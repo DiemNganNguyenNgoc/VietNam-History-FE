@@ -580,7 +580,7 @@ const QuestionDetails = () => {
         // Gửi thông báo
       const notificationData = {
         user_id: questionDetail?.data?.userQues,
-        message: "Bạn có một câu trả lời mới cho câu hỏi của mình",
+        message: "You have a new answer to your question.",
         type: "answer",
         metadata: {
           question_id: questionId,
@@ -707,7 +707,7 @@ const QuestionDetails = () => {
   
       await mutationComment.mutateAsync(commentData);
       setTextCom("");
-      alert("Thêm bình luận thành công");
+      alert("Comment has been added successfully!");
   
       reloadPage();
     }
@@ -736,7 +736,7 @@ const QuestionDetails = () => {
 
     await mutationComment.mutateAsync(commentData);
     setComConten("");
-    alert("Thêm bình luận thành công");
+    alert("Comment has been added successfully!");
 
     reloadPage();}
    

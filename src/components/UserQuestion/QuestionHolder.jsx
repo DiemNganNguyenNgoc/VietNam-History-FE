@@ -89,59 +89,64 @@ const QuestionHolder = () => {
     navigate(`/update-question/${questionId}`);
   };
 
-    const handleToggleHidden = async (quesId, currentStatus) => {
-      const isConfirmed = window.confirm(
-        `Are you sure you want to ${currentStatus ? 'hide' : 'show'} this question?`
-      );
-  
-      if (!isConfirmed) return;
-  
-      if (!quesId) {
-        console.error("Question ID is missing");
-        return;
-      }
-  
-      try {
-        const res = await QuestionService.toggleActiceQues(quesId);
-        console.log("Successfully toggled question status:", res.data);
-        
-        // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
-        const updatedQuestions = questions.map((question) => 
-          question._id === quesId ? { ...question, active: !currentStatus } : question
-        );
-        setQuestions(updatedQuestions);
-      } catch (error) {
-        console.error("Failed to toggle question status:", error.response?.data || error.message);
-      }
-    };
+  const handleToggleHidden = async (ques, currentStatus) => {
 
-    const handleDelete = async (quesId) => {
-      const isConfirmed = window.confirm(`Are you sure you want to delete this question?`);
+
+    if (!ques._id) {
+      console.error("Question ID is missing");
+      return;
+    }
+    try {
+      if(ques.reportCount<=2)
+      {
+        const isConfirmed = window.confirm(
+          `Are you sure you want to ${currentStatus ? 'hide' : 'show'} this question?`
+        );
     
-      if (!isConfirmed) return;
-    
-      if (!quesId) {
-        console.error("Question ID is missing");
-        return;
+        if (!isConfirmed) return;
+      const res = await QuestionService.toggleActiceQues(ques._id);
+      console.log("Successfully toggled question status:", res.data);
+
+      // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
+      const updatedQuestions = questions.map((question) =>
+        question._id === ques._id ? { ...question, active: !currentStatus } : question
+      );
+      setQuestions(updatedQuestions);}
+      else {
+        alert('This question was hidden by admin!')
       }
-    
-      try {
-        const res = await QuestionService.deleteQuestion(quesId);
-        console.log("Successfully deleted question:", res.data);
-    
-        // Hiển thị thông báo xóa thành công
-        alert("Question deleted successfully!");
-    
-        // Tải lại danh sách câu hỏi
-        fetchQuestions();
-      } catch (error) {
-        console.error("Failed to delete question:", error.response?.data || error.message);
-    
-        // Hiển thị thông báo lỗi nếu có
-        alert("Failed to delete question. Please try again.");
-      }
-    };
-    
+    } catch (error) {
+      console.error("Failed to toggle question status:", error.response?.data || error.message);
+    }
+  };
+
+  const handleDelete = async (quesId) => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete this question?`);
+
+    if (!isConfirmed) return;
+
+    if (!quesId) {
+      console.error("Question ID is missing");
+      return;
+    }
+
+    try {
+      const res = await QuestionService.deleteQuestion(quesId);
+      console.log("Successfully deleted question:", res.data);
+
+      // Hiển thị thông báo xóa thành công
+      alert("Question deleted successfully!");
+
+      // Tải lại danh sách câu hỏi
+      fetchQuestions();
+    } catch (error) {
+      console.error("Failed to delete question:", error.response?.data || error.message);
+
+      // Hiển thị thông báo lỗi nếu có
+      alert("Failed to delete question. Please try again.");
+    }
+  };
+
 
   return (
     <div style={{ padding: '20px' }}>
@@ -157,8 +162,8 @@ const QuestionHolder = () => {
             likes={question.upVoteCount}
             onUpdate={() => handleOnUpdate(question._id)}
             isHidden={question.active}
-            onHidden={() => handleToggleHidden(question._id, question.active)} 
-            onDelete={()=>handleDelete(question._id)}
+            onHidden={() => handleToggleHidden(question, question.active)}
+            onDelete={() => handleDelete(question._id)}
           />
         </div>
       ))}

@@ -56,9 +56,9 @@ function StatisticActivityPage() {
             return {
               uid: user._id,
               userName: user.name,
-              post: questions.data.length,
-              answer: answers.data.length,
-              vote: 0,
+              post: user.quesCount,
+              answer: user.answerCount,
+              // vote: 0,
             };
           })
         );
@@ -129,10 +129,10 @@ function StatisticActivityPage() {
             <label className="total__title">Total answer</label>
             <h2 className="total__number">{totalAnswer}</h2>
           </section>
-          <section className="section__total-question">
+          {/* <section className="section__total-question">
             <label className="total__title">Total vote</label>
             <h2 className="total__number">{totalVote}</h2>
-          </section>
+          </section> */}
         </div>
 
         {/* Bảng dữ liệu */}
@@ -142,11 +142,11 @@ function StatisticActivityPage() {
               <thead>
                 <tr>
                   <th style={{ width: '10%' }}>No</th>
-                  <th style={{ width: '30%' }}>UID</th>
+                  <th style={{ width: '30%' }}>ID</th>
                   <th style={{ width: '30%' }}>User Name</th>
                   <th style={{ width: '10%' }}>Post</th>
                   <th style={{ width: '10%' }}>Answer</th>
-                  <th style={{ width: '10%' }}>Vote</th>
+                  {/* <th style={{ width: '10%' }}>Vote</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -162,7 +162,7 @@ function StatisticActivityPage() {
                       <td>{row.userName}</td>
                       <td>{row.post}</td>
                       <td>{row.answer}</td>
-                      <td>{row.vote}</td>
+                      {/* <td>{row.vote}</td> */}
                     </tr>
                   ))
                 )}
