@@ -163,19 +163,15 @@ const HeaderComponent = () => {
 
       // Duyệt qua từng thông báo để kiểm tra và xóa nếu không có answer_id hoặc quesVote_id
       for (const notification of data.notifications) {
-        if (
-          !notification.metadata?.answer_id &&
-          !notification.metadata?.quesVote_id
-        ) {
+        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {
           // Nếu không có answer_id hoặc quesVote_id, xóa thông báo
           await NotificationService.deleteNotification(notification._id);
         }
       }
 
       // Sau khi xóa, lấy lại danh sách thông báo mới
-      const filteredNotifications = data.notifications.filter(
-        (notification) =>
-          notification.metadata?.answer_id || notification.metadata?.quesVote_id
+      const filteredNotifications = data.notifications.filter(notification =>
+        notification.metadata?.answer_id || notification.metadata?.quesVote_id || notification.metadata?.follow_id
       );
       setNotifications(filteredNotifications); // Lưu thông báo hợp lệ vào state
       setLoading(false);
@@ -192,7 +188,7 @@ const HeaderComponent = () => {
   }, [user?.id]);
 
   // Hàm đánh dấu thông báo đã đọc
-  const handleMarkAsRead = async (notificationId, questionId) => {
+  const handleMarkAsRead = async (notificationId, questionId, followId) => {
     try {
       await NotificationService.markAsRead(notificationId);
       fetchNotifications();
@@ -204,6 +200,9 @@ const HeaderComponent = () => {
       );
       if (questionId) {
         navigate(`/question-detail/${questionId}`);
+        closeModal();
+      } else {
+        navigate(`/otheruserprofile/${followId}`);
         closeModal();
       }
     } catch (error) {
@@ -436,6 +435,11 @@ const HeaderComponent = () => {
                     const questionTitle =
                       notification.metadata.question_id?.title;
                     message = `${userName} voted your question: "${questionTitle}" `;
+                  } 
+                  else if (notification.type === 'follow' && notification.metadata.follow_id) {
+                    // Trường hợp follow
+                    const userName = notification.metadata.follow_id?.name;
+                    message = `${userName} followed you`;
                   } else {
                     // Trường hợp khác, sử dụng message gốc
                     message = notification.message;
@@ -444,15 +448,8 @@ const HeaderComponent = () => {
                   return (
                     <div
                       key={notification._id}
-                      className={`notification-item ${
-                        notification.is_read ? "read" : "unread"
-                      }`}
-                      onClick={() =>
-                        handleMarkAsRead(
-                          notification._id,
-                          notification.metadata.question_id._id
-                        )
-                      }
+                      className={`notification-item ${notification.is_read ? 'read' : 'unread'}`}
+                      onClick={() => handleMarkAsRead(notification._id, notification.metadata.question_id?._id, notification.metadata.follow_id?._id)}
                     >
                       <p>{message}</p>
                       {!notification.is_read && <span>(Unread)</span>}

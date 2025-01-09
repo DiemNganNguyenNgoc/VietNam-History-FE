@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import UserCardFollowComponent from "../../components/UserCardFollowComponent/UserCardFollowComponent";
+import * as NotificationService from "../../services/NotificationService";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import {
   addFollower,
@@ -80,6 +81,17 @@ const OtherListUserPage = () => {
         result = await removeFollower(userId, access_token); // API unfollow
       } else {
         result = await addFollower(userId, access_token); // API follow
+        // Gửi thông báo
+        const notificationData = {
+          user_id: userId,
+          message: "A person followed you",
+          type: "follow",
+          metadata: {
+            follow_id: user?.id,
+          },
+        };
+  
+        await NotificationService.createNotification(notificationData);
       }
 
       const currentFollowing =
