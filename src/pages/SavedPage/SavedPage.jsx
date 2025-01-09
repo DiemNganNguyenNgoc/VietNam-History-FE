@@ -36,7 +36,7 @@ const SavedPage = () => {
       savedList.map(async (saved) => {
         const user = await getUserDetails(saved.user); // Lấy thông tin người dùng
         const question = await getQuestionDetails(saved.question); // Lấy thông tin câu hỏi
-        console.log("questionssss", question);
+        // console.log("questionssss", question);
 
         // Ánh xạ tagId sang tagName
         const tagsWithNames = await Promise.all(
@@ -60,7 +60,7 @@ const SavedPage = () => {
 
   const getTagDetails = async (tagId) => {
     const res = await TagService.getDetailsTag(tagId);
-    console.log("res.data", res.data);
+    // console.log("res.data", res.data);
     return res.data;
   };
 

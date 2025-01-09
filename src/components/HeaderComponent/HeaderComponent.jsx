@@ -12,6 +12,7 @@ import * as QuestionService from "../../services/QuestionService";
 import * as TagService from "../../services/TagService";
 import Modal from "react-modal";
 import "./SearchButton.css";
+import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -333,36 +334,40 @@ const HeaderComponent = () => {
                   </span>
                 </div>
               )}
-            </div>
 
-            {/* Icon thông báo */}
-            <div
-              className="btn"
-              onClick={openModal}
-              ref={buttonRef}
-              style={{ position: "relative" }}
-            >
-              <i
-                className="bi bi-bell-fill"
-                style={{ fontSize: "30px", cursor: "pointer", color: "white" }}
+              {/* Icon thông báo */}
+              <div
+                className="btn"
+                onClick={openModal}
+                ref={buttonRef}
+                style={{ position: "relative", marginTop: "15px" }}
               >
-                {notifications.some(
-                  (notification) => !notification.is_read
-                ) && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "12px",
-                      right: "11px",
-                      width: "10px",
-                      height: "10px",
-                      borderRadius: "50%",
-                      backgroundColor: "red",
-                      display: "inline-block",
-                    }}
-                  />
-                )}
-              </i>
+                <i
+                  className="bi bi-bell-fill"
+                  style={{
+                    fontSize: "30px",
+                    cursor: "pointer",
+                    color: "white",
+                  }}
+                >
+                  {notifications.some(
+                    (notification) => !notification.is_read
+                  ) && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "12px",
+                        right: "11px",
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        backgroundColor: "red",
+                        display: "inline-block",
+                      }}
+                    />
+                  )}
+                </i>
+              </div>
             </div>
 
             {/* Modal hiển thị thông báo */}
@@ -401,10 +406,10 @@ const HeaderComponent = () => {
                 },
               }}
             >
-              <h2 style={{ fontSize: "18px" }}>Thông báo</h2>
-              {loading && <p>Đang tải thông báo...</p>}
+              <h2 style={{ fontSize: "18px" }}>Notifications</h2>
+              {loading && <p>Loading notifications....</p>}
               {!loading && notifications.length === 0 && (
-                <p>Không có thông báo.</p>
+                <p>No notifications.</p>
               )}
 
               <div className="notification-list">
@@ -420,7 +425,7 @@ const HeaderComponent = () => {
                       notification.metadata.answer_id.userAns?.name; // Lấy tên người trả lời
                     const questionTitle =
                       notification.metadata.question_id?.title;
-                    message = `${userName} đã trả lời câu hỏi "${questionTitle}" của bạn`;
+                    message = `${userName} answered your question: "${questionTitle}"`;
                   } else if (
                     notification.type === "vote" &&
                     notification.metadata.quesVote_id
@@ -430,7 +435,7 @@ const HeaderComponent = () => {
                       notification.metadata.quesVote_id.user?.name; // Lấy tên người đã vote
                     const questionTitle =
                       notification.metadata.question_id?.title;
-                    message = `${userName} đã vote cho câu hỏi "${questionTitle}" của bạn`;
+                    message = `${userName} voted your question: "${questionTitle}" `;
                   } else {
                     // Trường hợp khác, sử dụng message gốc
                     message = notification.message;
@@ -450,13 +455,13 @@ const HeaderComponent = () => {
                       }
                     >
                       <p>{message}</p>
-                      {!notification.is_read && <span>(Chưa đọc)</span>}
+                      {!notification.is_read && <span>(Unread)</span>}
                     </div>
                   );
                 })}
               </div>
 
-              <button onClick={closeModal}>Đóng</button>
+              <ButtonComponent textButton="Close" onClick={closeModal} />
             </Modal>
           </div>
         </div>

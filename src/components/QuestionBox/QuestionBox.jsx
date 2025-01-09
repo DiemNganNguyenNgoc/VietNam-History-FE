@@ -57,13 +57,19 @@ const QuestionBox = ({
       {/* Nội dung câu hỏi */}
       <div className="question-content">
         <div className="title-and-tags">
-          <h3 className="question_title">{title}</h3>
-          <div className="tags-container">
-            {tags.map((tag, index) => (
-              <span key={index} className="tag-item">
-                {tag}
-              </span>
-            ))}
+          <div className="col">
+          <div className="row">
+            <h3 className="question_title">{title}</h3>
+          </div>
+          <div className="row">
+            <div className="tags-container">
+              {tags.map((tag, index) => (
+                <span key={index} className="tag-item">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
           </div>
         </div>
 
