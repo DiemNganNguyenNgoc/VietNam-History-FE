@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import * as UserService from "../../services/UserService"; 
 import * as TagService from "../../services/TagService"; 
-import "./SearchResultsPage.css";
+import "./SearchPostPage.css";
 
 const SearchResultsPage = () => {
   const location = useLocation();

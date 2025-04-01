@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../css/StatisticPage.css";
 import StatisticActivityPage from "./StatisticActivityPage";
-import StatisticQuestionPage from "./StatisticQuestionPage";
+import StatisticPostPage from "./StatisticPostPage";
 import StatisticTopicPage from "./StatisticTopicPage";
 import StatisticUserPage from "./StatisticUserPage";
 
@@ -39,7 +39,7 @@ const StatisticPage = () => {
       <div className="tab-content" style={{ flexGrow: 1 }}>
         <div className="tab-pane fade show active">
           {activeTab === "users" && <div><StatisticActivityPage/></div>}
-          {activeTab === "questions" && <div><StatisticQuestionPage/></div>}
+          {activeTab === "questions" && <div><StatisticPostPage/></div>}
           {activeTab === "tags" && <div><StatisticTopicPage /></div>}
         </div>
       </div>

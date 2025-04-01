@@ -4,7 +4,7 @@ import ReputationSubTab from "./ReputationSubTab";
 import FollowerSubTab from "./FollowerSubTab";
 import FollowingSubTab from "./FollowingSubTab";
 import ResponsesSubTab from "./ResponsesSubTab";
-import QuestionSubTab from "./QuestionSubTab";
+import QuestionSubTab from "./PostSubTab";
 import AnswerSubTab from "./AnswerSubTab";
 import TagSubTab from "./TagSubTab";
 import SaveSubTab from "./SaveSubTab";

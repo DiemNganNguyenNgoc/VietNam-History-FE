@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import TagAdmin from "../TagAdmin/TagAdmin";
 import UsersAdmin from "../UsersAdmin/UsersAdmin";
-import QuestionAdmin from "../QuestionAdmin/QuestionAdmin";
+import QuestionAdmin from "../PostAdmin/PostAdmin";
 import AdminAccount from "../AdminAccount/AdminAccount";
 import { useSelector } from "react-redux";
 import StatisticPage from "../../pages/StatisticPage/StatisticPage";
