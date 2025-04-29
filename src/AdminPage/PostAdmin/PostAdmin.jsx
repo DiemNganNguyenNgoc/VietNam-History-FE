@@ -8,6 +8,8 @@ import SortBtnAdmin from '../../components/SortBtnAdmin/SortBtnAdmin';
 import * as QuestionService from "../../services/QuestionService";
 import * as TagService from "../../services/TagService";
 import * as UserService from "../../services/UserService";
+import * as QuizService from "../../services/QuizService";
+import { Modal, Select, Button } from 'antd';
 
 const QuestionAdmin = () => {
 
@@ -24,6 +26,11 @@ const QuestionAdmin = () => {
   const [tags, setTags] = useState({});
   const [questions, setQuestions] = useState([]);
   const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
+  const [isLinkQuizModalVisible, setIsLinkQuizModalVisible] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [availableQuizzes, setAvailableQuizzes] = useState([]);
+  const [selectedQuizzes, setSelectedQuizzes] = useState([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
 
   const navigate = useNavigate();
 
@@ -128,6 +135,88 @@ const QuestionAdmin = () => {
   const getTagDetails = async (tagId) => {
     const res = await TagService.getDetailsTag(tagId);
     return res.data;
+  };
+
+  // Fetch available quizzes
+  const fetchAvailableQuizzes = async () => {
+    setLoadingQuizzes(true);
+    try {
+      const response = await QuizService.getAllQuizzes(1, 100); // Get up to 100 quizzes
+      if (response && response.data && response.data.quizzes) {
+        // Make sure we have all necessary quiz data
+        const quizzes = response.data.quizzes.map(quiz => ({
+          _id: quiz._id,
+          title: quiz.title || 'Untitled Quiz',
+          description: quiz.description || '',
+          // Include other fields if needed
+        }));
+        setAvailableQuizzes(quizzes);
+        return quizzes;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+      return [];
+    } finally {
+      setLoadingQuizzes(false);
+    }
+  };
+
+  // Handle link quiz button click
+  const handleLinkQuiz = (question) => {
+    setSelectedQuestion(question);
+    setIsLinkQuizModalVisible(true);
+    setLoadingQuizzes(true);
+    
+    // Fetch available quizzes
+    fetchAvailableQuizzes().then(() => {
+      // Set initially selected quizzes if the question already has linked quizzes
+      if (question.linkedQuizzes && question.linkedQuizzes.length > 0) {
+        // If linkedQuizzes are objects with _id property, extract the IDs
+        const linkedQuizIds = question.linkedQuizzes.map(quiz => 
+          typeof quiz === 'object' && quiz._id ? quiz._id : quiz
+        );
+        setSelectedQuizzes(linkedQuizIds);
+      } else {
+        setSelectedQuizzes([]);
+      }
+      setLoadingQuizzes(false);
+    }).catch(error => {
+      console.error("Error loading quizzes:", error);
+      setLoadingQuizzes(false);
+    });
+  };
+
+  // Handle save quiz links
+  const handleSaveQuizLinks = async () => {
+    if (!selectedQuestion) return;
+    
+    try {
+      // Update the question with selected quiz IDs
+      await QuestionService.updateQuestion(selectedQuestion._id, {
+        linkedQuizzes: selectedQuizzes
+      });
+      
+      // Get the full quiz objects for the selected IDs
+      const selectedQuizObjects = availableQuizzes.filter(quiz => 
+        selectedQuizzes.includes(quiz._id)
+      );
+      
+      // Update local state with the full quiz objects
+      const updatedQuestions = questions.map(q => 
+        q._id === selectedQuestion._id 
+          ? { ...q, linkedQuizzes: selectedQuizObjects }
+          : q
+      );
+      setQuestions(updatedQuestions);
+      
+      // Close modal
+      setIsLinkQuizModalVisible(false);
+      alert("Quiz links updated successfully!");
+    } catch (error) {
+      console.error("Error updating question with linked quizzes:", error);
+      alert("Failed to update quiz links.");
+    }
   };
 
   useEffect(() => {
@@ -269,9 +358,9 @@ const QuestionAdmin = () => {
                     likes={question.upVoteCount}
                     isHidden={question.active}
                     onHidden={() => handleToggleHidden(question, question.active)}
-                    onDelete={(event) => handleOnDelete(question._id, event)} // Truyền event vào handleOnDelete
+                    onDelete={(event) => handleOnDelete(question._id, event)}
+                    onLinkQuiz={() => handleLinkQuiz(question)}
                   />
-
                 </div>
               );
             })
@@ -279,6 +368,81 @@ const QuestionAdmin = () => {
             <LoadingComponent isLoading={isLoadingQues} />
           )}
       </div>
+
+      {/* Modal for linking quizzes to a question */}
+      <Modal
+        title="Link Quizzes to Question"
+        open={isLinkQuizModalVisible}
+        onCancel={() => setIsLinkQuizModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsLinkQuizModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button 
+            key="save" 
+            type="primary" 
+            onClick={handleSaveQuizLinks}
+            loading={loadingQuizzes}
+          >
+            Save
+          </Button>
+        ]}
+        width={600}
+      >
+        {selectedQuestion && (
+          <div>
+            <h4>{selectedQuestion.title}</h4>
+            <p>Select quizzes to link to this question:</p>
+            
+            <Select
+              mode="multiple"
+              style={{ width: '100%' }}
+              placeholder="Select quizzes"
+              value={selectedQuizzes}
+              onChange={setSelectedQuizzes}
+              optionFilterProp="children"
+              loading={loadingQuizzes}
+              allowClear
+              optionLabelProp="label"
+            >
+              {availableQuizzes.map(quiz => (
+                <Select.Option 
+                  key={quiz._id} 
+                  value={quiz._id}
+                  label={quiz.title}
+                >
+                  <div>
+                    <div style={{ fontWeight: 'bold' }}>{quiz.title}</div>
+                    {quiz.description && (
+                      <div style={{ fontSize: '12px', color: '#888' }}>
+                        {quiz.description.length > 50 
+                          ? `${quiz.description.substring(0, 50)}...` 
+                          : quiz.description}
+                      </div>
+                    )}
+                  </div>
+                </Select.Option>
+              ))}
+            </Select>
+            
+            {selectedQuizzes.length > 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <h5>Selected Quizzes:</h5>
+                <ul>
+                  {selectedQuizzes.map(quizId => {
+                    const quiz = availableQuizzes.find(q => q._id === quizId);
+                    return quiz ? (
+                      <li key={quizId}>{quiz.title}</li>
+                    ) : (
+                      <li key={quizId}>Loading quiz information...</li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

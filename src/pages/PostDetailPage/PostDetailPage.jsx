@@ -17,6 +17,7 @@ import * as CommentService from "../../services/CommentService";
 import * as CommentReportService from "../../services/CommentReportService";
 import * as AnswerReportService from "../../services/AnswerReportService";
 import * as NotificationService from "../../services/NotificationService";
+import LinkedQuizzes from "../../components/QuizComponent/LinkedQuizzes";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -923,6 +924,10 @@ const QuestionDetails = () => {
         </div>
       </div>
 
+      {/* Related Quizzes */}
+      {questionDetail.data?.linkedQuizzes && questionDetail.data.linkedQuizzes.length > 0 && (
+        <LinkedQuizzes quizzes={questionDetail.data.linkedQuizzes} />
+      )}
 
       {/* Phần bình luận */}
       <div className="mb-4">

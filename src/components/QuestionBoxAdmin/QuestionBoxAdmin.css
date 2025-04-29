@@ -132,3 +132,16 @@
     color: #777;
   }
   
+  .admin-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    margin-left: 10px;
+    min-width: 100px;
+  }
+  
+  .admin-actions button {
+    margin-bottom: 5px;
+  }
+  

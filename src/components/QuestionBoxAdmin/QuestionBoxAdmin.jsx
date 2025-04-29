@@ -16,6 +16,7 @@ const QuestionBoxAdmin = ({
   report,
   onHidden,
   isHidden, // Thêm trạng thái hiện tại
+  onLinkQuiz, // Add new prop for handling quiz linking
 }) => {
 
   return (
@@ -77,25 +78,30 @@ const QuestionBoxAdmin = ({
 
       </div>
 
-      <div>
+      <div className="admin-actions">
         <button
-          className="btn btn-sm btn-light"
-          onClick={onDelete} // Truyền event vào hàm
+          className="btn btn-sm btn-light me-2"
+          onClick={onDelete}
         >
           <i className="bi bi-trash text-danger"></i>
         </button>
 
-{(isHidden === true || report > 2) && (
-  <button
-    className="btn btn-sm btn-light"
-    onClick={onHidden} // Truyền event vào hàm
-  >
-    {isHidden ? "Hidden" : "Show"}
-  </button>
-)}
+        {(isHidden === true || report > 2) && (
+          <button
+            className="btn btn-sm btn-light me-2"
+            onClick={onHidden}
+          >
+            {isHidden ? "Hidden" : "Show"}
+          </button>
+        )}
 
-
-
+        {/* New Link Quiz button */}
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={onLinkQuiz}
+        >
+          <i className="bi bi-link"></i> Link Quiz
+        </button>
       </div>
     </div>
   );
