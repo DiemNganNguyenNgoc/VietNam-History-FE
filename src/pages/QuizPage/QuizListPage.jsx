@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Typography, Row, Col, Input, Select, Button, Empty, Spin, Pagination } from 'antd';
-import { useQuery } from '@tanstack/react-query';
+import { Typography, Row, Col, Input, Select, Button, Empty, Spin, Pagination, Space } from 'antd';
 import { useSelector } from 'react-redux';
 import QuizCard from '../../components/QuizComponent/QuizCard';
 import { getAllQuizzes, getRandomQuizByTag } from '../../services/QuizService';
 import * as TagService from '../../services/TagService';
 import { SearchOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import './QuizListPage.css';
+import { message } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -16,10 +16,13 @@ const QuizListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((state) => state.user);
+  const admin = useSelector((state) => state.admin);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [loadingTags, setLoadingTags] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 12,
@@ -30,50 +33,116 @@ const QuizListPage = () => {
     tag: ''
   });
 
-  // Fetch all tags before quizzes
-  const { data: tags, isLoading: isLoadingTags } = useQuery({
-    queryKey: ['tags'],
-    queryFn: TagService.getAllTag
-  });
+  // Load tags on component mount
+  useEffect(() => {
+    fetchTags();
+  }, []);
 
-  // Fetch all quizzes with proper dependency on filters
+  // Fetch quizzes when filters or pagination changes
   useEffect(() => {
     fetchQuizzes();
   }, [pagination.current, filters]);
 
+  // Debug user state on mount
+  useEffect(() => {
+    console.log('Current user state:', user);
+    console.log('Current admin state:', admin);
+  }, [user, admin]);
+
+  // Check if user or admin is authenticated
+  const isAuthenticated = () => {
+    // User authentication
+    if (user && (user.id || user._id || user.access_token)) {
+      return true;
+    }
+    
+    // Admin authentication
+    if (admin && (admin.id || admin._id || admin.access_token)) {
+      return true;
+    }
+    
+    return false;
+  };
+
   const handleCreateQuiz = () => {
-    if (!user?.id) {
-      alert('Please log in to create a quiz!');
+    if (!isAuthenticated()) {
+      message.warning('Please log in to create a quiz!');
       navigate('/login', { state: location.pathname });
-    } else if (!user?.active) {
-      alert('Your account is inactive. You cannot create a quiz at this time.');
+    } else if (user.active === false) {
+      message.warning('Your account is inactive. You cannot create a quiz at this time.');
     } else {
       navigate('/create-quiz');
     }
   };
 
   const handleStartQuiz = (quizId) => {
-    if (!user?.id) {
-      alert('Please log in to take a quiz!');
+    if (!isAuthenticated()) {
+      message.warning('Please log in to take a quiz!');
       navigate('/login', { state: location.pathname });
-    } else if (!user?.active) {
-      alert('Your account is inactive. You cannot take quizzes at this time.');
+    } else if (user.active === false) {
+      message.warning('Your account is inactive. You cannot take quizzes at this time.');
     } else {
       navigate(`/quiz/${quizId}`);
     }
   };
 
   const handleRandomQuiz = async () => {
+    if (!isAuthenticated()) {
+      message.warning('Please log in to take a quiz!');
+      navigate('/login', { state: location.pathname });
+      return;
+    }
+    
     try {
       const randomQuiz = await getRandomQuizByTag(selectedTag);
       if (randomQuiz?.data) {
         handleStartQuiz(randomQuiz.data._id);
       } else {
-        alert('No quizzes available for the selected criteria.');
+        message.info('No quizzes available for the selected criteria.');
       }
     } catch (error) {
       console.error('Error getting random quiz:', error);
-      alert('Failed to get a random quiz. Please try again.');
+      message.error('Failed to get a random quiz. Please try again.');
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      setLoadingTags(true);
+      const response = await TagService.getAllTag();
+      console.log("Raw tag response:", response);
+      
+      // Based on the structure you shared: the response contains an array directly
+      if (response && Array.isArray(response)) {
+        console.log("Using direct array response");
+        setTags(response);
+      } 
+      // If response has a data property containing an array
+      else if (response && Array.isArray(response.data)) {
+        console.log("Using response.data array");
+        setTags(response.data);
+      }
+      // If response has a data.data property containing an array (nested structure)
+      else if (response?.data?.data && Array.isArray(response.data.data)) {
+        console.log("Using nested response.data.data array");
+        setTags(response.data.data);
+      }
+      // If response is a single tag object
+      else if (response?.data?._id) {
+        console.log("Single tag object found");
+        setTags([response.data]);
+      }
+      // Fallback: empty array if no valid structure found
+      else {
+        console.error("No valid tag data found in response:", response);
+        setTags([]);
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      message.error('Failed to load tags');
+      setTags([]);
+    } finally {
+      setLoadingTags(false);
     }
   };
 
@@ -91,7 +160,7 @@ const QuizListPage = () => {
         setQuizzes(response.data.quizzes);
         setPagination(prev => ({
           ...prev,
-          total: response.data.pagination.total
+          total: response.data.pagination.total || 0
         }));
       } else {
         console.error('Invalid quiz data structure:', response);
@@ -99,6 +168,7 @@ const QuizListPage = () => {
       }
     } catch (error) {
       console.error('Error fetching quizzes:', error);
+      message.error('Failed to load quizzes');
       setQuizzes([]);
     } finally {
       setLoading(false);
@@ -111,6 +181,7 @@ const QuizListPage = () => {
   };
 
   const handleTagFilter = (value) => {
+    console.log("Selected tag:", value);
     setSelectedTag(value);
     setFilters(prev => ({ ...prev, tag: value }));
     setPagination(prev => ({ ...prev, current: 1 }));
@@ -119,17 +190,6 @@ const QuizListPage = () => {
   const handlePageChange = (page) => {
     setPagination(prev => ({ ...prev, current: page }));
   };
-
-  if (isLoadingTags) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  // Process tags data properly
-  const tagOptions = tags?.data || [];
 
   return (
     <div className="quiz-list-container">
@@ -147,7 +207,7 @@ const QuizListPage = () => {
 
       <div className="filters-container">
         <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
+          <Col xs={24} sm={12}>
             <div className="custom-search">
               <Input
                 placeholder="Search quizzes..."
@@ -167,7 +227,7 @@ const QuizListPage = () => {
               </Button>
             </div>
           </Col>
-          <Col xs={24} md={6}>
+          <Col xs={24} sm={6}>
             <Select
               placeholder="Filter by tag"
               style={{ width: '100%' }}
@@ -175,19 +235,26 @@ const QuizListPage = () => {
               allowClear
               onChange={handleTagFilter}
               className="filter-select"
+              loading={loadingTags}
               optionFilterProp="children"
             >
-              {Array.isArray(tagOptions) && tagOptions.map(tag => (
-                <Option key={tag._id} value={tag._id}>{tag.name}</Option>
-              ))}
+              {tags.length > 0 ? (
+                tags.map(tag => (
+                  <Option key={tag._id} value={tag._id}>
+                    {tag.name}
+                  </Option>
+                ))
+              ) : (
+                <Option disabled>No tags available</Option>
+              )}
             </Select>
           </Col>
-          <Col xs={24} md={6}>
+          <Col xs={24} sm={6}>
             <Button 
               type="primary" 
               icon={<ThunderboltOutlined />} 
               onClick={handleRandomQuiz} 
-              disabled={!user?.id}
+              disabled={!isAuthenticated()}
               className="random-quiz-btn"
             >
               Start Random Quiz
@@ -234,4 +301,4 @@ const QuizListPage = () => {
   );
 };
 
-export default QuizListPage; 
+export default QuizListPage;
