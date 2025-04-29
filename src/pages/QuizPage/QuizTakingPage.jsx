@@ -45,6 +45,68 @@ const QuizTakingPage = () => {
     }
   };
 
+  // Ensure questions array exists and is valid
+  const getQuestions = useCallback(() => {
+    if (!quiz) return [];
+    
+    // Handle direct questions array
+    if (Array.isArray(quiz.questions)) {
+      console.log('Found questions directly in quiz.questions array');
+      return quiz.questions;
+    }
+    
+    // Handle nested questions in data property
+    if (quiz.data && Array.isArray(quiz.data.questions)) {
+      console.log('Found questions in quiz.data.questions array');
+      return quiz.data.questions;
+    }
+    
+    // Handle deeply nested data structure (data.data.questions)
+    if (quiz.data && quiz.data.data && Array.isArray(quiz.data.data.questions)) {
+      console.log('Found questions in quiz.data.data.questions array');
+      return quiz.data.data.questions;
+    }
+    
+    // Check for questions property with different casing
+    if (Array.isArray(quiz.Questions)) {
+      console.log('Found questions in quiz.Questions array (different casing)');
+      return quiz.Questions;
+    }
+    
+    // Check for items or content property that might contain questions
+    if (Array.isArray(quiz.items)) {
+      console.log('Found questions in quiz.items array');
+      return quiz.items;
+    }
+    
+    if (Array.isArray(quiz.content)) {
+      console.log('Found questions in quiz.content array');
+      return quiz.content;
+    }
+    
+    // Handle questions as direct properties of quiz object
+    if (typeof quiz === 'object' && quiz !== null) {
+      // Check if quiz itself might be an array of questions
+      if (Array.isArray(quiz) && quiz.length > 0 && quiz[0].type) {
+        console.log('Quiz itself appears to be an array of questions');
+        return quiz;
+      }
+      
+      // Look for a property that might contain questions
+      for (const key in quiz) {
+        if (Array.isArray(quiz[key]) && 
+            quiz[key].length > 0 && 
+            (quiz[key][0].type || quiz[key][0].question || quiz[key][0].content || quiz[key][0].text)) {
+          console.log(`Found questions array in quiz.${key}`);
+          return quiz[key];
+        }
+      }
+    }
+    
+    console.warn('No valid questions array found in quiz data');
+    return [];
+  }, [quiz]);
+
   // Submit quiz function (extracted to be reusable)
   const submitQuiz = useCallback(async (isTimeout = false) => {
     if (isSubmitting) return; // Prevent multiple submissions
@@ -61,11 +123,12 @@ const QuizTakingPage = () => {
     
     try {
       const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+      const questions = getQuestions();
       
       // Auto-answer unanswered questions if timed out
       let formattedAnswers;
       if (isTimeout) {
-        formattedAnswers = quiz.questions.map((question, index) => {
+        formattedAnswers = questions.map((question, index) => {
           const userAnswer = currentAnswers[index];
           
           if (!userAnswer) {
@@ -102,7 +165,7 @@ const QuizTakingPage = () => {
         });
       } else {
         // Normal submission with validation
-        formattedAnswers = quiz.questions.map((question, index) => {
+        formattedAnswers = questions.map((question, index) => {
           const userAnswer = currentAnswers[index];
           
           if (!userAnswer) {
@@ -180,7 +243,7 @@ const QuizTakingPage = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [quiz, currentAnswers, startTime, quizId, navigate, isSubmitting, hasTimedOut]);
+  }, [quiz, currentAnswers, startTime, quizId, navigate, isSubmitting, hasTimedOut, getQuestions]);
 
   // Timer effect for countdown
   useEffect(() => {
@@ -212,8 +275,66 @@ const QuizTakingPage = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const data = await getQuizById(quizId);
-        setQuiz(data);
+        // Add a loading message
+        console.log(`Starting to fetch quiz with ID: ${quizId}`);
+        
+        const response = await getQuizById(quizId);
+        console.log('Received API response:', response);
+        
+        // Log the entire response structure
+        console.log('Response structure:', JSON.stringify(response, null, 2));
+        
+        // Handle different possible response structures
+        let quizData;
+        
+        if (response && response.data) {
+          // Response has a nested data property
+          quizData = response.data;
+          console.log('Quiz data extracted from response.data:', quizData);
+        } else {
+          // Response is the quiz data directly
+          quizData = response;
+          console.log('Using direct response as quiz data:', quizData);
+        }
+        
+        // Ensure questions array exists and has proper structure
+        if (quizData) {
+          // Check if the data is nested one level deeper
+          if (quizData.data && typeof quizData.data === 'object') {
+            console.log('Found nested data property:', quizData.data);
+            
+            // If the quiz is in a nested 'quiz' property
+            if (quizData.data.quiz && typeof quizData.data.quiz === 'object') {
+              quizData = quizData.data.quiz;
+              console.log('Using quiz from data.quiz:', quizData);
+            } 
+            // If main quiz data is in data property 
+            else if (!quizData.questions) {
+              quizData = { ...quizData, ...quizData.data };
+              console.log('Merged data with parent object:', quizData);
+            }
+          }
+          
+          // Some APIs nest the questions inside a 'questions' property
+          if (!quizData.questions && quizData.data && Array.isArray(quizData.data.questions)) {
+            quizData.questions = quizData.data.questions;
+            console.log('Extracted questions from quizData.data.questions:', quizData.questions);
+          }
+          
+          // If questions still don't exist, create an empty array
+          if (!quizData.questions) {
+            console.warn('No questions found in quiz data, initializing empty array');
+            quizData.questions = [];
+          }
+          
+          console.log('Final questions array:', quizData.questions);
+          console.log('Final quiz data structure:', JSON.stringify(quizData, null, 2));
+        } else {
+          console.error('No valid quiz data found in the response');
+          throw new Error('Invalid quiz data received');
+        }
+        
+        setQuiz(quizData);
       } catch (error) {
         console.error('Error fetching quiz:', error);
         if (error?.status === 401) {
@@ -304,8 +425,9 @@ const QuizTakingPage = () => {
     );
   }
 
-  const allQuestionsAnswered = quiz && Array.isArray(quiz.questions)
-    ? quiz.questions.every((_, index) => currentAnswers[index])
+  const questions = getQuestions();
+  const allQuestionsAnswered = questions.length > 0 
+    ? questions.every((_, index) => currentAnswers[index])
     : false;
 
   // Determine color for timer based on remaining time
@@ -348,34 +470,43 @@ const QuizTakingPage = () => {
         )}
         
         <Space direction="vertical" style={{ width: '100%' }} size="large">
-          {Array.isArray(quiz.questions) && quiz.questions.map((question, index) => (
-            <QuizQuestion
-              key={index}
-              question={question}
-              questionNumber={index + 1}
-              currentAnswer={currentAnswers[index]?.selectedOption ?? currentAnswers[index]?.answer}
-              onAnswerChange={(answer) => handleAnswerChange(index, answer, question.type)}
-              showResults={showResults}
-              isSubmitting={isSubmitting}
-            />
-          ))}
-          
-          <div className="question-progress">
-            <Progress 
-              percent={(Object.keys(currentAnswers).length / quiz.questions.length) * 100} 
-              format={() => `${Object.keys(currentAnswers).length}/${quiz.questions.length}`}
-            />
-          </div>
-          
-          <Button
-            type="primary"
-            onClick={handleSubmit}
-            disabled={!allQuestionsAnswered || isSubmitting}
-            loading={isSubmitting}
-            className="submit-btn"
-          >
-            Nộp bài
-          </Button>
+          {questions.length > 0 ? (
+            <>
+              {questions.map((question, index) => (
+                <QuizQuestion
+                  key={index}
+                  question={question}
+                  questionNumber={index + 1}
+                  currentAnswer={currentAnswers[index]?.selectedOption ?? currentAnswers[index]?.answer}
+                  onAnswerChange={(answer) => handleAnswerChange(index, answer, question.type)}
+                  showResults={showResults}
+                  isSubmitting={isSubmitting}
+                />
+              ))}
+              
+              <div className="question-progress">
+                <Progress 
+                  percent={(Object.keys(currentAnswers).length / questions.length) * 100} 
+                  format={() => `${Object.keys(currentAnswers).length}/${questions.length}`}
+                />
+              </div>
+              
+              <Button
+                type="primary"
+                onClick={handleSubmit}
+                disabled={!allQuestionsAnswered || isSubmitting}
+                loading={isSubmitting}
+                className="submit-btn"
+              >
+                Nộp bài
+              </Button>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <p>Bài kiểm tra này không có câu hỏi nào.</p>
+              <Button onClick={() => navigate('/quizzes')}>Quay lại danh sách bài kiểm tra</Button>
+            </div>
+          )}
         </Space>
       </Card>
     </div>
