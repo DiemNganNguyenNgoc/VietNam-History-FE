@@ -12,6 +12,7 @@ import * as QuestionService from "../../services/QuestionService";
 import * as TagService from "../../services/TagService";
 import Modal from "react-modal";
 import "./SearchButton.css";
+import "./HeaderComponent.css";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
 const HeaderComponent = () => {
@@ -25,31 +26,49 @@ const HeaderComponent = () => {
 
   const [img, setImg] = useState("");
   const [name, setName] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); // State to store the search input
-  const [searchResults, setSearchResults] = useState([]); // State to store search results
+  const [searchKeyword, setSearchKeyword] = useState(""); 
+  const [searchResults, setSearchResults] = useState([]); 
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quizMenuOpen, setQuizMenuOpen] = useState(false);
+  const quizDropdownRef = useRef(null);
 
-  // useEffect(() => {
-  //   const fetchTags = async () => {
-  //     try {
-  //       const tagsData = await TagService.getAllTag(); // Gọi API để lấy danh sách tags
-  //       setTags(tagsData); // Lưu tags vào state
-  //     } catch (error) {
-  //       console.error("Error fetching tags:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
 
-  //   fetchTags();
-  // }, []);
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (quizDropdownRef.current && !quizDropdownRef.current.contains(event.target)) {
+        setQuizMenuOpen(false);
+      }
+    }
+   
+    document.addEventListener("mousedown", handleClickOutside);
+       
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+ 
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {    
+      const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+      if (window.bootstrap && window.bootstrap.Dropdown) {
+        const dropdowns = [...dropdownElementList].map(dropdownToggleEl => {
+          return new window.bootstrap.Dropdown(dropdownToggleEl);
+        });
+      } else {
+        if (window.jQuery) {
+          window.jQuery('.dropdown-toggle').dropdown();
+        }
+      }
+    }
+  }, []);
+
 
   const checkIfTagExists = async (tag) => {
-    try {
-      // Gọi API để lấy danh sách tag (dựa trên API của bạn)
+    try {   
       const tags = await TagService.getAllTag();
-      return tags.some((t) => t.name.toLowerCase() === tag.toLowerCase()); // Kiểm tra xem tag có tồn tại không
+      return tags.some((t) => t.name.toLowerCase() === tag.toLowerCase()); 
     } catch (error) {
       console.error("Error checking if tag exists:", error);
       return false;
@@ -83,33 +102,31 @@ const HeaderComponent = () => {
     try {
       let tagList = [];
       let keyword = "";
-
-      // Kiểm tra nếu người dùng nhập các tag phân tách bằng dấu phẩy
+     
       if (searchKeyword.includes(",")) {
         tagList = searchKeyword
-          .split(",") // Tách chuỗi theo dấu phẩy
-          .map((tag) => tag.trim()) // Loại bỏ khoảng trắng thừa
-          .filter((tag) => tag !== ""); // Loại bỏ tag rỗng
-      } else {
-        // Nếu không phải danh sách tag, kiểm tra từ khóa có phải là tag không
+          .split(",") 
+          .map((tag) => tag.trim()) 
+          .filter((tag) => tag !== ""); 
+      } else {      
         const isTagSearch = await checkIfTagExists(searchKeyword);
         if (isTagSearch) {
           tagList = [searchKeyword];
         } else {
-          keyword = searchKeyword; // Tìm kiếm theo từ khóa
+          keyword = searchKeyword; 
         }
       }
 
-      // Gửi yêu cầu tìm kiếm
+     
       const results = await QuestionService.searchQuestion(
-        tagList, // Danh sách các tag
-        keyword, // Từ khóa tìm kiếm
-        1, // Trang bắt đầu
-        10, // Số lượng kết quả trên mỗi trang
-        {} // Tuỳ chọn sắp xếp
+        tagList,
+        keyword, 
+        1, 
+        10, 
+        {} 
       );
 
-      setSearchResults(results); // Lưu kết quả tìm kiếm vào state
+      setSearchResults(results);
       navigate("/search-results", {
         state: { searchKeyword, searchResults: results },
       });
@@ -156,24 +173,21 @@ const HeaderComponent = () => {
     }
   };
 
-  // Hàm lấy thông báo của người dùng
+  
   const fetchNotifications = async () => {
     try {
       const data = await NotificationService.getNotificationsByUserId(user?.id); // Gọi API để lấy thông báo
 
-      // Duyệt qua từng thông báo để kiểm tra và xóa nếu không có answer_id hoặc quesVote_id
-      for (const notification of data.notifications) {
-        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {
-          // Nếu không có answer_id hoặc quesVote_id, xóa thông báo
+       for (const notification of data.notifications) {
+        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {       
           await NotificationService.deleteNotification(notification._id);
         }
       }
-
-      // Sau khi xóa, lấy lại danh sách thông báo mới
+    
       const filteredNotifications = data.notifications.filter(notification =>
         notification.metadata?.answer_id || notification.metadata?.quesVote_id || notification.metadata?.follow_id
       );
-      setNotifications(filteredNotifications); // Lưu thông báo hợp lệ vào state
+      setNotifications(filteredNotifications); 
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -183,16 +197,16 @@ const HeaderComponent = () => {
 
   useEffect(() => {
     if (user?.id) {
-      fetchNotifications(); // Gọi hàm khi component được mount
+      fetchNotifications();
     }
   }, [user?.id]);
 
-  // Hàm đánh dấu thông báo đã đọc
+ 
   const handleMarkAsRead = async (notificationId, questionId, followId) => {
     try {
       await NotificationService.markAsRead(notificationId);
       fetchNotifications();
-      // Đánh dấu thông báo đã đọc
+    
       setNotifications((prevNotifications) =>
         prevNotifications.map((notif) =>
           notif._id === notificationId ? { ...notif, read: true } : notif
@@ -515,6 +529,50 @@ const HeaderComponent = () => {
               </a>
             </li>
           </ul>
+          
+          {/* New Quiz Tab with dropdown */}
+          <ul className="nav nav-underline">
+            <li className="nav-item dropdown" style={{ position: 'relative' }} ref={quizDropdownRef}>
+              <div 
+                className={`nav-link ${quizMenuOpen ? 'dropdown-open' : ''}`}
+                onClick={() => setQuizMenuOpen(!quizMenuOpen)}
+                style={{...Styles.textHeader, cursor: 'pointer'}}
+              >
+                <i className="bi bi-question-circle-fill" style={Styles.iconHeader}></i>
+                Quizzes <i className="bi bi-caret-down-fill dropdown-toggle-icon"></i>
+              </div>
+              {quizMenuOpen && (
+                <div className="quiz-dropdown">
+                  <div 
+                    onClick={() => { navigate('/quizzes'); setQuizMenuOpen(false); }}
+                    className="dropdown-item"
+                    style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                  >
+                    All Quizzes
+                  </div>
+                  {(user?.id || admin?.id) && (
+                    <div 
+                      onClick={() => { navigate('/my-quizzes'); setQuizMenuOpen(false); }}
+                      className="dropdown-item"
+                      style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                      My Quizzes
+                    </div>
+                  )}
+                  {(user?.id || admin?.id) && (
+                    <div 
+                      onClick={() => { navigate('/create-quiz'); setQuizMenuOpen(false); }}
+                      className="dropdown-item"
+                      style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                    >
+                      Create Quiz
+                    </div>
+                  )}
+                </div>
+              )}
+            </li>
+          </ul>
+          
           {admin?.isAdmin && (
             <ul className="nav nav-underline">
               <li className="nav-item">
