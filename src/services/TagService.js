@@ -10,24 +10,18 @@ export const addTag = async (data) => {
 export const getAllTag = async () => {
   try {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all`);
-    return res.data; // Trả về dữ liệu từ response
+    return res.data; 
   } catch (error) {
     console.error('Error fetching tags:', error);
-    throw error; // Ném lỗi nếu có vấn đề
+    throw error; 
   }
 };
 
 
-// export const getAllTagByUser = async (userId) => {
-//   const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all?userTag=${userId}`)
-//   return res.data
-// }
-
-// Giả sử trong services/TagService.js
 export const getAllTagByUser = async (userId) => {
   try {
     const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all?userTag=${userId}`);
-    return response; // Phải trả về đối tượng có thuộc tính 'data'
+    return response;
   } catch (error) {
     console.error("API call failed:", error);
     throw error;
@@ -36,9 +30,19 @@ export const getAllTagByUser = async (userId) => {
 
 
 export const getDetailsTag = async (tagId) => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`
-  );
-  return res.data;
+  try {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`);
+    console.log('Tag data for ID', tagId, ':', res.data);
+    
+   
+    if (res.data && res.data.status === "OK" && res.data.data) {
+      return res.data; 
+    }
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching tag ${tagId}:`, error);
+    return null;
+  }
 };
 
 export const deleteTag = async (tagId) => {
@@ -56,16 +60,3 @@ export const updateTag = async (tagId, data) => {
 };
 
 
-// export const getDetailsTag = async (tagId) => {
-//   try {
-//       const response = await fetch(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`); // Đường dẫn API
-//       if (!response.ok) {
-//           throw new Error('Failed to fetch tag details');
-//       }
-//       const data = await response.json();
-//       return data;
-//   } catch (error) {
-//       console.error('Error in getDetailsTag:', error);
-//       throw error;
-//   }
-// };

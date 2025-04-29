@@ -25,6 +25,14 @@ import OtherListUserPage from "../pages/OrtherListUserPage/OtherListUserPage";
 import UpdateQuestionPage from "../pages/UpdateQuestionPage/UpdatePostPage";
 import SignUpAdminPage from "../AdminPage/ProfileAdmin/SignUpAdminPage";
 import SavedPage from "../pages/SavedPage/SavedPage";
+import QuizListPage from "../pages/QuizPage/QuizListPage";
+import QuizTakingPage from "../pages/QuizPage/QuizTakingPage";
+import MyQuizzesPage from "../pages/QuizPage/MyQuizzesPage";
+import LeaderboardPage from "../pages/QuizPage/LeaderboardPage";
+import CreateQuizPage from "../pages/QuizPage/CreateQuizPage";
+import EditQuizPage from "../pages/QuizPage/EditQuizPage";
+import QuizAdmin from "../AdminPage/QuizAdmin/QuizAdmin";
+import QuizDetailAdmin from "../AdminPage/QuizAdmin/QuizDetailAdmin";
 
 export const routes = [
   {
@@ -186,5 +194,52 @@ export const routes = [
     isShowHeader: true,
   },
 
+  {
+    path: "/quizzes",
+    page: QuizListPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/my-quizzes",
+    page: MyQuizzesPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/quiz/:quizId",
+    page: QuizTakingPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/quiz/edit/:quizId",
+    page: EditQuizPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/quizzes/:quizId/leaderboard",
+    page: LeaderboardPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/create-quiz",
+    page: CreateQuizPage,
+    isShowHeader: true,
+  },
+
+  {
+    path: "admin/quiz",
+    page: QuizAdmin,
+    isShowHeader: true,
+  },
+
+  {
+    path: "/admin/quiz-detail/:quizId",
+    page: QuizDetailAdmin,
+    isShowHeader: true,
+  },
 
 ];
