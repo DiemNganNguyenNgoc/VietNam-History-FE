@@ -26,9 +26,12 @@ export const getAllQuizzes = async (page = 1, limit = 10, tag = '', search = '')
 
 export const getQuizById = async (quizId) => {
     try {
+        console.log(`Fetching quiz details for ID: ${quizId}`);
         const response = await axiosInstance.get(`/quiz/get-details/${quizId}`);
-        return response.data.data;
+        console.log('Raw response from getQuizById:', response);
+        return response.data; // Return the full response data
     } catch (error) {
+        console.error('Error in getQuizById:', error);
         throw error.response?.data || error;
     }
 };

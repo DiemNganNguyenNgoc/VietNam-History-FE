@@ -32,7 +32,7 @@ import LeaderboardPage from "../pages/QuizPage/LeaderboardPage";
 import CreateQuizPage from "../pages/QuizPage/CreateQuizPage";
 import EditQuizPage from "../pages/QuizPage/EditQuizPage";
 import QuizAdmin from "../AdminPage/QuizAdmin/QuizAdmin";
-import QuizDetailAdmin from "../AdminPage/QuizAdmin/QuizDetailAdmin";
+import QuizDetail from "../AdminPage/QuizAdmin/QuizDetail";
 
 export const routes = [
   {
@@ -237,8 +237,8 @@ export const routes = [
   },
 
   {
-    path: "/admin/quiz-detail/:quizId",
-    page: QuizDetailAdmin,
+    path: "/admin/quiz/:quizId",
+    page: QuizDetail,
     isShowHeader: true,
   },
 
