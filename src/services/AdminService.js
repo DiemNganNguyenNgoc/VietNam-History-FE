@@ -109,28 +109,44 @@ export const updateAdminInfo = async (id, data, access_token) => {
 };
 
 export const getDetailsAdmin = async (id, access_token) => {
-  console.log("ACCESS", access_token)
-  const res = await axios.get(
-    `${process.env.REACT_APP_API_URL_BACKEND}/admin/get-detail-admin/${id}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        token: `Bearer ${access_token}`,
-      },
-    }
-  );
+  if (!id || !access_token) {
+    console.warn("Missing ID or access token for getDetailsAdmin");
+    throw new Error("Invalid admin ID or token");
+  }
   
-  return res.data;
+  try {
+    console.log("ACCESS", access_token);
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/admin/get-detail-admin/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          token: `Bearer ${access_token}`,
+        },
+      }
+    );
+    
+    return res.data;
+  } catch (error) {
+    console.error("Error in getDetailsAdmin:", error);
+    throw error;
+  }
 };
 
 export const refreshToken = async () => {
-  const res = await axios.post(
-    `${process.env.REACT_APP_API_URL_BACKEND}/admin/refresh-token`,
-    {
-      withCredentials: true,
-    }
-  );
-  return res.data;
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL_BACKEND}/admin/refresh-token`,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.warn("Error refreshing admin token:", error.message);
+    // Don't throw further errors, just return null
+    return null;
+  }
 };
 
 export const logoutAdmin = async () => {

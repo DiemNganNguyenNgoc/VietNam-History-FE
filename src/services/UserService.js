@@ -57,20 +57,37 @@ export const signupUser = async (data) => {
 };
 
 export const getDetailsUser = async (id) => {
-  const res = await axios.get(
-    `${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`
-  );
-  return res.data;
+  // Check if the ID is valid before making the API call
+  if (!id) {
+    console.warn("getDetailsUser called with invalid or missing ID");
+    throw new Error("Invalid user ID");
+  }
+  
+  try {
+    const res = await axios.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error in getDetailsUser:", error);
+    throw error;
+  }
 };
 
 export const refreshToken = async () => {
-  const res = await axios.post(
-    `${process.env.REACT_APP_API_URL_BACKEND}/user/refresh-token`,
-    {
-      withCredentials: true,
-    }
-  );
-  return res.data;
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/refresh-token`,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.warn("Error refreshing token:", error.message);
+    // Don't throw further errors, just return null so the caller knows refresh failed
+    return null;
+  }
 };
 
 export const logoutUser = async () => {

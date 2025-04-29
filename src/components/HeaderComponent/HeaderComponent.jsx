@@ -14,6 +14,7 @@ import Modal from "react-modal";
 import "./SearchButton.css";
 import "./HeaderComponent.css";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import { message } from "antd";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -81,12 +82,40 @@ const HeaderComponent = () => {
 
   const handleLogout = async () => {
     try {
-      (await UserService.logoutUser()) || AdminService.logoutAdmin();
-      dispatch(resetUser()) || dispatch(resetAdmin());
-      localStorage.clear();
-      alert("Logout successful");
+      // First clear local storage to prevent any automatic re-login attempts
+      localStorage.removeItem("access_token");
+      
+      // Then try to call the logout endpoints
+      try {
+        if (user?.id || user?.access_token) {
+          await UserService.logoutUser();
+        } else if (admin?.id || admin?.access_token) {
+          await AdminService.logoutAdmin();
+        }
+      } catch (apiError) {
+        // If the API call fails, that's ok, we'll continue with local logout
+        console.warn("API logout failed but continuing with local logout", apiError);
+      }
+      
+      // Reset Redux state
+      if (user?.id || user?.access_token) {
+        dispatch(resetUser());
+      }
+      if (admin?.id || admin?.access_token) {
+        dispatch(resetAdmin());
+      }
+      
+      // Redirect to home page
+      message.success("Logout successful");
+      navigate('/');
+      
+      // Refresh the page to ensure all components reload with the updated auth state
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error("Logout failed", error);
+      message.error("Logout failed");
     }
   };
 
