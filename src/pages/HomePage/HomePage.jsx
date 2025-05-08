@@ -230,10 +230,10 @@ function HomePage() {
 
   return (
     <div className="container mt-4">
-      
+
       <div className="row">
         <div className="col">
-          <span className="title">TOP QUESTION MAY INTEREST YOU</span>
+          <span className="title">TOP POST MAY INTEREST YOU</span>
         </div>
         <div className="col-2" style={{ marginTop: "10px" }}>
           <ButtonComponent

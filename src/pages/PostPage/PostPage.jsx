@@ -386,7 +386,7 @@ const QuestionPage = () => {
               marginTop: "20px",
             }}
           >
-            All Questions
+            All post
           </h1>
           <div className="btn-holder">
             <div className="askQues">

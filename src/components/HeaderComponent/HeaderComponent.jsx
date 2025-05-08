@@ -27,8 +27,8 @@ const HeaderComponent = () => {
 
   const [img, setImg] = useState("");
   const [name, setName] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState(""); 
-  const [searchResults, setSearchResults] = useState([]); 
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quizMenuOpen, setQuizMenuOpen] = useState(false);
@@ -41,17 +41,17 @@ const HeaderComponent = () => {
         setQuizMenuOpen(false);
       }
     }
-   
+
     document.addEventListener("mousedown", handleClickOutside);
-       
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
- 
+
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {    
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
       if (window.bootstrap && window.bootstrap.Dropdown) {
         const dropdowns = [...dropdownElementList].map(dropdownToggleEl => {
@@ -67,9 +67,9 @@ const HeaderComponent = () => {
 
 
   const checkIfTagExists = async (tag) => {
-    try {   
+    try {
       const tags = await TagService.getAllTag();
-      return tags.some((t) => t.name.toLowerCase() === tag.toLowerCase()); 
+      return tags.some((t) => t.name.toLowerCase() === tag.toLowerCase());
     } catch (error) {
       console.error("Error checking if tag exists:", error);
       return false;
@@ -84,7 +84,7 @@ const HeaderComponent = () => {
     try {
       // First clear local storage to prevent any automatic re-login attempts
       localStorage.removeItem("access_token");
-      
+
       // Then try to call the logout endpoints
       try {
         if (user?.id || user?.access_token) {
@@ -96,7 +96,7 @@ const HeaderComponent = () => {
         // If the API call fails, that's ok, we'll continue with local logout
         console.warn("API logout failed but continuing with local logout", apiError);
       }
-      
+
       // Reset Redux state
       if (user?.id || user?.access_token) {
         dispatch(resetUser());
@@ -104,11 +104,11 @@ const HeaderComponent = () => {
       if (admin?.id || admin?.access_token) {
         dispatch(resetAdmin());
       }
-      
+
       // Redirect to home page
       message.success("Logout successful");
       navigate('/');
-      
+
       // Refresh the page to ensure all components reload with the updated auth state
       setTimeout(() => {
         window.location.reload();
@@ -131,28 +131,28 @@ const HeaderComponent = () => {
     try {
       let tagList = [];
       let keyword = "";
-     
+
       if (searchKeyword.includes(",")) {
         tagList = searchKeyword
-          .split(",") 
-          .map((tag) => tag.trim()) 
-          .filter((tag) => tag !== ""); 
-      } else {      
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== "");
+      } else {
         const isTagSearch = await checkIfTagExists(searchKeyword);
         if (isTagSearch) {
           tagList = [searchKeyword];
         } else {
-          keyword = searchKeyword; 
+          keyword = searchKeyword;
         }
       }
 
-     
+
       const results = await QuestionService.searchQuestion(
         tagList,
-        keyword, 
-        1, 
-        10, 
-        {} 
+        keyword,
+        1,
+        10,
+        {}
       );
 
       setSearchResults(results);
@@ -202,21 +202,21 @@ const HeaderComponent = () => {
     }
   };
 
-  
+
   const fetchNotifications = async () => {
     try {
       const data = await NotificationService.getNotificationsByUserId(user?.id); // Gọi API để lấy thông báo
 
        for (const notification of data.notifications) {
-        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {       
+        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {
           await NotificationService.deleteNotification(notification._id);
         }
       }
-    
+
       const filteredNotifications = data.notifications.filter(notification =>
         notification.metadata?.answer_id || notification.metadata?.quesVote_id || notification.metadata?.follow_id
       );
-      setNotifications(filteredNotifications); 
+      setNotifications(filteredNotifications);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -230,12 +230,12 @@ const HeaderComponent = () => {
     }
   }, [user?.id]);
 
- 
+
   const handleMarkAsRead = async (notificationId, questionId, followId) => {
     try {
       await NotificationService.markAsRead(notificationId);
       fetchNotifications();
-    
+
       setNotifications((prevNotifications) =>
         prevNotifications.map((notif) =>
           notif._id === notificationId ? { ...notif, read: true } : notif
@@ -271,14 +271,14 @@ const HeaderComponent = () => {
             href="/"
             style={{ color: "#FFFFFF", fontSize: "2rem", fontWeight: "bold" }}
           >
-            SHARING-CODE
+            VIETNAM HISTORY
           </a>
 
           <div className="search-container">
             <input
               className="form-control search-input"
               type="text"
-              placeholder="Search question"
+              placeholder="Search Post"
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -478,7 +478,7 @@ const HeaderComponent = () => {
                     const questionTitle =
                       notification.metadata.question_id?.title;
                     message = `${userName} voted your question: "${questionTitle}" `;
-                  } 
+                  }
                   else if (notification.type === 'follow' && notification.metadata.follow_id) {
                     // Trường hợp follow
                     const userName = notification.metadata.follow_id?.name;
@@ -534,7 +534,7 @@ const HeaderComponent = () => {
                   className="bi bi-chat-left-fill"
                   style={Styles.iconHeader}
                 ></i>
-                Questions
+                Post
               </a>
             </li>
           </ul>
@@ -558,11 +558,11 @@ const HeaderComponent = () => {
               </a>
             </li>
           </ul>
-          
+
           {/* New Quiz Tab with dropdown */}
           <ul className="nav nav-underline">
             <li className="nav-item dropdown" style={{ position: 'relative' }} ref={quizDropdownRef}>
-              <div 
+              <div
                 className={`nav-link ${quizMenuOpen ? 'dropdown-open' : ''}`}
                 onClick={() => setQuizMenuOpen(!quizMenuOpen)}
                 style={{...Styles.textHeader, cursor: 'pointer'}}
@@ -572,7 +572,7 @@ const HeaderComponent = () => {
               </div>
               {quizMenuOpen && (
                 <div className="quiz-dropdown">
-                  <div 
+                  <div
                     onClick={() => { navigate('/quizzes'); setQuizMenuOpen(false); }}
                     className="dropdown-item"
                     style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
@@ -580,7 +580,7 @@ const HeaderComponent = () => {
                     All Quizzes
                   </div>
                   {(user?.id || admin?.id) && (
-                    <div 
+                    <div
                       onClick={() => { navigate('/my-quizzes'); setQuizMenuOpen(false); }}
                       className="dropdown-item"
                       style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
@@ -589,7 +589,7 @@ const HeaderComponent = () => {
                     </div>
                   )}
                   {(user?.id || admin?.id) && (
-                    <div 
+                    <div
                       onClick={() => { navigate('/create-quiz'); setQuizMenuOpen(false); }}
                       className="dropdown-item"
                       style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
@@ -601,7 +601,7 @@ const HeaderComponent = () => {
               )}
             </li>
           </ul>
-          
+
           {admin?.isAdmin && (
             <ul className="nav nav-underline">
               <li className="nav-item">
