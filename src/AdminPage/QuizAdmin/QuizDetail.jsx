@@ -25,21 +25,25 @@ const QuizDetail = () => {
       console.log("Fetching quiz details for ID:", quizId);
       const response = await getQuizById(quizId);
       console.log("Quiz details response:", response);
-      
+
       if (response && response.data) {
-        // Store the quiz data from the response
-        setQuiz(response.data);
-        
+        const quizData = response.data;
+        console.log("Quiz data:", quizData);
+
+        // Store the quiz data
+        setQuiz(quizData);
+
         // Fetch tag names if quiz has tags
-        if (response.data.tags && response.data.tags.length > 0) {
-          fetchTagNames(response.data.tags);
+        if (quizData.tags && quizData.tags.length > 0) {
+          fetchTagNames(quizData.tags);
         }
       } else {
+        console.error("Invalid response structure:", response);
         message.error("Failed to load quiz details - no data returned");
       }
     } catch (error) {
       console.error("Error fetching quiz details:", error);
-      message.error("Failed to load quiz details");
+      message.error(error.message || "Failed to load quiz details");
     } finally {
       setLoading(false);
     }
@@ -48,7 +52,7 @@ const QuizDetail = () => {
   const fetchTagNames = async (tagIds) => {
     try {
       const tagMapping = {};
-      
+
       // Fetch each tag individually
       for (const tagId of tagIds) {
         try {
@@ -63,7 +67,7 @@ const QuizDetail = () => {
           tagMapping[tagId] = tagId; // Fallback to ID on error
         }
       }
-      
+
       setTagNames(tagMapping);
     } catch (error) {
       console.error("Error fetching tag names:", error);
@@ -156,34 +160,34 @@ const QuizDetail = () => {
       <Card className="quiz-header-card">
         <Title level={2}>{quiz.title}</Title>
         <Paragraph>{quiz.description}</Paragraph>
-        
+
         {renderTags(quiz.tags)}
-        
+
         <Divider />
-        
+
         <div className="quiz-meta-info">
           <div className="quiz-meta-item">
             <Text strong>Created by:</Text>
             <Text>{quiz.createdBy?.name || "Unknown"}</Text>
           </div>
-          
+
           <div className="quiz-meta-item">
             <Text strong>Questions:</Text>
             <Text>{quiz.questions?.length || 0}</Text>
           </div>
-          
+
           {quiz.timeLimit && (
             <div className="quiz-meta-item">
               <Text strong>Time Limit:</Text>
               <Text>{Math.floor(quiz.timeLimit / 60)} minutes</Text>
             </div>
           )}
-          
+
           <div className="quiz-meta-item">
             <Text strong>Average Score:</Text>
             <Text>{Math.round(quiz.averageScore || 0)}%</Text>
           </div>
-          
+
           <div className="quiz-meta-item">
             <Text strong>Total Attempts:</Text>
             <Text>{quiz.totalAttempts || 0}</Text>
@@ -192,35 +196,35 @@ const QuizDetail = () => {
       </Card>
 
       <Title level={3} className="questions-title">Quiz Questions</Title>
-      
+
       {quiz.questions && quiz.questions.length > 0 ? (
         quiz.questions.map((question, index) => (
           <Card key={index} className="question-card">
             <Title level={4} className="question-number">
               Question {index + 1}
             </Title>
-            
+
             <Paragraph className="question-text">
               {question.questionText}
             </Paragraph>
-            
+
             <div className="question-type">
               <Tag color="processing">
-                {question.type === "MULTIPLE_CHOICE" 
-                  ? "Multiple Choice" 
-                  : question.type === "TRUE_FALSE" 
-                    ? "True/False" 
+                {question.type === "MULTIPLE_CHOICE"
+                  ? "Multiple Choice"
+                  : question.type === "TRUE_FALSE"
+                    ? "True/False"
                     : "Fill in the Blank"}
               </Tag>
             </div>
-            
+
             <Divider className="option-divider" />
-            
+
             <div className="question-options">
               <Title level={5}>Options:</Title>
               {renderQuestionOptions(question)}
             </div>
-            
+
             {question.explanation && (
               <div className="question-explanation">
                 <Title level={5}>Explanation:</Title>
@@ -238,4 +242,4 @@ const QuizDetail = () => {
   );
 };
 
-export default QuizDetail; 
+export default QuizDetail;

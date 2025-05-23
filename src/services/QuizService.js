@@ -7,7 +7,7 @@ export const getAllQuizzes = async (page = 1, limit = 10, tag = '', search = '')
         const response = await axiosInstance.get('/quiz/get-all', {
             params: { page, limit, tag, search }
         });
-        
+
         // Ensure each quiz has totalAttempts and averageScore with default values if missing
         if (response.data && response.data.data && response.data.data.quizzes) {
             response.data.data.quizzes = response.data.data.quizzes.map(quiz => ({
@@ -16,7 +16,7 @@ export const getAllQuizzes = async (page = 1, limit = 10, tag = '', search = '')
                 averageScore: quiz.averageScore || 0
             }));
         }
-        
+
         return response.data;
     } catch (error) {
         console.error('Error in getAllQuizzes:', error);
@@ -29,31 +29,15 @@ export const getQuizById = async (quizId) => {
         console.log(`Fetching quiz details for ID: ${quizId}`);
         const response = await axiosInstance.get(`/quiz/get-details/${quizId}`);
         console.log('Raw response from getQuizById:', response);
-        
-        // Extract quiz data from response
-        let quizData;
-        
-        if (response.data && response.data.data) {
-            // Nested response structure (data.data)
-            quizData = response.data.data;
-            console.log('Extracted quiz from response.data.data:', quizData);
-        } else if (response.data) {
-            // Standard response structure (data)
-            quizData = response.data;
-            console.log('Extracted quiz from response.data:', quizData);
-        } else {
-            // Fallback to entire response
-            quizData = response;
-            console.log('Using entire response as quiz data:', quizData);
+
+        // The backend always returns { status, message, data } structure
+        if (response.data && response.data.status === 'OK' && response.data.data) {
+            return {
+                data: response.data.data
+            };
         }
-        
-        // Process quiz questions if needed
-        if (quizData && !quizData.questions && quizData.data && quizData.data.questions) {
-            quizData.questions = quizData.data.questions;
-            console.log('Moved questions from nested data property');
-        }
-        
-        return quizData;
+
+        throw new Error('Invalid response structure from server');
     } catch (error) {
         console.error('Error in getQuizById:', error);
         throw error.response?.data || error;
@@ -91,10 +75,10 @@ export const submitQuizAttempt = async (quizId, attemptData) => {
     try {
         console.log(`Submitting quiz attempt to /quiz/submit/${quizId}`);
         console.log('Request data:', attemptData);
-        
+
         const response = await axiosInstance.post(`/quiz/submit/${quizId}`, attemptData);
         console.log('Raw API response:', response);
-        
+
         // Ensure we return the data property from the response
         return response.data;
     } catch (error) {
@@ -142,4 +126,4 @@ const QuizService = {
     getRandomQuizByTag
 };
 
-export default QuizService; 
+export default QuizService;
