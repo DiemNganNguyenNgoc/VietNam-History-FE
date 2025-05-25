@@ -12,6 +12,13 @@ const { Title, Text } = Typography;
 const { Search } = Input;
 const { confirm } = Modal;
 
+// Add custom styles for the table headers
+const tableHeaderStyle = {
+  backgroundColor: '#fffde7', // Light yellow background
+  fontWeight: 'bold',
+  borderBottom: '1px solid #e0e0e0'
+};
+
 const QuizAdmin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -47,7 +54,7 @@ const QuizAdmin = () => {
           // Handle single tag object
           tagMapping[response.data._id] = response.data.name;
         }
-        
+
         console.log("Tag mapping created:", tagMapping);
         setTagMap(tagMapping);
       }
@@ -89,7 +96,7 @@ const QuizAdmin = () => {
           ...pagination,
           total: response.data.pagination.total,
         });
-        
+
         // Fetch tag names for all unique tag IDs in the quizzes
         const allTagIds = new Set();
         response.data.quizzes.forEach(quiz => {
@@ -97,7 +104,7 @@ const QuizAdmin = () => {
             quiz.tags.forEach(tagId => allTagIds.add(tagId));
           }
         });
-        
+
         // Fetch tag details for each unique tag ID
         Array.from(allTagIds).forEach(tagId => {
           fetchTagName(tagId);
@@ -235,9 +242,9 @@ const QuizAdmin = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button 
-            type="primary" 
-            icon={<EyeOutlined />} 
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
             onClick={() => handleViewDetails(record._id)}
           >
             View
@@ -277,9 +284,17 @@ const QuizAdmin = () => {
         loading={loading}
         onChange={handleTableChange}
         scroll={{ x: true }}
+        // Add header styling
+        className="custom-table"
+        headerCell={{ style: tableHeaderStyle }}
+        components={{
+          header: {
+            cell: (props) => <th {...props} style={{ ...props.style, ...tableHeaderStyle }} />
+          }
+        }}
       />
     </div>
   );
 };
 
-export default QuizAdmin; 
+export default QuizAdmin;

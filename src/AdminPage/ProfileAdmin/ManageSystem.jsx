@@ -18,7 +18,7 @@ function ManageSystem() {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tabParam = queryParams.get("tab");
-    
+
     if (tabParam && ["question", "tag", "user", "admin", "quiz", "statistic"].includes(tabParam)) {
       setActiveTab(tabParam);
     }
@@ -35,7 +35,7 @@ function ManageSystem() {
                 className={`nav-link ${activeTab === "question" ? "active" : ""}`}
                 onClick={() => setActiveTab("question")}
               >
-                Questions
+                Posts
               </button>
             </li>
             <li className="nav-item">

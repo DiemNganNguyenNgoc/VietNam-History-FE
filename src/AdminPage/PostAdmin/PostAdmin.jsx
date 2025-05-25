@@ -167,13 +167,13 @@ const QuestionAdmin = () => {
     setSelectedQuestion(question);
     setIsLinkQuizModalVisible(true);
     setLoadingQuizzes(true);
-    
+
     // Fetch available quizzes
     fetchAvailableQuizzes().then(() => {
       // Set initially selected quizzes if the question already has linked quizzes
       if (question.linkedQuizzes && question.linkedQuizzes.length > 0) {
         // If linkedQuizzes are objects with _id property, extract the IDs
-        const linkedQuizIds = question.linkedQuizzes.map(quiz => 
+        const linkedQuizIds = question.linkedQuizzes.map(quiz =>
           typeof quiz === 'object' && quiz._id ? quiz._id : quiz
         );
         setSelectedQuizzes(linkedQuizIds);
@@ -190,26 +190,26 @@ const QuestionAdmin = () => {
   // Handle save quiz links
   const handleSaveQuizLinks = async () => {
     if (!selectedQuestion) return;
-    
+
     try {
       // Update the question with selected quiz IDs
       await QuestionService.updateQuestion(selectedQuestion._id, {
         linkedQuizzes: selectedQuizzes
       });
-      
+
       // Get the full quiz objects for the selected IDs
-      const selectedQuizObjects = availableQuizzes.filter(quiz => 
+      const selectedQuizObjects = availableQuizzes.filter(quiz =>
         selectedQuizzes.includes(quiz._id)
       );
-      
+
       // Update local state with the full quiz objects
-      const updatedQuestions = questions.map(q => 
-        q._id === selectedQuestion._id 
+      const updatedQuestions = questions.map(q =>
+        q._id === selectedQuestion._id
           ? { ...q, linkedQuizzes: selectedQuizObjects }
           : q
       );
       setQuestions(updatedQuestions);
-      
+
       // Close modal
       setIsLinkQuizModalVisible(false);
       alert("Quiz links updated successfully!");
@@ -266,8 +266,16 @@ const QuestionAdmin = () => {
     });
   };
 
-  const handleQuestionClick = (questionId) => {
-    navigate(`/admin/question-detail/${questionId}`);
+  const handleQuestionClick = async (questionId) => {
+    try {
+      // Navigate to the admin question detail page without updating view count
+      // This uses the direct navigation without calling updateViewCount
+      navigate(`/admin/question-detail/${questionId}`);
+    } catch (error) {
+      console.error("Error navigating to question:", error);
+      // Still try to navigate even if there's an error
+      navigate(`/admin/question-detail/${questionId}`);
+    }
   };
 
   const handleOnDelete = async (quesId, event) => {
@@ -298,15 +306,15 @@ const QuestionAdmin = () => {
         `Are you sure you want to ${currentStatus ? "hide" : "show"} this question?`
       );
       if (!isConfirmed) return;
-  
+
       // Xác định giá trị count cần cập nhật
       const updatedCount = currentStatus ? 3 : 0;
-  
+
       // Gọi service để cập nhật count
       const res = await QuestionService.updateReportCount(ques._id, { count: updatedCount });
       await QuestionService.toggleActiceQues(ques._id)
       console.log("Successfully toggled question status:", res.data);
-  
+
       // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
       const updatedQuestions = questions.map((question) =>
         question._id === ques._id
@@ -319,7 +327,7 @@ const QuestionAdmin = () => {
       console.error("Failed to toggle question status:", error.response?.data || error.message);
     }
   };
-  
+
 
 
   return (
@@ -342,8 +350,10 @@ const QuestionAdmin = () => {
             getFilteredQuestion().map((question) => {
               const user = users[question.userQues];
               return (
-                <div key={question._id} 
-                //onClick={() => handleQuestionClick(question._id)}
+                <div
+                  key={question._id}
+                  onClick={() => handleQuestionClick(question._id)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <QuestionBoxAdmin
                     img={user?.img || ""}
@@ -357,9 +367,18 @@ const QuestionAdmin = () => {
                     answers={question.answerCount}
                     likes={question.upVoteCount}
                     isHidden={question.active}
-                    onHidden={() => handleToggleHidden(question, question.active)}
-                    onDelete={(event) => handleOnDelete(question._id, event)}
-                    onLinkQuiz={() => handleLinkQuiz(question)}
+                    onHidden={(e) => {
+                      e.stopPropagation(); // Prevent triggering parent onClick
+                      handleToggleHidden(question, question.active);
+                    }}
+                    onDelete={(event) => {
+                      event.stopPropagation(); // Prevent triggering parent onClick
+                      handleOnDelete(question._id, event);
+                    }}
+                    onLinkQuiz={(e) => {
+                      e.stopPropagation(); // Prevent triggering parent onClick
+                      handleLinkQuiz(question);
+                    }}
                   />
                 </div>
               );
@@ -378,9 +397,9 @@ const QuestionAdmin = () => {
           <Button key="cancel" onClick={() => setIsLinkQuizModalVisible(false)}>
             Cancel
           </Button>,
-          <Button 
-            key="save" 
-            type="primary" 
+          <Button
+            key="save"
+            type="primary"
             onClick={handleSaveQuizLinks}
             loading={loadingQuizzes}
           >
@@ -393,7 +412,7 @@ const QuestionAdmin = () => {
           <div>
             <h4>{selectedQuestion.title}</h4>
             <p>Select quizzes to link to this question:</p>
-            
+
             <Select
               mode="multiple"
               style={{ width: '100%' }}
@@ -406,8 +425,8 @@ const QuestionAdmin = () => {
               optionLabelProp="label"
             >
               {availableQuizzes.map(quiz => (
-                <Select.Option 
-                  key={quiz._id} 
+                <Select.Option
+                  key={quiz._id}
                   value={quiz._id}
                   label={quiz.title}
                 >
@@ -415,8 +434,8 @@ const QuestionAdmin = () => {
                     <div style={{ fontWeight: 'bold' }}>{quiz.title}</div>
                     {quiz.description && (
                       <div style={{ fontSize: '12px', color: '#888' }}>
-                        {quiz.description.length > 50 
-                          ? `${quiz.description.substring(0, 50)}...` 
+                        {quiz.description.length > 50
+                          ? `${quiz.description.substring(0, 50)}...`
                           : quiz.description}
                       </div>
                     )}
@@ -424,7 +443,7 @@ const QuestionAdmin = () => {
                 </Select.Option>
               ))}
             </Select>
-            
+
             {selectedQuizzes.length > 0 && (
               <div style={{ marginTop: '20px' }}>
                 <h5>Selected Quizzes:</h5>

@@ -189,12 +189,12 @@ const AskQuestionPage = () => {
   return (
     <div className="container">
       <div className="title" style={{ marginTop: "30px" }}>
-        <h1 className="title">Ask a Question</h1>
+        <h1 className="title">Add a post</h1>
       </div>
 
       <div className="input">
         <h1 className="label">
-          Question title <span className="asterisk">*</span>
+          Post title <span className="asterisk">*</span>
         </h1>
         <h2 className="description">
           Be specific and imagine you're asking a question to another person.

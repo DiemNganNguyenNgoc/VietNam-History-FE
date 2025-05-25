@@ -21,6 +21,10 @@ const QuestionPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  // Check if the user is an admin
+  const admin = useSelector((state) => state.admin);
+  const isAdmin = admin?.isAdmin === true;
+
   // console.log("user1", user);
   const [savedList, setSavedList] = useState([]); // Danh sách câu hỏi đã lưu
   const [reportedList, setReportedList] = useState([]); // Quản lý danh sách câu hỏi đã report
@@ -144,32 +148,43 @@ const QuestionPage = () => {
   }
 
   const handleAskQuestionClick = () => {
-    if (!user?.id) {
+    // Check if user is regular user or admin
+    if (!user?.id && !isAdmin) {
       alert("Please log in to ask question!");
       navigate("/login", { state: location?.pathname });
-    } else if (!user?.active) {
+    } else if (user?.id && !user?.active) {
       alert(
         "Your account is inactive. You cannot add a question at this time."
       );
     } else {
+      // Allow both regular users and admins to ask questions
       navigate("/askquestion");
     }
   };
 
   const handleQuestionClick = async (questionId) => {
     try {
-      if (!user?.id) {
-        console.error("User ID is missing");
+      if (!user?.id && !isAdmin) {
+        console.error("User ID is missing and not an admin");
         return;
       }
-      await QuestionService.updateViewCount(questionId, user.id);
 
-      navigate(`/question-detail/${questionId}`);
+      if (isAdmin) {
+        // For admin users, just navigate directly without updating view count
+        navigate(`/question-detail/${questionId}`);
+      } else {
+        // For regular users, update view count before navigation
+        await QuestionService.updateViewCount(questionId, user.id);
+        navigate(`/question-detail/${questionId}`);
+      }
     } catch (error) {
       console.error(
         "Failed to update view count:",
         error.response?.data || error.message
       );
+
+      // Still navigate to question detail even if view count update fails
+      navigate(`/question-detail/${questionId}`);
     }
   };
 

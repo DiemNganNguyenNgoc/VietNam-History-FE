@@ -13,22 +13,31 @@ function ProfileAdmin() {
   return (
     <div className="container mt-4">
       {/* Avatar và Tên */}
-      <div className="row ">
-        <div className="col-3">
-          <img src={admin.img} />
+      <div className="row">
+        <div className="col-md-3 col-sm-4 text-center">
+          <img
+            src={admin.img}
+            alt="Admin Avatar"
+            className="img-fluid rounded-circle"
+            style={{ maxWidth: "150px", maxHeight: "150px", objectFit: "cover" }}
+          />
         </div>
-        <div className="col-9">
+        <div className="col-md-9 col-sm-8">
           <div className="row">
             <h2 className="mt-3">{admin.name}</h2>
           </div>
           <div className="row">
-            <div className="col">
-              <i class="bi bi-calendar"></i>
-              <p>Member for 10 days</p>
+            <div className="col-md-6">
+              <div className="d-flex align-items-center">
+                <i className="bi bi-calendar me-2"></i>
+                <p className="mb-1">Member for 10 days</p>
+              </div>
             </div>
-            <div className="col">
-              <i class="bi bi-clock-history"></i>
-              <p>Recent access history: 01/01/2024</p>
+            <div className="col-md-6">
+              <div className="d-flex align-items-center">
+                <i className="bi bi-clock-history me-2"></i>
+                <p className="mb-1">Recent access history: 01/01/2024</p>
+              </div>
             </div>
           </div>
         </div>

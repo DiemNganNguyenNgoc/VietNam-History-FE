@@ -76,7 +76,7 @@ function TagAdmin() {
 
   return (
     <div className="container my-4">
-      <h1 className='title'>MANAGEMENT TAGS</h1>
+      <h1 className='title' style={{ color: "#EDBE00" }}>MANAGEMENT TAGS</h1>
       <p
         style={{
           color: "#323538",
@@ -88,13 +88,20 @@ function TagAdmin() {
       >
         {tagsWithCount.length} tags
       </p>
-      <div>
+      <div style={{ position: "relative", width: "300px", marginBottom: '30px' }}>
         <input
           type="text"
-          className="form-control d-inline-block me-2"
+          className="form-control d-inline-block"
           placeholder="Search by tag name..."
-          style={{ width: "300px", marginBottom:'30px' }}
+          style={{ width: "100%" }}
         />
+        <i className="bi bi-search" style={{
+          position: "absolute",
+          right: "15px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          color: "#666"
+        }}></i>
       </div>
 
       {/* Tags Grid */}
@@ -108,10 +115,10 @@ function TagAdmin() {
               key={tag._id}
               onClick={() => handleTagClick(tag._id)}
             >
-              <div className="card shadow-sm">
+              <div className="card shadow-sm" style={{ backgroundColor: "#FFF9E6" }}>
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h5 className="card-title text-primary mb-0">{tag.name}</h5>
+                    <h5 className="card-title mb-0" style={{ color: "#EDBE00" }}>{tag.name}</h5>
                     <div>
                       <button
                         className="btn btn-sm btn-light"
@@ -121,11 +128,11 @@ function TagAdmin() {
                       </button>
                     </div>
                   </div>
-                  <p className="card-text text-muted" style={{ fontSize: "14px" }}>
+                  <p className="card-text" style={{ fontSize: "14px", color: "#000" }}>
                     {tag.description}
                   </p>
-                  <span className="text-secondary" style={{ fontSize: "13px" }}>
-                    {tag.usedCount} questions
+                  <span style={{ fontSize: "13px", color: "#000" }}>
+                    {tag.usedCount} câu hỏi
                   </span>
                 </div>
               </div>

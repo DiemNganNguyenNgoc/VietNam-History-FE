@@ -54,7 +54,7 @@ const TagsDetailPage = () => {
         (question) => question.answerCount === 0
       ); // Chỉ hiển thị câu hỏi chưa có câu trả lời
     }
- 
+
     return filteredQuestions;
   };
 
@@ -86,9 +86,9 @@ const TagsDetailPage = () => {
 
     // Lấy thông tin người dùng dựa trên userId từ câu hỏi
     const getUserDetails = async (userId) => {
-        if (!userId) return null; 
+        if (!userId) return null;
         const res = await UserService.getDetailsUser(userId);
-        return res.data; 
+        return res.data;
     };
 
     // Lấy thông tin tag dựa trên tagId
@@ -142,10 +142,10 @@ const TagsDetailPage = () => {
             console.error("User ID is missing");
             return;
           }
-      
+
           // Gọi API updateViewCount
           await QuestionService.updateViewCount(questionId, user.id);
-      
+
           // Điều hướng sau khi gọi API thành công
           navigate(`/question-detail/${questionId}`);
         } catch (error) {
@@ -158,7 +158,13 @@ const TagsDetailPage = () => {
             className="container"
             style={{
                 color: "#023E73",
-                marginTop: "20px",
+                marginTop: "30px",
+                marginBottom: "50px",
+                backgroundColor: "#faf6ed",
+                padding: "30px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+                border: "1px solid #e6dcc6"
             }}
         >
             <div
@@ -177,17 +183,35 @@ const TagsDetailPage = () => {
                     [{tagDetails.name}]
                 </h1>
             </div>
-            <p>
-                {tagDetails.name}: {tagDetails.description}
+            <p style={{
+                fontSize: "17px",
+                lineHeight: "1.6",
+                marginBottom: "35px",
+                marginTop: "15px",
+                padding: "15px 20px",
+                backgroundColor: "#f5f1e6",
+                borderLeft: "4px solid #b0a080",
+                borderRadius: "0 4px 4px 0",
+                color: "#5a4a2d",
+                fontStyle: "italic",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+            }}>
+                <strong style={{ color: "#3f3424" }}>{tagDetails.name}:</strong> {tagDetails.description}
             </p>
             <div className="row" style={{ marginTop: "30px" }}>
                 <div className="col">
-                    <p style={{ fontSize: "25px", color: "#666666" }}>
-                        {questions.length} questions
+                    <p style={{
+                        fontSize: "22px",
+                        color: "#5d4b35",
+                        fontWeight: "600",
+                        fontFamily: "Georgia, serif",
+                        textShadow: "0 1px 1px rgba(255,255,255,0.8)"
+                    }}>
+                        {questions.length} câu hỏi
                     </p>
                 </div>
                 <div className="col">
-                    <SortBtn setFilterOption={setFilterOption} />
+                    {/* SortBtn moved to center section below */}
                 </div>
             </div>
 
@@ -196,10 +220,21 @@ const TagsDetailPage = () => {
                     display: "flex",
                     justifyContent: "center",
                     marginTop: "20px",
+                    marginBottom: "30px",
                     width: "100%",
                 }}
             >
-               
+                <div
+                    style={{
+                        padding: "12px 25px",
+                        backgroundColor: "#f0e9db",
+                        borderRadius: "6px",
+                        border: "1px solid #d9ceb2",
+                        display: "inline-block",
+                    }}
+                >
+                    <SortBtn setFilterOption={setFilterOption} />
+                </div>
             </div>
             <div style={{ marginTop: "20px" }}>
                 {Array.isArray(questions) && questions.length > 0 ? (

@@ -195,7 +195,7 @@ const QuestionDetails = () => {
       message.error();
     }
   }, [isSuccessUpdate, isErrorUpdate, dataUpdate]);
-  //Click them answer 
+  //Click them answer
   const handlePostAnswerClick = useCallback(async () => {
     if (!user?.id) {
       alert("User ID is missing. Please log in again.");
@@ -225,7 +225,7 @@ const QuestionDetails = () => {
         // Cập nhật số câu trả lời cho câu hỏi (update answerCount)
         const updatedAnswerCount = questionDetail.data?.answerCount + 1; // Tăng 1 số câu trả lời
         await QuestionService.updateAnswerCount(questionId, updatedAnswerCount);
-        //Cập nhật số câu trả lời của người dùng đã post 
+        //Cập nhật số câu trả lời của người dùng đã post
         await mutationUpdate.mutateAsync(userAns);
         // Gọi hàm fetchAnswers để cập nhật danh sách câu trả lời
         fetchAnswersWithUserDetails();
@@ -286,30 +286,30 @@ const QuestionDetails = () => {
           console.error("User must be logged in to report comments.");
           return;
         }
-  
+
         const isConfirmed = window.confirm(
           "Are you sure you want to report this comment?"
         );
-  
+
         if (!isConfirmed) {
           return; // Nếu người dùng nhấn "Cancel", thoát khỏi hàm
         }
-  
+
         const response = await CommentReportService.createCommentReport({
           comment: commentQuess._id, // ID của bình luận
           user: user.id, // ID của người dùng
         });
-  
+
         // Cập nhật danh sách báo cáo
         const updatedList = [...reportedCommentList, commentQuess._id];
         setReportedCommentList(updatedList);
         localStorage.setItem("reportedComments", JSON.stringify(updatedList)); // Lưu vào localStorage
-  
+
         console.log("Report submitted successfully:", response);
-  
+
         // Cập nhật danh sách các bình luận đã báo cáo
         // setReportedCommentList((prev) => [...prev, commentQuess._id]);
-  
+
         alert(response.message); // Thông báo sau khi báo cáo thành công
       } catch (error) {
         console.error("Error reporting comment:", error);
@@ -357,7 +357,7 @@ const QuestionDetails = () => {
       const res = await CommentService.getCommentByQuestionId(questionId);
       return res.data;
     };
-  
+
     const {
       isLoading: isLoadingQuesAns,
       data: commentAns,
@@ -366,14 +366,14 @@ const QuestionDetails = () => {
       queryKey: ["commentAns"],
       queryFn: getAllComAns,
     });
-  
- 
 
-  //Xóa bình luận 
+
+
+  //Xóa bình luận
   const deleteMutation = useMutationHook(data => CommentService.deleteComment(data));
   const { isSuccess: isSuccessDelete, isError: isErrorDelete } = deleteMutation;
   useEffect(() => {
-        
+
     if ( isErrorDelete) {
         message.error();
     }
@@ -393,7 +393,7 @@ const handleDeleteComment = (comment,event) => {
        }
        reloadPage();
 };
-  
+
 
 
   return (
@@ -434,7 +434,15 @@ const handleDeleteComment = (comment,event) => {
 
       {/* Nội dung bài viết */}
       <div className="bg-light p-4 rounded mb-4">
-        <p>{questionDetail.data?.content || "No content provided"}</p>
+        <div className="content-container" style={{
+          backgroundColor: "#fffde7",
+          padding: "15px",
+          borderRadius: "8px",
+          border: "1px solid #e0e0e0",
+          marginBottom: "15px"
+        }}>
+          {parse(questionDetail.data?.content || "No content provided")}
+        </div>
         <div className="bg-dark text-white p-3 rounded">
           {questionDetail.data?.images?.map((img, index) => (
             <img
@@ -446,10 +454,22 @@ const handleDeleteComment = (comment,event) => {
           ))}
         </div>
         <p className="mt-3">Output:</p>
-        <div className="bg-light border rounded p-2">
+        <div className="p-2 rounded" style={{
+          backgroundColor: "#fffde7",
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px"
+        }}>
           <code>9 8 7 6 5 4 3 2 1 0</code>
         </div>
-        <p className="mt-3">{questionDetail.data?.note || ""}</p>
+        <div className="mt-3" style={{
+          backgroundColor: "#fffde7",
+          padding: "15px",
+          borderRadius: "8px",
+          border: "1px solid #e0e0e0",
+          marginTop: "15px"
+        }}>
+          {parse(questionDetail.data?.note || "")}
+        </div>
 
         {/* Tags chủ đề */}
         <div className="mt-4">
@@ -469,31 +489,28 @@ const handleDeleteComment = (comment,event) => {
         <h5 className="mb-3">Comments</h5>
         {Array.isArray(commentQuess) && commentQuess.length > 0 ? (
           commentQuess.map((commentQues) => {
-            //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
-
             return (
               <div
                 key={commentQues._id}
-                
               >
                 <Comment
                 name={commentQues.user.name || "Unknown"}
+                img={commentQues.user.img || "https://via.placeholder.com/40"}
                 text={commentQues.content || "Unknown"}
                 date={new Date(commentQues.createdAt).toLocaleString()}
                 key={commentQues._id || commentQues.id || commentQues}
                 onReport={() => handleCommentReport(commentQues)}
                 isReported={reportedCommentList.includes(commentQues._id)}
                 onclick1={(event)=> handleDeleteComment(commentQues._id,event)}
-
                 />
               </div>
             );
           })
         ) : (
-          <p>No conmment available.</p>
+          <p>No comments available.</p>
         )}
       </div>
-      
+
 
       {/* Danh sách câu trả lời */}
       <div>
@@ -523,7 +540,7 @@ const handleDeleteComment = (comment,event) => {
                         className={`btn btn-sm ${answer.active ? "btn-danger" : "btn-success"}`}
                         onClick={() => handleToggleAnswerStatus(answer._id, answer.active)}
                       > {answer.active ? "Delete" : "Restore"}</button>
-                      
+
                     </div>
                   </div>
                 </div>
@@ -541,10 +558,10 @@ const handleDeleteComment = (comment,event) => {
         {Array.isArray(commentAns) && commentAns.length > 0 ? (
           commentAns.filter((commentQues) => commentQues.answer === answer._id) // Lọc các comment có answer = answer.id
           .map((commentQues) => {
-            //const user = userInfo[commentQues._id] || {}; // Tránh truy cập vào undefined
             return (
               <Comment
                 name={commentQues.user.name || "Unknown"}
+                img={commentQues.user.img || "https://via.placeholder.com/40"}
                 text={commentQues.content || "Unknown"}
                 date={new Date(commentQues.createdAt).toLocaleString()}
                 key={commentQues._id || commentQues.id || commentQues}
@@ -555,7 +572,7 @@ const handleDeleteComment = (comment,event) => {
             );
           })
           ) : (
-          <p>No conmment available.</p>
+          <p>No comments available.</p>
         )}
       </div>
             </div>
