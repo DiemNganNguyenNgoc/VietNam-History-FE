@@ -12,13 +12,13 @@ const SortBtn = ({ setFilterOption }) => {
 
   return (
     <div className="container">
-      <button className="button">
+      <button className="sort-button">
         {["Newest", "Active",  "Unanswered"].map((option, index) => (
           <React.Fragment key={index}>
             <span
-              className={`options ${
-                selectedOption === option ? "selectedOption" : ""
-              } ${hoveredOption === option ? "optionHover" : ""}`}
+              className={`sort-options ${
+                selectedOption === option ? "selectedSortOption" : ""
+              } ${hoveredOption === option ? "sort-optionHover" : ""}`}
               onClick={() => handleOptionClick(option)}
               onMouseEnter={() => setHoveredOption(option)}
               onMouseLeave={() => setHoveredOption(null)}

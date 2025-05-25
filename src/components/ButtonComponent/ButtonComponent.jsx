@@ -5,12 +5,14 @@ const ButtonComponent = (props) => {
 
   return (
     <button
-      type={props.type || "button"} // Mặc định là "button", nhưng có thể truyền "submit"
+      type={props.type || "button"}
       className="btn btn-primary"
       style={{
         fontSize: "16px",
-        backgroundColor: hover ? "#336699" : "#003366",
-        color: "#FFFFFF",
+        border: "none",
+        backgroundColor: hover ? "#EDBE00" : "#EDBE00",
+        color: "#000000",
+        ...props.style,
       }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

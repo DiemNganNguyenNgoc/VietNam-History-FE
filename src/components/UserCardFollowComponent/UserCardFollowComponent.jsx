@@ -45,7 +45,13 @@ const UserCardFollowComponent = ({
         }}
         onClick={handleCardClick}
       >
-        <div className="row g-0 align-items-center">
+        <div
+          className="row g-0 align-items-center"
+          style={{
+            border: "solid 2px #EDBE00",
+            borderRadius: "5px",
+          }}
+        >
           <div className="col-md-4">
             <img
               src={img || "https://via.placeholder.com/150"} // Ảnh mặc định nếu không có img
@@ -73,6 +79,11 @@ const UserCardFollowComponent = ({
                 className={`btn btn-sm ${
                   isFollowed ? "btn-secondary" : "btn-primary"
                 }`}
+                style={{
+                  color: "black",
+                  border: "none",
+                  backgroundColor: "#EDBE00",
+                }}
               >
                 {isFollowed ? "Followed" : "Follow"}
               </button>

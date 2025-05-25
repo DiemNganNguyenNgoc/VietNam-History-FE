@@ -1,6 +1,6 @@
  export const Styles={
   textHeader: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: '20px',
   },
 
@@ -22,7 +22,7 @@
   },
 
   iconHeader: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontSize: '30px',
     marginRight: '8px',
     marginLeft: '8px',

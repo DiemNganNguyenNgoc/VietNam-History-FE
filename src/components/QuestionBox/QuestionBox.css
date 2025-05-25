@@ -1,8 +1,8 @@
 .question-box {
   display: flex;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f2f5ff;
+  border: 1px solid #FFEA75;
+  border-radius: 10px;
+  background-color: #FFFDF0;
   padding: 10px;
   margin-bottom: 10px;
   color: #666666;
@@ -82,7 +82,7 @@
   font-size: 20px;
   margin: 0;
   font-weight: 600;
-  color: #023e73;
+  color: #000000;
 }
 
 .tags-container {
@@ -92,7 +92,7 @@
 }
 
 .tag-item {
-  background-color: #c5e3fc;
+  background-color: #FFEA75;
   border-radius: 10px;
   padding: 5px 10px;
   margin-right: 5px;

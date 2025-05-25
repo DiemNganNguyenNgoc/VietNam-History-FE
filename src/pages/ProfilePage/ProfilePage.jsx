@@ -58,7 +58,7 @@ function ProfilePage() {
       {/* Tabs */}
       <div className="row mt-4">
         <div className="col-12">
-          <ul className="nav nav-tabs">
+          <ul className="nav nav-tabs custom-tabs">
             <li className="nav-item">
               <button
                 className={`nav-link ${activeTab === "profile" ? "active" : ""

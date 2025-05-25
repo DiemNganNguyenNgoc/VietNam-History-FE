@@ -22,8 +22,13 @@ const ProfileTab = () => {
   const [statusMessage, setStatusMessage] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
-  const [commentList,setCommentList]= useState([]);
+  const [commentList, setCommentList] = useState([]);
   const [userID, setUserID] = useState("null");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
 
   //   const [name, setName] = useState(user?.name);
   //   const [email, setEmail] = useState(user?.email);
@@ -262,31 +267,69 @@ const ProfileTab = () => {
     }
   }, [user.id]); // Chạy lại khi userId thay đổi
   //Lấy tất cả comment
-  
 
-  
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleUpdatePassword = async () => {
+    const { currentPassword, newPassword, confirmNewPassword } = passwordForm;
+
+    if (newPassword !== confirmNewPassword) {
+      alert("Mật khẩu mới và xác nhận không khớp!");
+      return;
+    }
+
+    try {
+      const res = await UserService.updatePassword(
+        {
+          userId: user?.id,
+          currentPassword,
+          newPassword,
+        },
+        user?.access_token // truyền token riêng ra ngoài
+      );
+
+      if (res?.success) {
+        alert("Đổi mật khẩu thành công!");
+        setPasswordForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmNewPassword: "",
+        });
+      } else {
+        alert(res?.message || "Đổi mật khẩu thất bại!");
+      }
+    } catch (err) {
+      alert("Lỗi khi đổi mật khẩu: " + err.message);
+    }
+  };
 
   return (
     <div className="row">
       <div className="col-3">
-        {/* <h3 className="title-profile">Summary</h3>
+        <h3 className="title-profile">Summary</h3>
 
         <div className="card-profile" style={{ padding: "0 10px" }}>
           <table className="table table-borderless">
             <tbody style={{ verticalAlign: "middle" }}>
               <tr>
-              <td className="fw-bold fs-5">{formData.savedCount}</td>
+                <td className="fw-bold fs-5">{formData.savedCount}</td>
                 <td className="fw-bold fs-5">{formData.followerCount}</td>
               </tr>
               <tr className="row-2">
-              <td className="text-muted">saved</td>
+                <td className="text-muted">saved</td>
                 <td className="text-muted">followers</td>
               </tr>
               <tr>
                 <td className="fw-bold fs-5">{formData.followingCount}</td>
               </tr>
               <tr className="row-2">
-              <td className="text-muted">comments</td>
+                <td className="text-muted">comments</td>
                 <td className="text-muted">following</td>
               </tr>
               <tr>
@@ -299,7 +342,7 @@ const ProfileTab = () => {
               </tr>
             </tbody>
           </table>
-        </div> */}
+        </div>
       </div>
 
       <div className="col-9">
@@ -441,28 +484,28 @@ const ProfileTab = () => {
           </h3>
           <div className="card-profile " style={{ padding: "0 20px" }}>
             <FormComponent
-              name="password"
-              label="Old password"
+              name="currentPassword"
+              label="Current password"
               type="password"
               placeholder="Enter your old password"
-              value={formData.password}
-              onChange={handleChange}
+              value={passwordForm.currentPassword}
+              onChange={handlePasswordChange}
             />
             <FormComponent
               name="newPassword"
               label="New password"
               type="password"
               placeholder="Enter your new password"
-              value={formData.password}
-              onChange={handleChange}
+              value={passwordForm.newPassword}
+              onChange={handlePasswordChange}
             />
             <FormComponent
               name="confirmNewPassword"
               label="Confirm password"
               type="password"
               placeholder="Confirm your password"
-              value={formData.password}
-              onChange={handleChange}
+              value={passwordForm.confirmNewPassword}
+              onChange={handlePasswordChange}
             />
             <div
               style={{
@@ -472,7 +515,10 @@ const ProfileTab = () => {
                 marginBottom: "10px",
               }}
             >
-              <ButtonComponent textButton="Update" />
+              <ButtonComponent
+                textButton="Update"
+                onClick={handleUpdatePassword}
+              />
             </div>
           </div>
         </div>

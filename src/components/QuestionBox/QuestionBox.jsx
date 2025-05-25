@@ -106,7 +106,7 @@ const QuestionBox = ({
                 e.stopPropagation();
                 isSaved ? onUnsave() : onSave();
               }}
-              style={{ width: "80px" }}
+              style={{ width: "80px", backgroundColor: "#EDBE00", color: "black" }}
             >
               {isSaved ? "Saved" : "Save"}
             </button>

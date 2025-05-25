@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import "../../../src/css/QuestionPage.css"
+import "../../../src/css/QuestionPage.css";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -365,7 +365,7 @@ const QuestionPage = () => {
     <div className="container">
       <div
         style={{
-          color: "#023E73",
+          color: "#000000",
           marginTop: "20px",
           marginLeft: "20px",
           height: "auto",
@@ -391,17 +391,15 @@ const QuestionPage = () => {
           <div className="btn-holder">
             <div className="askQues">
               <ButtonComponent
-
-                textButton="Ask question"
+                textButton="Add a post"
                 onClick={handleAskQuestionClick}
               />
             </div>
 
             <ButtonComponent
-              textButton="Saved questions"
+              textButton="Saved posts"
               onClick={handleNavToSavedPage}
             />
-
           </div>
         </div>
         <p
@@ -413,7 +411,7 @@ const QuestionPage = () => {
             fontWeight: "600",
           }}
         >
-          {questions.length} questions
+          {questions.length} posts
         </p>
         <br />
         <SortBtn setFilterOption={setFilterOption} />
@@ -470,8 +468,8 @@ const QuestionPage = () => {
                     tags={
                       question.tags
                         ? question.tags.map(
-                          (tagId) => tags[tagId]?.name || tagId
-                        )
+                            (tagId) => tags[tagId]?.name || tagId
+                          )
                         : []
                     } // Lấy tên tag từ tags map
                     date={new Date(question.updatedAt).toLocaleString()}

@@ -34,10 +34,12 @@ const HeaderComponent = () => {
   const [quizMenuOpen, setQuizMenuOpen] = useState(false);
   const quizDropdownRef = useRef(null);
 
-
   useEffect(() => {
     function handleClickOutside(event) {
-      if (quizDropdownRef.current && !quizDropdownRef.current.contains(event.target)) {
+      if (
+        quizDropdownRef.current &&
+        !quizDropdownRef.current.contains(event.target)
+      ) {
         setQuizMenuOpen(false);
       }
     }
@@ -49,22 +51,20 @@ const HeaderComponent = () => {
     };
   }, []);
 
-
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
+      const dropdownElementList = document.querySelectorAll(".dropdown-toggle");
       if (window.bootstrap && window.bootstrap.Dropdown) {
-        const dropdowns = [...dropdownElementList].map(dropdownToggleEl => {
+        const dropdowns = [...dropdownElementList].map((dropdownToggleEl) => {
           return new window.bootstrap.Dropdown(dropdownToggleEl);
         });
       } else {
         if (window.jQuery) {
-          window.jQuery('.dropdown-toggle').dropdown();
+          window.jQuery(".dropdown-toggle").dropdown();
         }
       }
     }
   }, []);
-
 
   const checkIfTagExists = async (tag) => {
     try {
@@ -94,7 +94,10 @@ const HeaderComponent = () => {
         }
       } catch (apiError) {
         // If the API call fails, that's ok, we'll continue with local logout
-        console.warn("API logout failed but continuing with local logout", apiError);
+        console.warn(
+          "API logout failed but continuing with local logout",
+          apiError
+        );
       }
 
       // Reset Redux state
@@ -107,7 +110,7 @@ const HeaderComponent = () => {
 
       // Redirect to home page
       message.success("Logout successful");
-      navigate('/');
+      navigate("/");
 
       // Refresh the page to ensure all components reload with the updated auth state
       setTimeout(() => {
@@ -145,7 +148,6 @@ const HeaderComponent = () => {
           keyword = searchKeyword;
         }
       }
-
 
       const results = await QuestionService.searchQuestion(
         tagList,
@@ -202,19 +204,25 @@ const HeaderComponent = () => {
     }
   };
 
-
   const fetchNotifications = async () => {
     try {
       const data = await NotificationService.getNotificationsByUserId(user?.id); // Gọi API để lấy thông báo
 
-       for (const notification of data.notifications) {
-        if (!notification.metadata?.answer_id && !notification.metadata?.quesVote_id && !notification.metadata?.follow_id) {
+      for (const notification of data.notifications) {
+        if (
+          !notification.metadata?.answer_id &&
+          !notification.metadata?.quesVote_id &&
+          !notification.metadata?.follow_id
+        ) {
           await NotificationService.deleteNotification(notification._id);
         }
       }
 
-      const filteredNotifications = data.notifications.filter(notification =>
-        notification.metadata?.answer_id || notification.metadata?.quesVote_id || notification.metadata?.follow_id
+      const filteredNotifications = data.notifications.filter(
+        (notification) =>
+          notification.metadata?.answer_id ||
+          notification.metadata?.quesVote_id ||
+          notification.metadata?.follow_id
       );
       setNotifications(filteredNotifications);
       setLoading(false);
@@ -229,7 +237,6 @@ const HeaderComponent = () => {
       fetchNotifications();
     }
   }, [user?.id]);
-
 
   const handleMarkAsRead = async (notificationId, questionId, followId) => {
     try {
@@ -264,12 +271,12 @@ const HeaderComponent = () => {
 
   return (
     <>
-      <nav className="navbar" style={{ backgroundColor: "#023E73" }}>
+      <nav className="navbar" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="container">
           <a
             className="navbar-brand"
             href="/"
-            style={{ color: "#FFFFFF", fontSize: "2rem", fontWeight: "bold" }}
+            style={{ color: "#000000", fontSize: "2rem", fontWeight: "bold" }}
           >
             VIETNAM HISTORY
           </a>
@@ -330,7 +337,7 @@ const HeaderComponent = () => {
                         marginTop: "0px",
                         fontSize: "15px",
                         fontWeight: "500",
-                        color: "#FFFFFF",
+                        color: "#000000",
                       }}
                     >
                       {user.name || admin.name}
@@ -369,7 +376,7 @@ const HeaderComponent = () => {
                     style={{
                       fontSize: "16px",
                       fontWeight: "100px",
-                      color: "#FFFFFF",
+                      color: "#000000",
                     }}
                   >
                     Login
@@ -389,7 +396,7 @@ const HeaderComponent = () => {
                   style={{
                     fontSize: "30px",
                     cursor: "pointer",
-                    color: "white",
+                    color: "black",
                   }}
                 >
                   {notifications.some(
@@ -478,8 +485,10 @@ const HeaderComponent = () => {
                     const questionTitle =
                       notification.metadata.question_id?.title;
                     message = `${userName} voted your question: "${questionTitle}" `;
-                  }
-                  else if (notification.type === 'follow' && notification.metadata.follow_id) {
+                  } else if (
+                    notification.type === "follow" &&
+                    notification.metadata.follow_id
+                  ) {
                     // Trường hợp follow
                     const userName = notification.metadata.follow_id?.name;
                     message = `${userName} followed you`;
@@ -491,8 +500,16 @@ const HeaderComponent = () => {
                   return (
                     <div
                       key={notification._id}
-                      className={`notification-item ${notification.is_read ? 'read' : 'unread'}`}
-                      onClick={() => handleMarkAsRead(notification._id, notification.metadata.question_id?._id, notification.metadata.follow_id?._id)}
+                      className={`notification-item ${
+                        notification.is_read ? "read" : "unread"
+                      }`}
+                      onClick={() =>
+                        handleMarkAsRead(
+                          notification._id,
+                          notification.metadata.question_id?._id,
+                          notification.metadata.follow_id?._id
+                        )
+                      }
                     >
                       <p>{message}</p>
                       {!notification.is_read && <span>(Unread)</span>}
@@ -506,10 +523,17 @@ const HeaderComponent = () => {
           </div>
         </div>
       </nav>
+      <div
+        style={{
+          width: "85%", 
+          margin: "0 auto", 
+          borderBottom: "1px solid #ccc",
+        }}
+      />
 
       <nav
         className="navbar"
-        style={{ backgroundColor: "#023E73", height: "65px" }}
+        style={{ backgroundColor: "#FFFFFF", height: "65px" }}
       >
         <div className="container">
           <ul className="nav nav-underline">
@@ -561,38 +585,67 @@ const HeaderComponent = () => {
 
           {/* New Quiz Tab with dropdown */}
           <ul className="nav nav-underline">
-            <li className="nav-item dropdown" style={{ position: 'relative' }} ref={quizDropdownRef}>
+            <li
+              className="nav-item dropdown"
+              style={{ position: "relative" }}
+              ref={quizDropdownRef}
+            >
               <div
-                className={`nav-link ${quizMenuOpen ? 'dropdown-open' : ''}`}
+                className={`nav-link ${quizMenuOpen ? "dropdown-open" : ""}`}
                 onClick={() => setQuizMenuOpen(!quizMenuOpen)}
-                style={{...Styles.textHeader, cursor: 'pointer'}}
+                style={{ ...Styles.textHeader, cursor: "pointer" }}
               >
-                <i className="bi bi-question-circle-fill" style={Styles.iconHeader}></i>
-                Quizzes <i className="bi bi-caret-down-fill dropdown-toggle-icon"></i>
+                <i
+                  className="bi bi-question-circle-fill"
+                  style={Styles.iconHeader}
+                ></i>
+                Quizzes{" "}
+                <i className="bi bi-caret-down-fill dropdown-toggle-icon"></i>
               </div>
               {quizMenuOpen && (
                 <div className="quiz-dropdown">
                   <div
-                    onClick={() => { navigate('/quizzes'); setQuizMenuOpen(false); }}
+                    onClick={() => {
+                      navigate("/quizzes");
+                      setQuizMenuOpen(false);
+                    }}
                     className="dropdown-item"
-                    style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                    style={{
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                    }}
                   >
                     All Quizzes
                   </div>
                   {(user?.id || admin?.id) && (
                     <div
-                      onClick={() => { navigate('/my-quizzes'); setQuizMenuOpen(false); }}
+                      onClick={() => {
+                        navigate("/my-quizzes");
+                        setQuizMenuOpen(false);
+                      }}
                       className="dropdown-item"
-                      style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                      style={{
+                        padding: "8px 16px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                      }}
                     >
                       My Quizzes
                     </div>
                   )}
                   {(user?.id || admin?.id) && (
                     <div
-                      onClick={() => { navigate('/create-quiz'); setQuizMenuOpen(false); }}
+                      onClick={() => {
+                        navigate("/create-quiz");
+                        setQuizMenuOpen(false);
+                      }}
                       className="dropdown-item"
-                      style={{ padding: '8px 16px', cursor: 'pointer', fontSize: '14px' }}
+                      style={{
+                        padding: "8px 16px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                      }}
                     >
                       Create Quiz
                     </div>

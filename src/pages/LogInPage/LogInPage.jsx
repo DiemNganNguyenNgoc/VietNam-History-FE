@@ -153,9 +153,8 @@ const LogInPage = () => {
         style={{
           width: "auto",
           padding: "20px",
-          border: "1px solid #ccc",
+          border: "1px solid #EDBE00",
           borderRadius: "8px",
-          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
         }}
       >
         <h1
@@ -164,7 +163,7 @@ const LogInPage = () => {
             marginBottom: "20px",
             fontWeight: "bold",
             textAlign: "center",
-            color: "#003366",
+            color: "#000000",
             fontSize: "25px",
           }}
         >

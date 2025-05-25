@@ -235,9 +235,9 @@ function HomePage() {
         <div className="col">
           <span className="title">TOP POST MAY INTEREST YOU</span>
         </div>
-        <div className="col-2" style={{ marginTop: "10px" }}>
+        <div className="col-auto" style={{ marginTop: "10px" }}>
           <ButtonComponent
-            textButton="Ask question"
+            textButton="Add post"
             onClick={handleAskQuestionClick}
           />
         </div>

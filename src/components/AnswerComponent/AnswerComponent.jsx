@@ -1,8 +1,18 @@
-import React from 'react'
-import TextEditor from '../../pages/AskQuestionPage/partials/TextEditor';
-import LoadingComponent from '../LoadingComponent/LoadingComponent';
-import ButtonComponent from '../ButtonComponent/ButtonComponent';
-const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel, isLoading, imageSrcs, onImageUpload, onRemoveImage }) => {
+import React from "react";
+import TextEditor from "../../pages/AskQuestionPage/partials/TextEditor";
+import LoadingComponent from "../LoadingComponent/LoadingComponent";
+import ButtonComponent from "../ButtonComponent/ButtonComponent";
+const AnswerEditor = React.memo(
+  ({
+    content,
+    onContentChange,
+    onSubmit,
+    onCancel,
+    isLoading,
+    imageSrcs,
+    onImageUpload,
+    onRemoveImage,
+  }) => {
     return (
       <div>
         <div className="input" style={{ marginTop: "30px" }}>
@@ -26,7 +36,7 @@ const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel,
                     />
                     <button
                       style={{
-                       // position: "absolute",
+                        // position: "absolute",
                         top: "0",
                         right: "0",
                         backgroundColor: "red",
@@ -46,7 +56,7 @@ const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel,
             </div>
           )}
         </div>
-  
+
         <div className="input" style={{ marginTop: "30px" }}>
           <h1 className="label">
             Answer details <span className="asterisk">*</span>
@@ -58,14 +68,25 @@ const AnswerEditor = React.memo(({ content, onContentChange, onSubmit, onCancel,
             placeholder="Write your answer here..."
           />
         </div>
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "30px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "30px",
+          }}
+        >
           <LoadingComponent isLoading={isLoading}>
             <ButtonComponent textButton="Submit answer" onClick={onSubmit} />
           </LoadingComponent>
-          <ButtonComponent textButton="Cancel" onClick={onCancel} />
+          <ButtonComponent
+            textButton="Cancel"
+            onClick={onCancel}
+            style={{ marginLeft: "20px" }}
+          />
         </div>
       </div>
     );
-  });
+  }
+);
 
-export default AnswerEditor
+export default AnswerEditor;

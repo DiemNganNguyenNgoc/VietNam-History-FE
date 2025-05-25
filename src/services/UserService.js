@@ -62,7 +62,7 @@ export const getDetailsUser = async (id) => {
     console.warn("getDetailsUser called with invalid or missing ID");
     throw new Error("Invalid user ID");
   }
-  
+
   try {
     const res = await axios.get(
       `${process.env.REACT_APP_API_URL_BACKEND}/user/get-details/${id}`
@@ -248,24 +248,53 @@ export const updateUserStatus = async (userId, isActive) => {
   );
 };
 
-
 export const filterUsers = async (searchParams) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/filter`, {
-      params: searchParams,
-    });
-    return response.data;  
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/filter`,
+      {
+        params: searchParams,
+      }
+    );
+    return response.data;
   } catch (error) {
-    throw error;  
+    throw error;
   }
 };
 
 export const filterUsersByActive = async (active) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/user/filter?active=${active}`);
-    return response.data;  
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/filter?active=${active}`
+    );
+    return response.data;
   } catch (error) {
-    throw error;  
+    throw error;
   }
 };
 
+export const updatePassword = async (data, access_token) => {
+  console.log("API URL backend:", process.env.REACT_APP_API_URL_BACKEND);
+  try {
+    const res = await axios.put(
+      `${process.env.REACT_APP_API_URL_BACKEND}/user/update-password`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    if (error.response) {
+      throw {
+        status: error.response.status,
+        message: error.response.data.message || "Đổi mật khẩu thất bại.",
+      };
+    } else {
+      throw { status: 500, message: "Không thể kết nối đến máy chủ." };
+    }
+  }
+};

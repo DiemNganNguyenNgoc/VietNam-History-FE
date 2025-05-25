@@ -137,7 +137,7 @@ const OtherListUserPage = () => {
   return (
     <>
       <div className="container text-left">
-        <h1 className="my-4" style={{ color: "#033F74" }}>
+        <h1 className="my-4" style={{ color: "#000000" }}>
           User List
         </h1>
         <div className="row">

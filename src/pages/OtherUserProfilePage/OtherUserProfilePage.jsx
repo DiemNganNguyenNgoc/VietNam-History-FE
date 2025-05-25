@@ -42,20 +42,19 @@ function OtherUserProfilePage() {
   const [tags, setTags] = useState({});
   const navigate = useNavigate();
 
-
   const fetchQuestions = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await QuestionService.getQuestionsByUserId(userId);
-      console.log('bbbj', response)
-      if (response.status === 'OK') {
+      console.log("bbbj", response);
+      if (response.status === "OK") {
         setQuestions(response.data);
       } else {
-        setError('Không thể tải câu hỏi');
+        setError("Không thể tải câu hỏi");
       }
     } catch (err) {
-      setError(err.message || 'Đã xảy ra lỗi khi tải câu hỏi');
+      setError(err.message || "Đã xảy ra lỗi khi tải câu hỏi");
     } finally {
       setLoading(false);
     }
@@ -89,8 +88,6 @@ function OtherUserProfilePage() {
       setTags(tagMap);
     };
 
-
-
     if (questions.length > 0) {
       fetchUsersAndTags();
     }
@@ -120,7 +117,9 @@ function OtherUserProfilePage() {
 
   const handleToggleHidden = async (quesId, currentStatus) => {
     const isConfirmed = window.confirm(
-      `Are you sure you want to ${currentStatus ? 'hide' : 'show'} this question?`
+      `Are you sure you want to ${
+        currentStatus ? "hide" : "show"
+      } this question?`
     );
 
     if (!isConfirmed) return;
@@ -136,11 +135,16 @@ function OtherUserProfilePage() {
 
       // Cập nhật lại trạng thái của câu hỏi trong state sau khi toggle thành công
       const updatedQuestions = questions.map((question) =>
-        question._id === quesId ? { ...question, active: !currentStatus } : question
+        question._id === quesId
+          ? { ...question, active: !currentStatus }
+          : question
       );
       setQuestions(updatedQuestions);
     } catch (error) {
-      console.error("Failed to toggle question status:", error.response?.data || error.message);
+      console.error(
+        "Failed to toggle question status:",
+        error.response?.data || error.message
+      );
     }
   };
 
@@ -177,7 +181,7 @@ function OtherUserProfilePage() {
       <div className="container">
         <div className="row">
           <div className="col-3">
-            {/* <h3 className="title-profile">Summary</h3>
+            <h3 className="title-profile">Summary</h3>
             <div className="card-profile" style={{ padding: "0 10px" }}>
               <table className="table table-borderless">
                 <tbody style={{ verticalAlign: "middle" }}>
@@ -205,7 +209,7 @@ function OtherUserProfilePage() {
                   </tr>
                 </tbody>
               </table>
-            </div> */}
+            </div>
           </div>
 
           <div className="col-9">
@@ -225,9 +229,12 @@ function OtherUserProfilePage() {
                     label="Birthday"
                     type="date"
                     value={
-                      detailUser.birthday && !isNaN(new Date(detailUser.birthday).getTime())
-                        ? new Date(detailUser.birthday).toISOString().split("T")[0]
-                        : ""  // Trả về giá trị mặc định nếu ngày không hợp lệ
+                      detailUser.birthday &&
+                      !isNaN(new Date(detailUser.birthday).getTime())
+                        ? new Date(detailUser.birthday)
+                            .toISOString()
+                            .split("T")[0]
+                        : "" // Trả về giá trị mặc định nếu ngày không hợp lệ
                     }
                     disabled
                   />
@@ -239,7 +246,6 @@ function OtherUserProfilePage() {
                     value={detailUser.note || "No introduction provided"}
                     disabled
                   />
-
                 </div>
               </div>
             </div>
@@ -277,20 +283,31 @@ function OtherUserProfilePage() {
                 Questions
               </h3>
               <div className="card-profile " style={{ padding: "0 20px" }}>
-                <div style={{ padding: '20px' }}>
+                <div style={{ padding: "20px" }}>
                   {questions.map((question) => (
-                    <div key={question._id} onClick={() => handleQuestionClick(question._id)}>
+                    <div
+                      key={question._id}
+                      onClick={() => handleQuestionClick(question._id)}
+                    >
                       <QuestionBox
                         key={question._id}
                         title={question.title}
-                        tags={question.tags ? question.tags.map(tagId => tags[tagId]?.name || "Unknown Tag") : []}
+                        tags={
+                          question.tags
+                            ? question.tags.map(
+                                (tagId) => tags[tagId]?.name || "Unknown Tag"
+                              )
+                            : []
+                        }
                         date={new Date(question.updatedAt).toLocaleString()}
                         views={question.view}
                         answers={question.answerCount}
                         likes={question.upVoteCount}
                         onUpdate={() => handleOnUpdate(question._id)}
                         isHidden={question.active}
-                        onHidden={() => handleToggleHidden(question._id, question.active)}
+                        onHidden={() =>
+                          handleToggleHidden(question._id, question.active)
+                        }
                       />
                     </div>
                   ))}

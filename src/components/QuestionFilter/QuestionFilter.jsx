@@ -56,9 +56,9 @@ const QuestionFilter = ({ onApplyFilters }) => {
       style={{
         marginTop: '30px',
         padding: '10px 20px',
-        border: '1px solid #023E73',
+        border: '1px solid #FFEA75',
         borderRadius: '16px',
-        backgroundColor: '#F2F5FF',
+        backgroundColor: '#FFFDF0',
         maxWidth: '1000px',
         width: '100%',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -131,14 +131,13 @@ const QuestionFilter = ({ onApplyFilters }) => {
           <input
             className="form-control"
             type="text"
-            placeholder="e.g. javascript, python, ..."
             value={filters.tag}
             onChange={handleInputChange}
             style={{
               width: '100%',
               height: '35px',
               marginTop: '10px',
-              border: '1px solid #023E73',
+              border: '1px solid #FFEA75',
             }}
           />
         </div>

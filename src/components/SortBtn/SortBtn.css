@@ -5,9 +5,9 @@
   margin-top: 0px;
 } */
 
-.button {
+.sort-button {
   background-color: #FFFFFF;
-  border: 1px solid #023E73;
+  border: 1px solid #EDBE00;
   border-radius: 10px;
   padding: 5px;
   cursor: pointer;
@@ -17,7 +17,7 @@
   margin-top: -35px;
 }
 
-.options {
+.sort-options {
   padding: 5px 10px;
   border-radius: 5px;
   margin: 0 5px;
@@ -34,15 +34,15 @@
   margin: 0 5px;
 }
 
-.optionHover {
-  background-color: #e0e0e0;
+.sort-optionHover {
+  background-color: #EDBE00;
 }
 
-.optionHover:hover {
-  background-color: #e0e0e0;
+.sort-optionHover:hover {
+  background-color: #EDBE00;
 }
 
-.selectedOption {
-  background-color: #e0e0e0;
+.selectedSortOption {
+  background-color: #EDBE00;
   color: #121212;
 }

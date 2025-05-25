@@ -27,11 +27,11 @@ const FormComponent = ({
         type={props.type || "text"}
         style={{
           padding: "0 20px",
-          backgroundColor: "#F2F5FF",
+          backgroundColor: "#FFFFFF",
           fontSize: "16px",
           width: "100%",
           height: "35px",
-          border: "none",
+          border: "1px solid #EDBE00",
           borderRadius: "10px",
         }}
         onChange={(e) => onChange(e)}
