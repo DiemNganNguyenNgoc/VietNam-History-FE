@@ -5,7 +5,7 @@ const SearchBtn = ({ onClick }) => {
     <button 
       onClick={onClick} 
       style={{
-        backgroundColor: '#023E73',
+        backgroundColor: '#EDBE00',
         color: '#FFFFFF',
         padding: '10px 20px',
         border: 'none',

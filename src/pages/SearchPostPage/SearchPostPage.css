@@ -2,7 +2,6 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #f9f9f9;
     border-radius: 8px;
   }
   
@@ -30,7 +29,7 @@
   }
   
   .question-item {
-    background-color: #fff;
+    background-color: #FFFDF0;
     padding: 15px;
     margin-bottom: 10px;
     border: 1px solid #ddd;

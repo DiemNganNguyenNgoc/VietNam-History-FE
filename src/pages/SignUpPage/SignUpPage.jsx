@@ -165,7 +165,7 @@ const SignUpPage = () => {
             label="Birthday"
             type="date"
             name="birthday"
-            value={formData.birthDate}
+            value={formData.birthday}
             placeholder="Pick your birthday"
             onChange={handleChange}
           />
