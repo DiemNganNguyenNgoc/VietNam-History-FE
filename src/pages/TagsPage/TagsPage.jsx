@@ -12,12 +12,15 @@ import * as QuestionService from "../../services/QuestionService";
 import { useQuery } from "@tanstack/react-query";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import { useSelector } from "react-redux";
+import Pagination from "../../components/Pagination/Pagination";
 
 const TagsPage = () => {
   // Lấy thông tin user từ Redux
   const user = useSelector((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOption, setFilterOption] = useState(null); // "New" hoặc "Popular"
+  const [currentPage, setCurrentPage] = useState(1);
+  const TAGS_PER_PAGE = 15;
 
   // State cho form
   const [formData, setFormData] = useState({
@@ -128,7 +131,13 @@ const TagsPage = () => {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
+    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
   };
+
+  // Handle filter option change
+  useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 when filter option changes
+  }, [filterOption]);
 
   const getFilteredTags = () => {
     let filteredTags = tagsWithCount;
@@ -151,6 +160,22 @@ const TagsPage = () => {
 
     return filteredTags;
   };
+
+  // Xử lý phân trang
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Lấy danh sách tags cho trang hiện tại
+  const getCurrentPageTags = () => {
+    const filteredTags = getFilteredTags();
+    const startIndex = (currentPage - 1) * TAGS_PER_PAGE;
+    const endIndex = startIndex + TAGS_PER_PAGE;
+    return filteredTags.slice(startIndex, endIndex);
+  };
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(getFilteredTags().length / TAGS_PER_PAGE);
 
   return (
     <>
@@ -201,8 +226,8 @@ const TagsPage = () => {
         <div className="d-flex flex-wrap justify-content-center align-items-center gap-5">
           {isLoadingTag ? (
             <LoadingComponent />
-          ) : getFilteredTags().length > 0 ? (
-            getFilteredTags().map((tag) => (
+          ) : getCurrentPageTags().length > 0 ? (
+            getCurrentPageTags().map((tag) => (
               <div
                 className="col-6 col-md-4 col-lg-2 mb-4"
                 key={tag._id}
@@ -219,6 +244,15 @@ const TagsPage = () => {
             <p>No tags match your search.</p>
           )}
         </div>
+
+        {/* Pagination */}
+        {getFilteredTags().length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       {/* Modal thêm tag mới */}

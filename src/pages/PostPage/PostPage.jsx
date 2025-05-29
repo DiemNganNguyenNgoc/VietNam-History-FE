@@ -507,6 +507,7 @@ const QuestionPage = () => {
                       if (savedItem) handleUnsave(savedItem._id); // Truyền `_id` của bài đã lưu
                     }}
                     onReport={() => handleReport(question._id)}
+                    onClick={handleQuestionClick}
                   />
                 </div>
               );

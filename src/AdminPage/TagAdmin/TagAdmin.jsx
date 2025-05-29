@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../../components/LoadingComponent/LoadingComponent";
 import * as QuestionService from "../../services/QuestionService";
 import * as TagService from "../../services/TagService";
+import Pagination from "../../components/Pagination/Pagination";
 
 function TagAdmin() {
   const [tagsWithCount, setTagsWithCount] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const TAGS_PER_PAGE = 15;
   const navigate = useNavigate();
 
   // Lấy danh sách tag và số lượng câu hỏi liên quan
@@ -36,8 +40,6 @@ function TagAdmin() {
 
     fetchTagsWithCount();
   }, []);
-
-  console.log('jhbjb', tagsWithCount)
 
   // Hàm lấy danh sách câu hỏi theo tagId
   const getAllQues = async (tagId) => {
@@ -74,6 +76,38 @@ function TagAdmin() {
     }
   };
 
+  // Xử lý tìm kiếm
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+  };
+
+  // Lọc tag theo tìm kiếm
+  const getFilteredTags = () => {
+    if (!searchQuery) {
+      return tagsWithCount;
+    }
+    return tagsWithCount.filter(tag =>
+      tag.name.toLowerCase().includes(searchQuery)
+    );
+  };
+
+  // Xử lý phân trang
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Lấy danh sách tags cho trang hiện tại
+  const getCurrentPageTags = () => {
+    const filteredTags = getFilteredTags();
+    const startIndex = (currentPage - 1) * TAGS_PER_PAGE;
+    const endIndex = startIndex + TAGS_PER_PAGE;
+    return filteredTags.slice(startIndex, endIndex);
+  };
+
+  // Tính tổng số trang
+  const totalPages = Math.ceil(getFilteredTags().length / TAGS_PER_PAGE);
+
   return (
     <div className="container my-4">
       <h1 className='title' style={{ color: "#EDBE00" }}>MANAGEMENT TAGS</h1>
@@ -86,7 +120,7 @@ function TagAdmin() {
           fontWeight: "600",
         }}
       >
-        {tagsWithCount.length} tags
+        {getFilteredTags().length} tags
       </p>
       <div style={{ position: "relative", width: "300px", marginBottom: '30px' }}>
         <input
@@ -94,6 +128,8 @@ function TagAdmin() {
           className="form-control d-inline-block"
           placeholder="Search by tag name..."
           style={{ width: "100%" }}
+          value={searchQuery}
+          onChange={handleSearchChange}
         />
         <i className="bi bi-search" style={{
           position: "absolute",
@@ -108,8 +144,8 @@ function TagAdmin() {
       <div className="row">
         {isLoading ? (
           <LoadingComponent isLoading={isLoading} />
-        ) : tagsWithCount && tagsWithCount.length > 0 ? (
-          tagsWithCount.map((tag) => (
+        ) : getCurrentPageTags().length > 0 ? (
+          getCurrentPageTags().map((tag) => (
             <div
               className="col-md-4 mb-4"
               key={tag._id}
@@ -139,9 +175,20 @@ function TagAdmin() {
             </div>
           ))
         ) : (
-          <LoadingComponent isLoading={isLoading} />
+          <p>No tags match your search.</p>
         )}
       </div>
+
+      {/* Pagination */}
+      {getFilteredTags().length > 0 && (
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Styles } from "../../style";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Popover } from "antd";
 import * as UserService from "../../services/UserService";
@@ -18,6 +18,7 @@ import { message } from "antd";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.user);
   const admin = useSelector((state) => state.admin);
   const [notifications, setNotifications] = useState([]);
@@ -267,6 +268,52 @@ const HeaderComponent = () => {
   // Đóng modal
   const closeModal = () => {
     setModalIsOpen(false);
+  };
+
+  // Function to check if a route is active
+  const isRouteActive = (path) => {
+    // Special case for home page
+    if (path === '/' && location.pathname === '/') {
+      return true;
+    }
+
+    // Special case for question and related pages
+    if (path === '/question' && (
+      location.pathname.startsWith('/question') ||
+      location.pathname.startsWith('/question-detail')
+    )) {
+      return true;
+    }
+
+    // Special case for tag and related pages
+    if (path === '/tag' && (
+      location.pathname.startsWith('/tag') ||
+      location.pathname.startsWith('/tagsdetail')
+    )) {
+      return true;
+    }
+
+    // Special case for quiz and related pages
+    if ((path === '/quiz' || path === '/quizzes' || path === '/my-quizzes' || path === '/create-quiz') && (
+      location.pathname.startsWith('/quiz') ||
+      location.pathname.startsWith('/quizzes') ||
+      location.pathname.startsWith('/my-quizzes') ||
+      location.pathname.startsWith('/create-quiz')
+    )) {
+      return true;
+    }
+
+    // Special case for admin pages
+    if (path === '/admin' && location.pathname.startsWith('/admin')) {
+      return true;
+    }
+
+    // General case
+    if (path !== '/' && location.pathname.startsWith(path)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -525,8 +572,8 @@ const HeaderComponent = () => {
       </nav>
       <div
         style={{
-          width: "85%", 
-          margin: "0 auto", 
+          width: "85%",
+          margin: "0 auto",
           borderBottom: "1px solid #ccc",
         }}
       />
@@ -538,7 +585,14 @@ const HeaderComponent = () => {
         <div className="container">
           <ul className="nav nav-underline">
             <li className="nav-item">
-              <a className="nav-link" href="/" style={Styles.textHeader}>
+              <a
+                className={`nav-link ${isRouteActive('/') && location.pathname === '/' ? 'active' : ''}`}
+                href="/"
+                style={{
+                  ...Styles.textHeader,
+                  ...(isRouteActive('/') && location.pathname === '/' ? { fontWeight: '500' } : {})
+                }}
+              >
                 <i
                   className="bi bi-house-door-fill"
                   style={Styles.iconHeader}
@@ -550,9 +604,12 @@ const HeaderComponent = () => {
           <ul className="nav nav-underline">
             <li className="nav-item">
               <a
-                className="nav-link"
+                className={`nav-link ${isRouteActive('/question') ? 'active' : ''}`}
                 href="/question"
-                style={Styles.textHeader}
+                style={{
+                  ...Styles.textHeader,
+                  ...(isRouteActive('/question') ? { fontWeight: '500' } : {})
+                }}
               >
                 <i
                   className="bi bi-chat-left-fill"
@@ -564,7 +621,14 @@ const HeaderComponent = () => {
           </ul>
           <ul className="nav nav-underline">
             <li className="nav-item">
-              <a className="nav-link" href="/tag" style={Styles.textHeader}>
+              <a
+                className={`nav-link ${isRouteActive('/tag') ? 'active' : ''}`}
+                href="/tag"
+                style={{
+                  ...Styles.textHeader,
+                  ...(isRouteActive('/tag') ? { fontWeight: '500' } : {})
+                }}
+              >
                 <i className="bi bi-tags-fill" style={Styles.iconHeader}></i>
                 Tags
               </a>
@@ -573,9 +637,12 @@ const HeaderComponent = () => {
           <ul className="nav nav-underline">
             <li className="nav-item">
               <a
-                className="nav-link"
+                className={`nav-link ${isRouteActive('/other-list-user') ? 'active' : ''}`}
                 href="/other-list-user"
-                style={Styles.textHeader}
+                style={{
+                  ...Styles.textHeader,
+                  ...(isRouteActive('/other-list-user') ? { fontWeight: '500' } : {})
+                }}
               >
                 <i className="bi bi-people-fill" style={Styles.iconHeader}></i>
                 Users
@@ -591,9 +658,13 @@ const HeaderComponent = () => {
               ref={quizDropdownRef}
             >
               <div
-                className={`nav-link ${quizMenuOpen ? "dropdown-open" : ""}`}
+                className={`nav-link ${isRouteActive('/quiz') || isRouteActive('/quizzes') || isRouteActive('/my-quizzes') || isRouteActive('/create-quiz') ? 'active' : ''} ${quizMenuOpen ? "dropdown-open" : ""}`}
                 onClick={() => setQuizMenuOpen(!quizMenuOpen)}
-                style={{ ...Styles.textHeader, cursor: "pointer" }}
+                style={{
+                  ...Styles.textHeader,
+                  cursor: "pointer",
+                  ...(isRouteActive('/quiz') || isRouteActive('/quizzes') || isRouteActive('/my-quizzes') || isRouteActive('/create-quiz') ? { fontWeight: '500' } : {})
+                }}
               >
                 <i
                   className="bi bi-question-circle-fill"
@@ -609,11 +680,14 @@ const HeaderComponent = () => {
                       navigate("/quizzes");
                       setQuizMenuOpen(false);
                     }}
-                    className="dropdown-item"
+                    className={`dropdown-item ${isRouteActive('/quizzes') ? 'active' : ''}`}
                     style={{
                       padding: "8px 16px",
                       cursor: "pointer",
                       fontSize: "14px",
+                      borderRadius: "4px",
+                      margin: "2px 4px",
+                      transition: "all 0.2s ease"
                     }}
                   >
                     All Quizzes
@@ -624,11 +698,14 @@ const HeaderComponent = () => {
                         navigate("/my-quizzes");
                         setQuizMenuOpen(false);
                       }}
-                      className="dropdown-item"
+                      className={`dropdown-item ${isRouteActive('/my-quizzes') ? 'active' : ''}`}
                       style={{
                         padding: "8px 16px",
                         cursor: "pointer",
                         fontSize: "14px",
+                        borderRadius: "4px",
+                        margin: "2px 4px",
+                        transition: "all 0.2s ease"
                       }}
                     >
                       My Quizzes
@@ -640,11 +717,14 @@ const HeaderComponent = () => {
                         navigate("/create-quiz");
                         setQuizMenuOpen(false);
                       }}
-                      className="dropdown-item"
+                      className={`dropdown-item ${isRouteActive('/create-quiz') ? 'active' : ''}`}
                       style={{
                         padding: "8px 16px",
                         cursor: "pointer",
                         fontSize: "14px",
+                        borderRadius: "4px",
+                        margin: "2px 4px",
+                        transition: "all 0.2s ease"
                       }}
                     >
                       Create Quiz
@@ -659,9 +739,12 @@ const HeaderComponent = () => {
             <ul className="nav nav-underline">
               <li className="nav-item">
                 <a
-                  className="nav-link"
+                  className={`nav-link ${isRouteActive('/admin') ? 'active' : ''}`}
                   href="/admin/manage"
-                  style={Styles.textHeader}
+                  style={{
+                    ...Styles.textHeader,
+                    ...(isRouteActive('/admin') ? { fontWeight: '500' } : {})
+                  }}
                 >
                   <i className="bi bi-gear" style={Styles.iconHeader}></i>
                   Manage System

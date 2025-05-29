@@ -11,24 +11,34 @@ export const getAllTag = async () => {
   try {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-all`);
     console.log('Raw getAllTag response:', res);
-    
-    // If response is an array directly, return it
+
+    // Case 1: If response.data is an array directly
     if (Array.isArray(res.data)) {
+      console.log('getAllTag: Returning direct array', res.data.length);
       return res.data;
-    } 
-    // If response has a data property with an array
+    }
+    // Case 2: If response has data.data as array (most common API structure)
     else if (res.data && res.data.data && Array.isArray(res.data.data)) {
+      console.log('getAllTag: Returning from data.data', res.data.data.length);
       return res.data.data;
     }
-    // If normal structure with status and data (default case)
-    else if (res.data && res.data.status === "OK") {
+    // Case 3: If response has data property as array
+    else if (res.data && Array.isArray(res.data)) {
+      console.log('getAllTag: Returning from data array', res.data.length);
       return res.data;
     }
-    // Just return whatever we got
-    return res.data;
+    // Case 4: Normal structure with status and data
+    else if (res.data && res.data.status === "OK" && res.data.data) {
+      console.log('getAllTag: Returning from OK status', Array.isArray(res.data.data) ? res.data.data.length : 'not array');
+      return res.data.data;
+    }
+
+    // Default: Return empty array if structure doesn't match
+    console.warn('getAllTag: Unexpected data structure, returning empty array');
+    return [];
   } catch (error) {
     console.error('Error fetching tags:', error);
-    throw error; 
+    return []; // Return empty array instead of throwing
   }
 };
 
@@ -48,10 +58,10 @@ export const getDetailsTag = async (tagId) => {
   try {
     const res = await axios.get(`${process.env.REACT_APP_API_URL_BACKEND}/tag/get-detail-tag/${tagId}`);
     console.log('Tag data for ID', tagId, ':', res.data);
-    
+
     // If response has the expected structure
     if (res.data && res.data.status === "OK" && res.data.data) {
-      return res.data; 
+      return res.data;
     }
     return res.data;
   } catch (error) {

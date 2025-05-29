@@ -23,7 +23,17 @@ const QuestionBox = ({
   onSave,
   onUnsave,
   onReport,
+  onClick,
 }) => {
+  // Thêm hover hint để chỉ rõ có thể click vào để xem chi tiết
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(id);
+    }
+  };
+
   // const getAllTag = async () => {
   //   const res = await TagService.getAllTag();
   //   // console.log("res.data", res);
@@ -31,7 +41,12 @@ const QuestionBox = ({
   // };
 
   return (
-    <div className="question-box">
+    <div
+      className="question-box"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
+    >
       {/* Thông tin người dùng */}
       <div className="user-info">
         <div className="icon-container">
@@ -57,6 +72,7 @@ const QuestionBox = ({
           <div className="col">
           <div className="row">
             <h3 className="question_title">{title}</h3>
+            {isHovered && <div className="view-hint">Click to view details</div>}
           </div>
           <div className="row">
             <div className="tags-container">
@@ -96,7 +112,7 @@ const QuestionBox = ({
         </div>
 
         {/* Ngày tạo và nút Save/Menu */}
-        <div className="footer-container">
+        <div className="footer-container" onClick={(e) => e.stopPropagation()}>
           <span className="date-item">{date}</span>
 
           <div className="action-container" style={{ marginBottom: "10px" }}>

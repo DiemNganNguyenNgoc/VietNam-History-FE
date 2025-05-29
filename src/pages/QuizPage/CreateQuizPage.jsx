@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Form, 
-  Input, 
-  Button, 
-  Select, 
-  InputNumber, 
-  Space, 
-  Card, 
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  InputNumber,
+  Space,
+  Card,
   Typography,
   Radio,
   message,
@@ -48,15 +48,25 @@ const CreateQuizPage = () => {
     queryKey: ['tags'],
     queryFn: TagService.getAllTag,
     select: (response) => {
-      // API trả về mảng tags trực tiếp trong response.data
-      return {
-        status: 'OK',
-        data: Array.isArray(response) ? response : []
-      };
+      console.log('Raw tags response:', response);
+      // Kiểm tra và xử lý dữ liệu theo định dạng phù hợp
+      if (Array.isArray(response)) {
+        console.log('Tags is an array:', response);
+        return response;
+      } else if (response && response.data && Array.isArray(response.data)) {
+        console.log('Tags in response.data:', response.data);
+        return response.data;
+      } else if (response && Array.isArray(response.data?.data)) {
+        console.log('Tags in response.data.data:', response.data.data);
+        return response.data.data;
+      }
+      console.log('Returning empty array for tags');
+      return [];
     }
   });
 
-  const tags = tagsResponse?.data || [];
+  // Đảm bảo tags luôn là một mảng
+  const tags = Array.isArray(tagsResponse) ? tagsResponse : [];
 
   // Fetch user's questions
   const { data: questions } = useQuery({
@@ -70,7 +80,7 @@ const CreateQuizPage = () => {
       setLoading(true);
       const formattedQuestions = values.questions.map(question => {
         let formattedOptions = [];
-        
+
         switch (question.type) {
           case QUESTION_TYPES.MULTIPLE_CHOICE:
             formattedOptions = question.options.map((option, index) => ({
@@ -78,14 +88,14 @@ const CreateQuizPage = () => {
               isCorrect: index === parseInt(question.correctAnswer)
             }));
             break;
-          
+
           case QUESTION_TYPES.TRUE_FALSE:
             formattedOptions = [
               { text: 'True', isCorrect: question.correctAnswer === 'true' },
               { text: 'False', isCorrect: question.correctAnswer === 'false' }
             ];
             break;
-          
+
           case QUESTION_TYPES.FILL_IN_BLANK:
             formattedOptions = [{ text: question.correctAnswer, isCorrect: true }];
             break;
@@ -168,14 +178,29 @@ const CreateQuizPage = () => {
           >
             <Select
               mode="multiple"
-              placeholder="Select tags"
+              placeholder="Search and select tags"
               style={{ width: '100%' }}
+              showSearch
+              filterOption={(input, option) => {
+                if (!input) return true;
+                // Hỗ trợ tìm kiếm không phân biệt chữ hoa/thường và tìm kiếm từng phần
+                return option.children.toLowerCase().includes(input.toLowerCase());
+              }}
+              optionFilterProp="children"
+              notFoundContent="No matching tags found"
+              loading={!tags.length}
+              filterSort={(optionA, optionB) =>
+                optionA.children.toLowerCase().localeCompare(optionB.children.toLowerCase())
+              }
+              onSearch={(value) => console.log('Searching for:', value)}
             >
               {tags && tags.length > 0 ? (
                 tags.map(tag => (
                   <Option key={tag._id} value={tag._id}>{tag.name}</Option>
                 ))
-              ) : null}
+              ) : (
+                <Option value="loading" disabled>Loading tags...</Option>
+              )}
             </Select>
           </Form.Item>
 
@@ -301,7 +326,7 @@ const CreateQuizPage = () => {
                       {({ getFieldValue }) => {
                         const questionType = getFieldValue(['questions', name, 'type']);
                         const options = getFieldValue(['questions', name, 'options']) || [];
-                        
+
                         if (questionType === QUESTION_TYPES.MULTIPLE_CHOICE) {
                           return (
                             <Form.Item
@@ -342,10 +367,10 @@ const CreateQuizPage = () => {
               ))}
 
               <Form.Item>
-                <Button 
-                  type="dashed" 
-                  onClick={() => add({ type: QUESTION_TYPES.MULTIPLE_CHOICE })} 
-                  block 
+                <Button
+                  type="dashed"
+                  onClick={() => add({ type: QUESTION_TYPES.MULTIPLE_CHOICE })}
+                  block
                   icon={<PlusOutlined />}
                 >
                   Add Question
@@ -365,4 +390,4 @@ const CreateQuizPage = () => {
   );
 };
 
-export default CreateQuizPage; 
+export default CreateQuizPage;

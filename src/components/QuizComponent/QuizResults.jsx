@@ -4,7 +4,7 @@ import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, TrophyOu
 
 const { Title, Text, Paragraph } = Typography;
 
-const QuizResults = ({ 
+const QuizResults = ({
   quizAttempt,
   quiz,
   onRetry,
@@ -51,7 +51,7 @@ const QuizResults = ({
             {isPassed ? 'Chúc mừng!' : 'Cố gắng lần sau nhé!'}
           </Title>
           <Text type="secondary">
-            {status === 'COMPLETED' 
+            {status === 'COMPLETED'
               ? 'Bạn đã hoàn thành bài kiểm tra'
               : status === 'TIMED_OUT'
                 ? 'Hết thời gian làm bài'
@@ -107,7 +107,7 @@ const QuizResults = ({
                 <List.Item>
                   <Space direction="vertical" style={{ width: '100%' }}>
                     <Space>
-                      {answer.isCorrect 
+                      {answer.isCorrect
                         ? <CheckCircleOutlined style={{ color: '#52c41a' }} />
                         : <CloseCircleOutlined style={{ color: '#f5222d' }} />
                       }
@@ -151,15 +151,11 @@ const QuizResults = ({
         <Button onClick={onViewLeaderboard}>
             Xem bảng xếp hạng
         </Button>
-          {quiz?.allowReview && (
-            <Button onClick={onReview}>
-              Xem lại đáp án
-        </Button>
-          )}
+
         </Space>
       </Space>
     </Card>
   );
 };
 
-export default QuizResults; 
+export default QuizResults;

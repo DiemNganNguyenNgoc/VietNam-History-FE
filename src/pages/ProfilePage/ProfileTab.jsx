@@ -216,6 +216,11 @@ const ProfileTab = () => {
         type: "Success",
         message: "Cập nhật thông tin thành công",
       });
+
+      // Thêm đoạn code reload trang sau khi cập nhật thành công
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500); // Đợi 1.5 giây để người dùng thấy thông báo thành công
     } else if (mutation.isError) {
       setStatusMessage({
         type: "Error",
@@ -301,6 +306,11 @@ const ProfileTab = () => {
           newPassword: "",
           confirmNewPassword: "",
         });
+
+        // Thêm đoạn code reload trang sau khi cập nhật mật khẩu thành công
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500); // Đợi 1.5 giây để người dùng thấy thông báo thành công
       } else {
         alert(res?.message || "Đổi mật khẩu thất bại!");
       }

@@ -207,7 +207,7 @@ const TagsDetailPage = () => {
                         fontFamily: "Georgia, serif",
                         textShadow: "0 1px 1px rgba(255,255,255,0.8)"
                     }}>
-                        {questions.length} câu hỏi
+                        {questions.length} Bài Post
                     </p>
                 </div>
                 <div className="col">

@@ -426,11 +426,15 @@ const QuestionDetails = () => {
       const response = await AnswerService.getAnswersByQuestionId(questionId);
       const answersWithUserDetails = await Promise.all(
         response.data.data.map(async (answer) => {
-          const userName = await fetchUserDetails(answer.userAns);
-          return { ...answer, userName };
+          const userInfo = await fetchUserDetails(answer.userAns);
+          return {
+            ...answer,
+            userName: userInfo.name,
+            userImg: userInfo.img
+          };
         })
       );
-      setAnswers(answersWithUserDetails); // Cập nhật danh sách câu trả lời với tên người dùng
+      setAnswers(answersWithUserDetails); // Cập nhật danh sách câu trả lời với tên người dùng và ảnh
     } catch (error) {
       console.error("Error fetching answers with user details:", error);
     }
@@ -649,10 +653,16 @@ const QuestionDetails = () => {
   const fetchUserDetails = async (userId) => {
     try {
       const userDetails = await UserService.getDetailsUser(userId);
-      return userDetails?.data?.name || "Unknown User"; // Lấy tên hoặc giá trị mặc định
+      return {
+        name: userDetails?.data?.name || "Unknown User",
+        img: userDetails?.data?.img || "https://via.placeholder.com/40"
+      }; // Trả về cả name và img
     } catch (error) {
       console.error("Error fetching user details:", error);
-      return "Unknown User"; // Giá trị fallback
+      return {
+        name: "Unknown User",
+        img: "https://via.placeholder.com/40"
+      }; // Giá trị fallback
     }
   };
 
@@ -984,6 +994,7 @@ const QuestionDetails = () => {
             return isCurrentUser ? (
               <Comment2
                 name={commentQues.user.name || "Unknown"}
+                img={commentQues.user.img || "https://via.placeholder.com/40"}
                 text={commentQues.content || "Unknown"}
                 date={new Date(commentQues.createdAt).toLocaleString()}
                 key={commentQues._id || commentQues.id || commentQues}
@@ -996,6 +1007,7 @@ const QuestionDetails = () => {
             ) : (
               <Comment
                 name={commentQues.user.name || "Unknown"}
+                img={commentQues.user.img || "https://via.placeholder.com/40"}
                 text={commentQues.content || "Unknown"}
                 date={new Date(commentQues.createdAt).toLocaleString()}
                 key={commentQues._id || commentQues.id || commentQues}
@@ -1083,7 +1095,7 @@ const QuestionDetails = () => {
                     {/* Thông tin người trả lời */}
                     <div className="d-flex align-items-center">
                       <img
-                        src="https://via.placeholder.com/40"
+                        src={answer.userImg || "https://via.placeholder.com/40"}
                         alt="Answerer Avatar"
                         className="rounded-circle me-2"
                         width="40"
@@ -1134,6 +1146,7 @@ const QuestionDetails = () => {
                           return isCurrentUser ? (
                             <Comment2
                               name={commentQues.user.name || "Unknown"}
+                              img={commentQues.user.img || "https://via.placeholder.com/40"}
                               text={commentQues.content || "Unknown"}
                               date={new Date(
                                 commentQues.createdAt
@@ -1152,6 +1165,7 @@ const QuestionDetails = () => {
                           ) : (
                             <Comment
                               name={commentQues.user.name || "Unknown"}
+                              img={commentQues.user.img || "https://via.placeholder.com/40"}
                               text={commentQues.content || "Unknown"}
                               date={new Date(
                                 commentQues.createdAt
