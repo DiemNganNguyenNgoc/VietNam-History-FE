@@ -90,7 +90,7 @@ const OtherListUserPage = () => {
             follow_id: user?.id,
           },
         };
-  
+
         await NotificationService.createNotification(notificationData);
       }
 

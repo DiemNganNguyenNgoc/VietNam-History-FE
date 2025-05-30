@@ -3,6 +3,7 @@ import React, { Fragment, useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import DefaultComponent from "./components/DefaultComponent/DefaultComponent";
+import ChatbotComponent from "./components/Chatbot/ChatbotComponent";
 import { routes } from "./routes";
 import { isJsonString } from "./utils";
 import { jwtDecode } from "jwt-decode";
@@ -35,7 +36,7 @@ function App() {
       console.log("No valid token found or user is logged out");
       return; // Exit early if no valid token or ID is found
     }
-    
+
     if (decoded?.isAdmin) {
       handleGetDetailsAdmin(decoded?.id, storageData);
     } else {
@@ -46,12 +47,12 @@ function App() {
   const handleDecoded = () => {
     let storageData = localStorage.getItem("access_token");
     let decoded = null;
-    
+
     if (storageData && isJsonString(storageData)) {
       try {
         storageData = JSON.parse(storageData);
         decoded = jwtDecode(storageData);
-        
+
         // Verify the token has not expired
         const currentTime = new Date().getTime() / 1000;
         if (decoded.exp < currentTime) {
@@ -65,7 +66,7 @@ function App() {
         return { decoded: null, storageData: null };
       }
     }
-    
+
     return { decoded, storageData };
   };
 
@@ -73,11 +74,11 @@ function App() {
     async (config) => {
       const currentTime = new Date();
       const { decoded, storageData } = handleDecoded();
-      
+
       if (!decoded || !storageData) {
         return config;
       }
-      
+
       if (decoded?.exp < currentTime.getTime() / 1000) {
         try {
           const data = await UserService.refreshToken();
@@ -105,11 +106,11 @@ function App() {
     async (config) => {
       const currentTime = new Date();
       const { decoded, storageData } = handleDecoded();
-      
+
       if (!decoded || !storageData) {
         return config;
       }
-      
+
       if (decoded?.exp < currentTime.getTime() / 1000) {
         try {
           const data = await AdminService.refreshToken();
@@ -138,7 +139,7 @@ function App() {
       console.log("Missing user ID or token, skipping user details fetch");
       return;
     }
-    
+
     try {
       const res = await UserService.getDetailsUser(id, token);
       dispatch(updateUser({ ...res?.data, access_token: token }));
@@ -156,7 +157,7 @@ function App() {
       console.log("Missing admin ID or token, skipping admin details fetch");
       return;
     }
-    
+
     try {
       const res = await AdminService.getDetailsAdmin(id, token);
       dispatch(updateAdmin({ ...res?.data, access_token: token }));
@@ -189,6 +190,7 @@ function App() {
             );
           })}
         </Routes>
+        <ChatbotComponent />
       </Router>
     </div>
   );
