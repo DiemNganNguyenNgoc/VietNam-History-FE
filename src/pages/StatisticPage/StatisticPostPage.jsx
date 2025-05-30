@@ -23,9 +23,9 @@ const StatisticQuestionPage = () => {
       try {
         const response = await QuestionService.getAllQues();
         const questions = response.data; // Đây phải là danh sách câu hỏi, không phải tag
-        
+
         console.log("Questions fetched:", questions); // Kiểm tra lại câu hỏi
-        
+
         // Xử lý các tag và câu hỏi
         const tags = {};
         questions.forEach((q) => {
@@ -42,18 +42,18 @@ const StatisticQuestionPage = () => {
             }
           });
         });
-        
+
         const tagDetails = await Promise.all(
           Object.keys(tags).map(async (tagId) => {
             const tagDetail = await TagService.getDetailsTag(tagId);
             return { id: tagId, name: tagDetail.data.name };
           })
         );
-        
+
         const tagMap = Object.fromEntries(
           tagDetails.map((tag) => [tag.id, tag.name])
         );
-        
+
         const data = Object.keys(tags).map((tagId) => ({
           id: tagId,
           name: tagMap[tagId] || tagId,
@@ -65,16 +65,16 @@ const StatisticQuestionPage = () => {
             : 0,
           createdAt: tags[tagId].createdAt,
         }));
-        
+
         setDataQuestion(data); // Gắn dữ liệu đã xử lý vào dataQuestion
         setFilteredData(data);  // Ban đầu hiển thị tất cả câu hỏi
-      
+
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
     };
-     
-  
+
+
     fetchData();
   }, []);
 
@@ -82,32 +82,32 @@ const StatisticQuestionPage = () => {
     const filterData = async () => {
       console.log("Filtering for year:", year, "month:", month);
       console.log("Data before filtering:", dataQuestion);
-  
+
       // Lọc câu hỏi theo tagId
       const filtered = await Promise.all(
         dataQuestion.map(async (item) => {
           // Sử dụng tagId để lấy câu hỏi từ API
           const response = await QuestionService.getAllQuesByTag(item.id);
           const questions = response.data;
-  
+
           // Lọc câu hỏi theo ngày tạo (createdAt)
           const filteredQuestions = questions.filter((question) => {
             const questionDate = new Date(question.createdAt); // Lấy ngày tạo của câu hỏi
             const questionYear = questionDate.getFullYear(); // Lấy năm từ createdAt
             const questionMonth = questionDate.getMonth() + 1; // Lấy tháng từ createdAt (lưu ý getMonth() trả về 0-11, nên cộng 1 để tương ứng với 1-12)
-  
+
             // Kiểm tra nếu năm và tháng của câu hỏi khớp với bộ lọc
             return (
               (!year || questionYear === parseInt(year)) &&
               (!month || questionMonth === parseInt(month))
             );
           });
-  
+
           // Đếm số câu hỏi chưa trả lời (ansCount === 0)
           const notAnswered = filteredQuestions.filter(
             (question) => question.answerCount === 0
           ).length;
-  
+
           // Tính tổng upVote và downVote
           const upVote = filteredQuestions.reduce(
             (sum, question) => sum + (question.upVoteCount || 0),
@@ -117,7 +117,7 @@ const StatisticQuestionPage = () => {
             (sum, question) => sum + (question.downVoteCount || 0),
             0
           );
-  
+
           // Trả về tag này cùng với câu hỏi đã lọc và thông tin tổng hợp
           return {
             ...item,
@@ -129,21 +129,21 @@ const StatisticQuestionPage = () => {
           };
         })
       );
-  
+
       // Lọc những tag có câu hỏi
       const finalFilteredData = filtered.filter((item) => item.questions.length > 0);
-  
+
       console.log("Filtered data:", finalFilteredData);
       setFilteredData(finalFilteredData);
     };
-  
+
     filterData();
   }, [year, month, dataQuestion]);
-  
-  
+
+
   // Tính tổng
   const totalQuestions = filteredData.reduce((sum, item) => sum + item.quantity, 0);
-  
+
 
   // Chuẩn bị dữ liệu cho PieChart
   const dataTopic = filteredData.map((item) => item.quantity);
@@ -155,7 +155,7 @@ const StatisticQuestionPage = () => {
   return (
     <div>
       <div className="container">
-      <h1 className='title'>STATISTIC QUESTIONS</h1>
+      <h1 className='title'>STATISTIC POSTS</h1>
 
         {/* Dropdown lọc */}
         <div className="row text-center d-flex">
@@ -196,7 +196,7 @@ const StatisticQuestionPage = () => {
         {/* Tổng số liệu */}
         <div className="total">
           <section className="section__total-question">
-            <label className="total__title">Total Questions</label>
+            <label className="total__title">Total Posts</label>
             <h2 className="total__number">{totalQuestions}</h2>
           </section>
         </div>

@@ -19,7 +19,7 @@ const StatisticPage = () => {
           className={`nav-link ${activeTab === "questions" ? "active" : ""}`}
           onClick={() => setActiveTab("questions")}
         >
-          Questions
+          Posts
         </button>
         <button
           className={`nav-link ${activeTab === "users" ? "active" : ""}`}
