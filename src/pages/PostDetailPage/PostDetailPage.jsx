@@ -954,7 +954,7 @@ const QuestionDetails = () => {
           ))}
         </div>
 
-        <p className="mt-3" style={{ fontSize: "20px" }}>
+        {/* <p className="mt-3" style={{ fontSize: "20px" }}>
           Expected Result:
         </p>
         <div className="bg-light border rounded p-2">
@@ -963,7 +963,7 @@ const QuestionDetails = () => {
               __html: questionDetail.data?.note || "",
             }}
           ></p>
-        </div>
+        </div> */}
 
         {/* Tags chủ đề */}
         <div className="mt-4">

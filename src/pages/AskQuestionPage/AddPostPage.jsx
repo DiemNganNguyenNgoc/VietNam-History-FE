@@ -166,7 +166,7 @@ const AskQuestionPage = () => {
       title,
       content,
       userQues,
-      note,
+      note: "asd",
       images: imageSrcs, // Truyền mảng ảnh vào câu hỏi
       tags: selectedTags, // Truyền mảng tag đã chọn vào câu hỏi
     };
@@ -252,12 +252,12 @@ const AskQuestionPage = () => {
 
       <div className="input" style={{ marginTop: "30px" }}>
         <h1 className="label">
-          Problem details <span className="asterisk">*</span>
+          Post Content <span className="asterisk">*</span>
         </h1>
-        <h2 className="description">
+        {/* <h2 className="description">
           Introduce the problem and expand on what you put in the title. Minimum
           20 characters.
-        </h2>
+        </h2> */}
         <TextEditor
           value={content}
           onChange={handleContent}
@@ -265,7 +265,7 @@ const AskQuestionPage = () => {
         />
       </div>
 
-      <div className="input" style={{ marginTop: "30px" }}>
+      {/* <div className="input" style={{ marginTop: "30px" }}>
         <h1 className="label">What did you try and what were you expecting?</h1>
         <h2 className="description">
           Describe what you tried, what you expected to happen, and what
@@ -276,7 +276,7 @@ const AskQuestionPage = () => {
           onChange={handleNote}
           placeholder="Describe what you tried and expected here..."
         />
-      </div>
+      </div> */}
 
       {/* ComboBox Tags với thẻ select */}
       <div className="input" style={{ marginTop: "30px" }}>
